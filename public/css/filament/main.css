@@ -1,0 +1,72 @@
+.session-hover {
+transition: all 0.35s ease;
+}
+
+.session-hover:hover {
+transform: translateY(-8px) scale(1.02);
+
+box-shadow:
+0 0 12px rgba(32, 201, 151, 0.5),
+0 0 30px rgba(32, 201, 151, 0.35);
+
+border-color: #20c997 !important;
+}
+
+:root {
+--bs-success: #367d3f;
+--bs-success-rgb: 54, 125, 63;
+}
+
+/* Buttons */
+.btn-success {
+background-color: #367d3f !important;
+border-color: #367d3f !important;
+}
+
+.btn-success:hover {
+background-color: #2e6b35 !important;
+border-color: #2e6b35 !important;
+}
+
+/* Outline buttons */
+.btn-outline-success {
+color: #367d3f !important;
+border-color: #367d3f !important;
+}
+
+.btn-outline-success:hover {
+background-color: #367d3f !important;
+color: #fff !important;
+}
+
+/* Text */
+.text-success {
+color: #367d3f !important;
+}
+
+/* Borders */
+.border-success {
+border-color: #367d3f !important;
+}
+
+/* Table header */
+.table-success {
+background-color: #367d3f !important;
+color: #fff !important;
+}
+
+/* Inputs focus */
+.form-control:focus {
+border-color: #367d3f;
+box-shadow: 0 0 0 0.2rem rgba(54, 125, 63, 0.25);
+}
+
+.nav-tabs .nav-link.active {
+background-color: #367d3f !important;
+color: #fff !important;
+border-color: #367d3f #367d3f #fff;
+}
+
+.nav-tabs .nav-link {
+color: #367d3f;
+}
