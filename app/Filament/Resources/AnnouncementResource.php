@@ -50,11 +50,14 @@ class AnnouncementResource extends Resource
                 ->schema([
                     Forms\Components\TextInput::make('title')
                         ->required()
+                        ->placeholder('e.g. Waste Segregation, etc.')
                         ->maxLength(255)
                         ->columnSpanFull(),
 
-                    Forms\Components\MarkdownEditor::make('description')
+                    Forms\Components\Textarea::make('description')
                         ->required()
+                        ->placeholder('e.g. Proper Waste Management on Biodegradable Waste and Non-Biodegradable Waste for the citizens of Hilongos, etc.')
+                        ->rows(5)
                         ->columnSpanFull(),
                 ])
                 ->columns(1),

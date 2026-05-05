@@ -1,7 +1,13 @@
 @php
-    $activeLogo = \App\Models\Logo::where('is_published', true)->latest()->first();
+    $activeLogo = \App\Models\Logo::where('is_published', true)
+        ->where('is_archived', false)
+        ->latest()
+        ->first();
 
-    $announcements = \App\Models\Announcement::where('published', true)->where('is_archived', false)->latest()->get();
+    $announcements = \App\Models\Announcement::where('published', true)
+        ->where('is_archived', false)
+        ->latest()
+        ->get();
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -11,6 +17,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Sangguniang Bayan - Hilongos, Leyte</title>
     <link rel="stylesheet" href="{{ asset('css/filament/main.css') }}">
+
+    <link rel="icon" type="image/x-icon" href="{{ asset('images/Logo.png') }}">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -60,48 +68,70 @@
         <!-- ══════════════════ HEADER ══════════════════ -->
         <header class="relative overflow-hidden">
 
-            <!-- Background Image -->
-            <img src="{{ asset('images/Lgu-building.jpg') }}" class="absolute inset-0 w-full h-full object-cover z-0"
-                alt="">
+            <!-- Background -->
+            <img src="{{ asset('images/Hilongos-Lgu.jpg') }}"
+                class="absolute inset-0 w-full h-full object-cover z-0">
 
-            <!-- Dark overlay (improves text visibility) -->
             <div class="absolute inset-0 bg-blue-900/80 z-0"></div>
 
-            <!-- Content -->
-            <div
-                class="relative flex flex-col sm:flex-row items-center justify-between px-3 sm:px-6 lg:px-8 py-4 gap-4 z-10">
+            <div class="relative px-4 sm:px-6 lg:px-8 py-6 z-10">
 
-                <!-- Left: Logos -->
-                <div class="flex items-center gap-3 md:flex-1">
+                <!-- DESKTOP LAYOUT -->
+                <div class="hidden sm:flex items-center justify-between relative">
 
-                    <div class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 flex-shrink-0 hidden sm:flex">
-                        <img src="{{ asset('images/Logo.png') }}"
-                            class="w-full h-full object-cover rounded-full border-2 border-green-300 shadow-[0_0_0_4px_rgba(46,204,113,0.25)] bg-slate-50">
+                    <!-- Left Logos -->
+                    <div class="flex items-center gap-3">
+
+                        <!-- Sangguniang Logo -->
+                        <div class="w-16 h-16 md:w-20 md:h-20">
+                            <img src="{{ asset('images/Logo.png') }}"
+                                class="w-full h-full object-cover rounded-full border-2 border-green-300 bg-slate-50">
+                        </div>
+
+                        <!-- Bagong Pilipinas -->
+                        <div class="w-16 h-16 md:w-20 md:h-20">
+                            <img src="{{ $activeLogo ? asset('storage/' . $activeLogo->pres_gov) : asset('images/Bagong-Pilipinas.png') }}"
+                                class="w-full h-full object-cover rounded-full border-2 border-green-300 bg-slate-50">
+                        </div>
+
                     </div>
 
-                    <div class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20">
-                        <img src="{{ $activeLogo ? asset('storage/' . $activeLogo->pres_gov) : asset('images/Bagong-Pilipinas.png') }}"
+                    <!-- Title -->
+                    <div class="absolute left-1/2 -translate-x-1/2 text-center">
+                        <p class="text-green-300 text-xs tracking-[0.2em] uppercase">
+                            Office of the
+                        </p>
+
+                        <h1 class="font-playfair text-white text-3xl font-bold leading-tight">
+                            Sangguniang Bayan<br>Hilongos, Leyte
+                        </h1>
+                    </div>
+
+                    <!-- Right Logo -->
+                    <div class="w-16 h-16 md:w-20 md:h-20">
+                        <img src="{{ $activeLogo ? asset('storage/' . $activeLogo->lgu_hilongos) : asset('images/Angat-ka.png') }}"
                             class="w-full h-full object-cover rounded-full border-2 border-green-300 bg-slate-50">
                     </div>
+
                 </div>
 
-                <!-- Center: Title -->
-                <div class="text-center md:flex-[2]">
-                    <p class="text-green-300 text-xs font-light tracking-[0.2em] uppercase mt-1">
+                <!-- MOBILE LAYOUT -->
+                <div class="flex flex-col items-center text-center sm:hidden">
+
+                    <p class="text-green-300 text-xs tracking-[0.2em] uppercase">
                         Office of the
                     </p>
 
-                    <h1 class="font-playfair text-white text-2xl md:text-3xl font-bold leading-tight mt-0.5">
+                    <h1 class="font-playfair text-white text-2xl font-bold leading-tight">
                         Sangguniang Bayan<br>Hilongos, Leyte
                     </h1>
-                </div>
 
-                <!-- Right: Logo -->
-                <div class="flex items-center gap-3 md:flex-1 justify-end">
-                    <div class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20">
-                        <img src="{{ $activeLogo ? asset('storage/' . $activeLogo->lgu_hilongos) : asset('images/Angat-ka.png') }}"
-                            class="w-full h-full object-cover rounded-full border-2 border-green-300  bg-slate-50">
+                    <!-- ONLY SANGGUNIANG LOGO -->
+                    <div class="mt-4 w-20 h-20">
+                        <img src="{{ asset('images/Logo.png') }}"
+                            class="w-full h-full object-cover rounded-full border-2 border-green-300 bg-slate-50">
                     </div>
+
                 </div>
 
             </div>
@@ -131,8 +161,9 @@
                 class="md:hidden bg-blue-900 border-t border-white/10 overflow-hidden max-h-0 transition-[max-height] duration-300 ease-in-out">
 
                 <!-- Home -->
-                <a href="#"
-                    class="block px-4 py-2.5 text-white text-xs font-semibold uppercase border-b border-white/10 hover:bg-green-700 transition-colors">
+                <a href="{{ route('home') }}"
+                    class="block px-4 py-2.5 text-xs font-semibold uppercase border-b border-white/10 transition-colors
+    {{ request()->routeIs('home') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
                     Home
                 </a>
 
@@ -143,17 +174,27 @@
                     </span>
 
                     <a href="{{ route('about') }}"
-                        class="block px-4 py-2.5 text-xs border-b border-white/10
-            {{ request()->routeIs('about') ? 'bg-blue-700 text-green-300' : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+                        class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
+   {{ request()->routeIs('about*')
+       ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
+       : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
                         About the SB
                     </a>
 
-                    <a href="#" class="block px-6 py-2 text-white text-xs hover:bg-blue-800">
+                    <a href="{{ route('sb.members') }}"
+                        class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
+    {{ request()->routeIs('sb.members*')
+        ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
+        : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
                         Members
                     </a>
 
-                    <a href="#" class="block px-6 py-2 text-white text-xs hover:bg-blue-800">
-                        Gallery
+                    <a href="{{ route('gallery') }}"
+                        class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
+   {{ request()->routeIs('gallery*')
+       ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
+       : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+                        Activities
                     </a>
                 </div>
 
@@ -164,8 +205,10 @@
                     Legislative Records
                 </a>
 
-                <a href="#"
-                    class="block px-4 py-2.5 text-white text-xs font-semibold uppercase border-b border-white/10 hover:bg-green-700 transition-colors">
+                <!-- Legislative Process -->
+                <a href="{{ route('legislative.process') }}"
+                    class="block px-4 py-2.5 text-xs font-semibold uppercase border-b border-white/10 transition-colors
+    {{ request()->routeIs('legislative.process') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
                     Legislative Process
                 </a>
 
@@ -197,16 +240,28 @@
                             class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 bg-blue-900 min-w-[200px] z-50 border-t-2 border-green-300 shadow-xl">
 
                             <a href="{{ route('about') }}"
-                                class="block px-4 py-2.5 text-xs border-b border-white/10
-   {{ request()->routeIs('about') ? 'bg-blue-700 text-green-300' : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+                                class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
+   {{ request()->routeIs('about*')
+       ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
+       : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
                                 About the SB
                             </a>
 
-                            <a href="#"
-                                class="block px-4 py-2.5 text-white text-xs border-b border-white/10 hover:bg-blue-700 hover:text-green-300">
-                                Members </a> <a href="#"
-                                class="block px-4 py-2.5 text-white text-xs hover:bg-blue-700 hover:text-green-300">
-                                Gallery
+
+                            <a href="{{ route('sb.members') }}"
+                                class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
+    {{ request()->routeIs('sb.members*')
+        ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
+        : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+                                Members
+                            </a>
+
+                            <a href="{{ route('gallery') }}"
+                                class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
+   {{ request()->routeIs('gallery*')
+       ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
+       : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+                                Activities
                             </a>
                         </div>
                     </div>
@@ -217,8 +272,9 @@
                         Legislative Records
                     </a>
 
-                    <a href="#"
-                        class="px-4 py-3 text-white text-xs font-semibold uppercase tracking-wide border-r border-white/10 whitespace-nowrap transition-colors hover:bg-green-700">
+                    <a href="{{ route('legislative.process') }}"
+                        class="px-4 py-3 text-white text-xs font-semibold uppercase tracking-wide border-r border-white/10 whitespace-nowrap transition-colors
+                        {{ request()->routeIs('legislative.process') ? 'bg-green-700' : 'hover:bg-green-700' }}">
                         Legislative Process
                     </a>
 
@@ -291,20 +347,47 @@
                     Legislative Records
                 </a>
 
-                <a href="#"
-                    class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-blue-800 border-r border-slate-100 hover:bg-blue-800 hover:text-white transition group">
-                    <i class="fa-solid fa-users text-xl group-hover:scale-110 transition-transform"></i> SB Members
-                </a> <a href="#"
-                    class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-blue-800 border-r border-slate-100 hover:bg-blue-800 hover:text-white transition group">
-                    <i class="fa-solid fa-list-check text-xl group-hover:scale-110 transition-transform"></i>
+                <a href="{{ route('sb.members') }}"
+                    class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide border-r border-slate-100 transition group
+                    {{ request()->routeIs('sb.members*')
+                        ? 'bg-blue-800 text-white'
+                        : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
+
+                    <i
+                        class="fa-solid fa-users text-xl transition-transform
+                        {{ request()->routeIs('sb.members*') ? 'scale-110' : 'group-hover:scale-110' }}">
+                    </i>
+
+                    SB Members
+                </a>
+
+                <a href="{{ route('legislative.process') }}"
+                    class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition group
+                    {{ request()->routeIs('legislative.process*')
+                        ? 'bg-blue-800 text-white'
+                        : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
+
+                    <i
+                        class="fa-solid fa-list-check text-xl transition-transform
+                        {{ request()->routeIs('legislative.process*') ? 'scale-110' : 'group-hover:scale-110' }}">
+                    </i>
+
                     Legislative
                     Process
                 </a>
 
-                <a href="#"
-                    class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-blue-800 hover:bg-blue-800 hover:text-white transition group">
-                    <i class="fa-solid fa-images text-xl group-hover:scale-110 transition-transform"></i>
-                    Gallery
+                <a href="{{ route('gallery') }}"
+                    class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition group
+   {{ request()->routeIs('gallery*')
+       ? 'bg-blue-800 text-white'
+       : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
+
+                    <i
+                        class="fa-solid fa-images text-xl transition-transform
+        {{ request()->routeIs('gallery*') ? 'scale-110' : 'group-hover:scale-110' }}">
+                    </i>
+
+                    Activities
                 </a>
 
             </div>
@@ -326,38 +409,57 @@
 
     <main class="flex-1 w-full">
         <div class="bg-green-900 w-full py-6 flex items-center justify-center">
-            <div class="bg-blue-900 w-full min-h-24 flex items-center justify-center px-4">
+            <div
+                class="bg-blue-900 w-full min-h-24 flex items-center justify-center px-6 py-8 relative overflow-hidden rounded-lg">
+
+                {{-- Top accent bar --}}
+                <div
+                    class="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-green-600 via-blue-500 to-green-600">
+                </div>
+
+                {{-- Corner dots --}}
+                <div class="absolute top-4 left-6 w-1.5 h-1.5 rounded-full bg-green-500 opacity-60"></div>
+                <div class="absolute top-4 right-6 w-1.5 h-1.5 rounded-full bg-green-500 opacity-60"></div>
+                <div class="absolute bottom-4 left-6 w-1.5 h-1.5 rounded-full bg-green-500 opacity-60"></div>
+                <div class="absolute bottom-4 right-6 w-1.5 h-1.5 rounded-full bg-green-500 opacity-60"></div>
 
                 @if ($announcements->count())
+                    <div class="text-center text-white w-full max-w-4xl">
 
-                    <div id="announcement-slider"
-                        class="text-center text-white transition-all duration-700 ease-in-out">
+                        {{-- Label --}}
+                        <div class="flex items-center justify-center gap-3 mb-3">
+                            <div class="h-px w-10 bg-green-400/40"></div>
+                            <span
+                                class="text-xs font-medium tracking-[3px] uppercase text-green-400">Announcements</span>
+                            <div class="h-px w-10 bg-green-400/40"></div>
+                        </div>
 
-                        @foreach ($announcements as $index => $announcement)
-                            <div class="announcement-slide {{ $index !== 0 ? 'hidden' : '' }}">
-
-                                <h2 class="text-2xl md:text-3xl font-playfair font-bold tracking-wide uppercase">
-                                    ANNOUNCEMENTS
-                                </h2>
-
-                                <p class="mt-2 text-xl md:text-2xl font-bold">
-                                    {{ $announcement->title }}
-                                </p>
-
-                                <p class="mt-1 text-sm sm:text-base md:text-lg max-w-4xl mx-auto leading-relaxed px-2">
-                                    {{ strip_tags($announcement->description) }}
-                                </p>
-
-                            </div>
-                        @endforeach
+                        <div id="announcement-slider">
+                            @foreach ($announcements as $index => $announcement)
+                                <div
+                                    class="announcement-slide {{ $index !== 0 ? 'hidden' : '' }} transition-all duration-700 ease-in-out">
+                                    <p class="text-lg md:text-xl font-semibold text-blue-50 tracking-wide">
+                                        {{ $announcement->title }}
+                                    </p>
+                                    <p
+                                        class="mt-1 text-sm md:text-base text-blue-100/70 leading-relaxed px-2 max-w-2xl mx-auto">
+                                        {{ strip_tags($announcement->description) }}
+                                    </p>
+                                </div>
+                            @endforeach
+                        </div>
 
                     </div>
                 @else
-                    <h2 class="text-center text-white text-2xl font-playfair font-bold tracking-wide">
-                        ANNOUNCEMENTS
-                        <p class="text-sm mt-2 text-white/70">No announcements available</p>
-                    </h2>
-
+                    <div class="text-center text-white">
+                        <div class="flex items-center justify-center gap-3 mb-2">
+                            <div class="h-px w-10 bg-green-400/40"></div>
+                            <span
+                                class="text-xs font-medium tracking-[3px] uppercase text-green-400">Announcements</span>
+                            <div class="h-px w-10 bg-green-400/40"></div>
+                        </div>
+                        <p class="text-sm text-white/50 mt-1">No announcements available</p>
+                    </div>
                 @endif
 
             </div>
@@ -397,26 +499,46 @@
 
                 <a href="{{ route('legislative_index') }}"
                     class="block text-xs leading-8 transition-colors
-    {{ request()->routeIs('legislative_index')
-        ? 'text-green-300 font-semibold'
-        : 'text-white/60 hover:text-green-300' }}">
+   {{ request()->routeIs('legislative_index*')
+       ? 'text-green-300 font-semibold border-l-2 border-green-400 pl-2'
+       : 'text-white/60 hover:text-green-300' }}">
                     Legislative Records
                 </a>
 
-                <a href="#"
-                    class="block text-xs leading-8 text-white/60 hover:text-green-300 transition-colors">
+
+                <a href="{{ route('legislative.process') }}"
+                    class="block text-xs leading-8 transition-colors
+                    {{ request()->routeIs('legislative.process*')
+                        ? 'text-green-300 font-semibold border-l-2 border-green-400 pl-2'
+                        : 'text-white/60 hover:text-green-300' }}">
                     Legislative Process
                 </a>
 
                 <a href="{{ route('about') }}"
                     class="block text-xs leading-8 transition-colors
-    {{ request()->routeIs('about') ? 'text-green-300 font-semibold' : 'text-white/60 hover:text-green-300' }}">
+   {{ request()->routeIs('about*')
+       ? 'text-green-300 font-semibold border-l-2 border-green-400 pl-2'
+       : 'text-white/60 hover:text-green-300' }}">
                     About Us
                 </a>
-                <a href="#"
-                    class="block text-xs leading-8 text-white/60 hover:text-green-300 transition-colors">Gallery</a> <a
-                    href="#"
-                    class="block text-xs leading-8 text-white/60 hover:text-green-300 transition-colors">SB Members</a>
+
+                <a href="{{ route('gallery') }}"
+                    class="block text-xs leading-8 transition-colors
+   {{ request()->routeIs('gallery*')
+       ? 'text-green-300 font-semibold border-l-2 border-green-400 pl-2'
+       : 'text-white/60 hover:text-green-300' }}">
+                    Activities
+                </a>
+
+
+                <a href="{{ route('sb.members') }}"
+                    class="block text-xs leading-8 transition-colors
+    {{ request()->routeIs('sb.members*')
+        ? 'text-green-300 font-semibold border-l-2 border-green-400 pl-2'
+        : 'text-white/60 hover:text-green-300' }}">
+                    SB Members
+                </a>
+
             </div>
             <div>
                 <h4
@@ -444,6 +566,8 @@
     <script src="{{ asset('js/filament/scroll-to-top.js') }}"></script>
     <script src="{{ asset('js/filament/announcement.js') }}"></script>
     <script src="{{ asset('js/filament/hamburger.js') }}"></script>
+    <script src="{{ asset('js/filament/activities.js') }}"></script>
+    {{-- <script src="{{ asset('js/filament/sb-member.js') }}"></script> --}}
 </body>
 
 </html>

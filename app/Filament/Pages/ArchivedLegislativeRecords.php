@@ -16,25 +16,24 @@ class ArchivedLegislativeRecords extends Page implements HasTable
     use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
-    protected static ?string $navigationLabel = 'Archived Orbus';
-    protected static ?string $navigationGroup = 'Orbus';
+    protected static ?string $navigationLabel = 'Archived ORBOS';
+    protected static ?string $navigationGroup = 'ORBOS';
     protected static ?int $navigationSort = 2;
     protected static string $view = 'filament.pages.archived-legislative-records';
 
-    // 👇 PUT IT HERE
-    public static function shouldRegisterNavigation(): bool
+    public function getTitle(): string
     {
-        $user = auth()->user();
-
-        return $user?->hasPermission(\App\Enums\Permission::ORBUS) ?? false;
+        return 'Archived ORBOS Records';
     }
 
-    // (optional but recommended)
-    public static function canAccess(): bool
+    public function getHeading(): string
     {
-        $user = auth()->user();
+        return 'Archived ORBOS Records';
+    }
 
-        return $user?->hasPermission(\App\Enums\Permission::ORBUS) ?? false;
+    public function getBreadcrumb(): string
+    {
+        return 'Archived ORBOS Records';
     }
 
     public function table(Table $table): Table

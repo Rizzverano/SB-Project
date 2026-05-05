@@ -1,278 +1,358 @@
 @extends('layout.layout')
 
 @section('content')
-    <div class="px-6 py-8 bg-gray-100 border border-slate-200 rounded-xl shadow-md mx-4 my-6">
 
-        <!-- TITLE + SEARCH -->
-        <div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+{{-- ══════════════════ PAGE HERO ══════════════════ --}}
+<div class="relative bg-gradient-to-br from-blue-950 via-blue-900 to-slate-900 py-20 px-4 overflow-hidden">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-white/5"></div>
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-white/5"></div>
+    <div class="absolute -bottom-24 -right-24 w-64 h-64 rounded-full bg-green-500/10 blur-3xl"></div>
+    <div class="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-blue-400/10 blur-2xl"></div>
+    <div class="relative z-10 text-center max-w-2xl mx-auto">
+        <span class="inline-block text-green-400 text-xs tracking-[0.4em] uppercase font-semibold mb-4">
+            Hilongos, Leyte • LGU
+        </span>
+        <h1 class="text-white text-4xl sm:text-5xl font-bold leading-tight mb-4" style="font-family: 'Playfair Display', serif;">
+            Legislative Records
+        </h1>
+        <p class="text-white/50 text-sm leading-relaxed max-w-md mx-auto">
+            Browse all ordinances, resolutions, and official session records of the Sangguniang Bayan.
+        </p>
+    </div>
+</div>
 
-            <h4 class="text-2xl md:text-3xl font-bold text-blue-900">
-                All Legislative Records
-            </h4>
+{{-- ══════════════════ MAIN CONTENT ══════════════════ --}}
+<div class="bg-slate-50 py-14 px-4 sm:px-6 lg:px-8 min-h-screen">
+    <div class="max-w-7xl mx-auto">
 
+        {{-- ══ SEARCH BAR ══ --}}
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6">
             <form method="GET" action="{{ route('legislative_index') }}">
                 @csrf
                 <input type="hidden" name="tab" id="activeTab" value="{{ request('tab', 'orbus') }}">
 
-                <div class="flex flex-wrap gap-2 items-center">
+                <div class="flex flex-wrap gap-3 items-end">
 
-                    <input type="text" name="session" value="{{ request('session') }}" placeholder="Search Session/Title"
-                        class="bg-white text-gray-700 border border-slate-300 rounded-lg px-3 py-2 text-sm
-                    focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <div class="flex-1 min-w-[180px]">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
+                            Search Session / Title
+                        </label>
+                        <input type="text" name="session" value="{{ request('session') }}"
+                            placeholder="e.g. Regular Session 01"
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm
+                                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                                   placeholder:text-slate-300 transition">
+                    </div>
 
-                    <input type="date" name="date" value="{{ request('date') }}"
-                        class="bg-white text-gray-700 border border-slate-300 rounded-lg px-3 py-2 text-sm
-                    focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <div class="min-w-[160px]">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
+                            Filter by Date
+                        </label>
+                        <input type="date" name="date" value="{{ request('date') }}"
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm
+                                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    </div>
 
-                    <button type="submit"
-                        class="bg-blue-700 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
-                        Search
-                    </button>
-
-                    <a href="{{ route('legislative_index') }}"
-                        class="border border-blue-700 text-blue-700 hover:bg-blue-700 hover:text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
-                        Reset
-                    </a>
+                    <div class="flex gap-2">
+                        <button type="submit"
+                            class="flex items-center gap-2 bg-blue-800 hover:bg-blue-700 text-white text-xs font-bold
+                                   uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all duration-200
+                                   hover:-translate-y-0.5 shadow-sm shadow-blue-800/30">
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            Search
+                        </button>
+                        <a href="{{ route('legislative_index') }}"
+                            class="flex items-center gap-2 bg-white border border-slate-200 hover:border-blue-300 text-slate-500
+                                   hover:text-blue-700 text-xs font-bold uppercase tracking-widest px-5 py-2.5 rounded-xl
+                                   transition-all duration-200">
+                            <i class="fa-solid fa-rotate-left text-xs"></i>
+                            Reset
+                        </a>
+                    </div>
 
                 </div>
             </form>
         </div>
 
-        <!-- TABS -->
-        <div class="flex gap-1 border-b border-slate-200 mb-6">
+        {{-- ══ TABS ══ --}}
+        <div class="flex justify-center mb-8">
+            <div class="inline-flex bg-white border border-slate-200 rounded-2xl p-1.5 shadow-sm gap-1 relative">
 
-            <button
-                class="tab-btn px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition
-            {{ $activeTab === 'orbus' ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-transparent text-gray-500 hover:text-blue-700 hover:border-blue-300' }}"
-                data-target="orbusTab" data-tab="orbus">
-                ORBUS
-            </button>
+                <button class="tab-btn relative z-10 flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300
+                               {{ $activeTab === 'orbus' ? 'text-white' : 'text-slate-400 hover:text-blue-700' }}"
+                    data-target="orbusTab" data-tab="orbus">
+                    <i class="fa-solid fa-layer-group text-xs"></i>
+                    ORBOS
+                </button>
 
-            <button
-                class="tab-btn px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition
-            {{ $activeTab === 'ordinance' ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-transparent text-gray-500 hover:text-blue-700 hover:border-blue-300' }}"
-                data-target="ordinanceTab" data-tab="ordinance">
-                Ordinance
-            </button>
+                <button class="tab-btn relative z-10 flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300
+                               {{ $activeTab === 'ordinance' ? 'text-white' : 'text-slate-400 hover:text-blue-700' }}"
+                    data-target="ordinanceTab" data-tab="ordinance">
+                    <i class="fa-solid fa-scale-balanced text-xs"></i>
+                    Ordinance
+                </button>
 
+                <span id="tabIndicator"
+                    class="absolute top-1.5 left-1.5 h-[calc(100%-0.75rem)] bg-blue-800 rounded-xl shadow-md transition-all duration-300 ease-in-out">
+                </span>
+
+            </div>
         </div>
 
-        <!-- ORBUS TAB -->
+        {{-- ══ ORBOS TAB ══ --}}
         <div id="orbusTab" class="tab-panel {{ $activeTab === 'orbus' ? '' : 'hidden' }}">
-
             @if ($records && count($records) > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-
                     @foreach ($records as $session => $items)
-                        <div class="bg-indigo-100 border border-slate-200 rounded-xl text-center p-5 shadow-sm
-                hover:border-blue-500 hover:shadow-md hover:-translate-y-0.5
-                cursor-pointer transition-all duration-200 session-card"
+                        <div class="group bg-white border border-slate-200 rounded-2xl p-6 shadow-sm
+                                    hover:border-blue-400 hover:shadow-lg hover:-translate-y-1
+                                    cursor-pointer transition-all duration-300 session-card text-center"
                             data-session="{{ $session }}">
 
-                            <h6 class="font-semibold text-blue-900 text-sm mb-1">{{ $session }}</h6>
+                            <div class="w-12 h-12 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-4
+                                        group-hover:bg-blue-800 group-hover:border-blue-800 transition-colors duration-300">
+                                <i class="fa-solid fa-file-lines text-blue-700 group-hover:text-white text-sm transition-colors duration-300"></i>
+                            </div>
 
-                            <p class="text-gray-500 text-xs">
+                            <h6 class="font-bold text-blue-900 text-sm mb-1 leading-tight">{{ $session }}</h6>
+
+                            <p class="text-slate-400 text-xs">
                                 {{ \Carbon\Carbon::parse($items[0]['date'])->format('F d, Y') }}
                             </p>
 
+                            <div class="mt-4 pt-4 border-t border-slate-100">
+                                <span class="text-blue-600 text-xs font-semibold group-hover:text-blue-800 transition-colors">
+                                    View Records <i class="fa-solid fa-arrow-right text-[10px] ml-1"></i>
+                                </span>
+                            </div>
+
                         </div>
                     @endforeach
-
                 </div>
             @else
-                <div class="text-center py-10 text-gray-500">
-                    <p class="text-lg font-semibold">No Record Found</p>
+                <div class="text-center py-20">
+                    <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-folder-open text-slate-300 text-2xl"></i>
+                    </div>
+                    <p class="text-slate-400 font-semibold">No Records Found</p>
+                    <p class="text-slate-300 text-xs mt-1">Try adjusting your search filters.</p>
                 </div>
             @endif
-
         </div>
 
-        <!-- ORDINANCE TAB -->
+        {{-- ══ ORDINANCE TAB ══ --}}
         <div id="ordinanceTab" class="tab-panel {{ $activeTab === 'ordinance' ? '' : 'hidden' }}">
-
             @if ($ordinances && count($ordinances) > 0)
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table class="w-full text-sm text-center text-gray-700">
-
-                        <thead class="bg-blue-700 text-white font-semibold">
-                            <tr>
-                                <th class="px-4 py-3">Title</th>
-                                <th class="px-4 py-3">Description</th>
-                                <th class="px-4 py-3">Sponsor</th>
-                                <th class="px-4 py-3">Action</th>
-                                <th class="px-4 py-3">Publish Through</th>
-                                <th class="px-4 py-3">Date</th>
-                            </tr>
-                        </thead>
-
-                        <tbody class="divide-y divide-slate-200 bg-white">
-                            @foreach ($ordinances as $ordinance)
-                                <tr
-                                    class="hover:bg-slate-50 transition {{ $loop->even ? 'bg-indigo-100' : 'bg-slate-100' }}">
-
-                                    <td class="px-4 py-3 text-left font-semibold">
-                                        {{ $ordinance->title }}
-                                    </td>
-
-                                    <td class="px-4 py-3 text-left">
-                                        {{ $ordinance->description ?? '-' }}
-                                    </td>
-
-                                    <td class="px-4 py-3">
-                                        {{ $ordinance->sponsor ?? '-' }}
-                                    </td>
-
-                                    <td class="px-4 py-3">
-                                        {{ $ordinance->action ?? '-' }}
-                                    </td>
-
-                                    <td class="px-4 py-3">
-                                        {{ $ordinance->publish_through ?? '-' }}
-                                    </td>
-
-                                    <td class="px-4 py-3">
-                                        {{ $ordinance->date ? \Carbon\Carbon::parse($ordinance->date)->format('F d, Y') : '-' }}
-                                    </td>
-
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-gray-700">
+                            <thead>
+                                <tr class="bg-blue-900 text-white">
+                                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-wider">Title</th>
+                                    <th class="px-5 py-4 text-left text-xs font-bold uppercase tracking-wider">Description</th>
+                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Sponsor</th>
+                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Action</th>
+                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Publish Through</th>
+                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Date</th>
+                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">N/A</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach ($ordinances as $ordinance)
+                                    <tr class="hover:bg-blue-50/50 transition-colors duration-150 {{ $loop->even ? 'bg-slate-50/50' : 'bg-white' }}">
 
-                    </table>
+                                        <td class="px-5 py-4 font-semibold text-blue-900 text-xs max-w-[200px]">
+                                            {{ $ordinance->title }}
+                                        </td>
+
+                                        <td class="px-5 py-4 text-slate-500 text-xs max-w-[220px]">
+                                            {{ $ordinance->description ?? '—' }}
+                                        </td>
+
+                                        <td class="px-5 py-4 text-center text-xs text-slate-600">
+                                            {{ $ordinance->sponsor ?? '—' }}
+                                        </td>
+
+                                        <td class="px-5 py-4 text-center text-xs text-slate-600">
+                                            {{ $ordinance->action ?? '—' }}
+                                        </td>
+
+                                        <td class="px-5 py-4 text-center text-xs text-slate-600">
+                                            {{ $ordinance->publish_through ?? '—' }}
+                                        </td>
+
+                                        <td class="px-5 py-4 text-center text-xs text-slate-500 whitespace-nowrap">
+                                            {{ $ordinance->date
+                                                ? \Carbon\Carbon::parse($ordinance->date)->format('M d, Y')
+                                                : '—' }}
+                                        </td>
+
+                                        <td class="px-5 py-4 text-center">
+                                            @if ($ordinance->not_applicable)
+                                                <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-bold
+                                                             bg-green-50 text-green-700 border border-green-200 rounded-full uppercase tracking-wide">
+                                                    <i class="fa-solid fa-check text-[8px]"></i> N/A
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2.5 py-1 text-[10px] font-bold
+                                                             bg-slate-100 text-slate-400 border border-slate-200 rounded-full uppercase tracking-wide">
+                                                    None
+                                                </span>
+                                            @endif
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             @else
-                <div class="text-center py-10 text-gray-500">
-                    <p class="text-lg font-semibold">No Record Found</p>
+                <div class="text-center py-20">
+                    <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                        <i class="fa-solid fa-scale-balanced text-slate-300 text-2xl"></i>
+                    </div>
+                    <p class="text-slate-400 font-semibold">No Ordinances Found</p>
+                    <p class="text-slate-300 text-xs mt-1">Try adjusting your search filters.</p>
                 </div>
             @endif
-
-        </div>
-
-        <!-- footer -->
-        <div class="flex justify-end mt-8">
         </div>
 
     </div>
+</div>
 
-    <!-- MODAL -->
-    <div id="legislativeModal"
-        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+{{-- ══════════════════ MODAL ══════════════════ --}}
+<div id="legislativeModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
 
-        <div class="bg-white border border-slate-200 rounded-xl shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
 
-            <!-- HEADER -->
-            <div class="relative text-center border-b border-slate-200 px-6 py-4">
+        {{-- Modal Header --}}
+        <div class="relative bg-blue-900 px-6 py-5 flex-shrink-0">
+            <button id="modal-close"
+                class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
 
-                <button id="modal-close" class="absolute top-3 right-4 text-gray-500 hover:text-black text-xl">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-                <p class="text-xs text-gray-500">Republic of the Philippines</p>
-                <p class="text-xs text-gray-500">Province of Leyte</p>
-                <p class="text-xs text-gray-500">Municipality of Hilongos</p>
-
-                <h5 class="font-bold text-blue-900 mt-1">LEGISLATIVE TRACKING SYSTEM</h5>
-
-                <p class="text-sm text-blue-700 mt-1">
-                    <strong id="modal-session-title"></strong>
-                    <span class="text-gray-400 mx-1">—</span>
-                    <span id="modal-session-date"></span>
+            <div class="text-center">
+                <p class="text-white/50 text-[10px] tracking-[0.3em] uppercase mb-1">
+                    Republic of the Philippines • Province of Leyte • Municipality of Hilongos
                 </p>
-
+                <h5 class="text-white font-bold text-base" style="font-family: 'Playfair Display', serif;">
+                    Legislative Tracking System
+                </h5>
+                <p class="text-green-300 text-xs mt-1.5">
+                    <strong id="modal-session-title"></strong>
+                    <span class="text-white/30 mx-2">•</span>
+                    <span id="modal-session-date" class="text-white/60"></span>
+                </p>
             </div>
-
-            <!-- BODY -->
-            <div class="overflow-auto flex-1">
-                <table class="w-full text-sm text-center text-gray-700">
-
-                    <thead class="bg-blue-700 text-white font-semibold sticky top-0">
-                        <tr>
-                            <th class="px-4 py-3">Session</th>
-                            <th class="px-4 py-3">Date</th>
-                            <th class="px-4 py-3">Legislative Record</th>
-                            <th class="px-4 py-3">Reported / Sponsored</th>
-                            <th class="px-4 py-3">Action Taken</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="modal-table-body" class="divide-y divide-slate-200 bg-white"></tbody>
-
-                </table>
-            </div>
-
-            <div class="py-2 mt-6"></div>
-
         </div>
-    </div>
 
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-
-                const tabInput = document.getElementById('activeTab');
-                const tabBtns = document.querySelectorAll('.tab-btn');
-                const tabPanels = document.querySelectorAll('.tab-panel');
-
-                tabBtns.forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const target = this.dataset.target;
-                        const tab = this.dataset.tab;
-
-                        tabInput.value = tab;
-
-                        tabPanels.forEach(p => p.classList.add('hidden'));
-                        document.getElementById(target).classList.remove('hidden');
-
-                        tabBtns.forEach(b => {
-                            b.classList.remove('border-blue-600', 'text-blue-700',
-                                'bg-blue-50');
-                            b.classList.add('border-transparent', 'text-gray-500');
-                        });
-
-                        this.classList.add('border-blue-600', 'text-blue-700', 'bg-blue-50');
-                    });
-                });
-
-                const sessionData = @json($records);
-                const modal = document.getElementById('legislativeModal');
-                const tbody = document.getElementById('modal-table-body');
-
-                document.querySelectorAll('.session-card').forEach(card => {
-                    card.addEventListener('click', function() {
-                        const session = this.dataset.session;
-                        const rows = sessionData[session] || [];
-
-                        tbody.innerHTML = '';
-
-                        rows.forEach(row => {
-                            tbody.innerHTML += `
+        {{-- Modal Body --}}
+        <div class="overflow-auto flex-1">
+            <table class="w-full text-sm text-gray-700">
+                <thead class="sticky top-0 bg-slate-50 border-b border-slate-200">
                     <tr>
-                        <td class="px-4 py-3">${row.session}</td>
-                        <td class="px-4 py-3">${new Date(row.date).toLocaleDateString()}</td>
-                        <td class="px-4 py-3 text-left">
-                            <strong>${row.title}</strong><br>
-                            <span class="text-gray-500 text-xs">${row.description ?? ''}</span>
-                        </td>
-                        <td class="px-4 py-3">${row.sponsor || '-'}</td>
-                        <td class="px-4 py-3">${row.action_taken || '-'}</td>
-                    </tr>`;
-                        });
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Session</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Legislative Record</th>
+                        <th class="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Sponsor</th>
+                        <th class="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Action Taken</th>
+                    </tr>
+                </thead>
+                <tbody id="modal-table-body" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+        </div>
 
-                        modal.classList.remove('hidden');
-                        modal.classList.add('flex');
-                    });
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const tabInput   = document.getElementById('activeTab');
+        const tabBtns    = document.querySelectorAll('.tab-btn');
+        const tabPanels  = document.querySelectorAll('.tab-panel');
+        const indicator  = document.getElementById('tabIndicator');
+
+        function moveIndicator(el) {
+            indicator.style.width = el.offsetWidth + 'px';
+            indicator.style.left  = el.offsetLeft  + 'px';
+        }
+
+        tabBtns.forEach(btn => {
+            if (btn.dataset.tab === tabInput.value) {
+                btn.classList.add('text-white');
+                btn.classList.remove('text-slate-400');
+                setTimeout(() => moveIndicator(btn), 50);
+            }
+        });
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                tabInput.value = this.dataset.tab;
+
+                tabPanels.forEach(p => p.classList.add('hidden'));
+                document.getElementById(this.dataset.target).classList.remove('hidden');
+
+                tabBtns.forEach(b => {
+                    b.classList.remove('text-white');
+                    b.classList.add('text-slate-400');
                 });
 
-                document.getElementById('modal-close').onclick = () => {
-                    modal.classList.add('hidden');
-                };
-
+                this.classList.remove('text-slate-400');
+                this.classList.add('text-white');
+                moveIndicator(this);
             });
+        });
 
-            function printFile(url) {
-                const win = window.open(url, '_blank');
-                win.print();
+        // Modal
+        const sessionData = @json($records);
+        const modal  = document.getElementById('legislativeModal');
+        const tbody  = document.getElementById('modal-table-body');
+
+        document.querySelectorAll('.session-card').forEach(card => {
+            card.addEventListener('click', function () {
+                const session = this.dataset.session;
+                const rows    = sessionData[session] || [];
+
+                tbody.innerHTML = '';
+
+                rows.forEach((row, i) => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-blue-50/40 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}">
+                            <td class="px-5 py-3 text-xs text-slate-600">${row.session}</td>
+                            <td class="px-5 py-3 text-xs text-slate-500 whitespace-nowrap">${new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                            <td class="px-5 py-3 text-left">
+                                <p class="font-semibold text-blue-900 text-xs">${row.title}</p>
+                                <p class="text-slate-400 text-xs mt-0.5">${row.description ?? ''}</p>
+                            </td>
+                            <td class="px-5 py-3 text-center text-xs text-slate-600">${row.sponsor || '—'}</td>
+                            <td class="px-5 py-3 text-center text-xs text-slate-600">${row.action_taken || '—'}</td>
+                        </tr>`;
+                });
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            });
+        });
+
+        document.getElementById('modal-close').onclick = () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
             }
-        </script>
-    @endpush
+        });
+
+    });
+</script>
+@endpush
+
 @endsection

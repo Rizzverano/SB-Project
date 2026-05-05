@@ -13,7 +13,7 @@ use Filament\Forms\Components\Section;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\CheckboxColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -29,7 +29,7 @@ class LogoResource extends Resource
 
     protected static ?string $navigationLabel = 'Logo Sets';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 10;
 
     protected static function hasPermission(Permission $permission): bool
     {
@@ -89,7 +89,9 @@ class LogoResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table->modifyQueryUsing(fn (Builder $query) => $query->latest())
+        return $table->modifyQueryUsing(fn (Builder $query) => $query
+            ->where('is_archived', false)
+            ->latest())
             ->columns([
                 TextColumn::make('id')
                     ->label('Set')
@@ -107,10 +109,10 @@ class LogoResource extends Resource
                     ->disk('public')
                     ->square()
                     ->size(72),
-                CheckboxColumn::make('is_published')
+                IconColumn::make('is_published')
                     ->label('Active')
-                    ->sortable()
-                    ->disabled(),
+                    ->boolean()
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->dateTime('M d, Y h:i A')
@@ -137,11 +139,48 @@ class LogoResource extends Resource
                             ->success()
                             ->send();
                     }),
+                Tables\Actions\Action::make('archive')
+                    ->label('Archive')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Archive Logo Set')
+                    ->modalDescription('Are you sure you want to archive this logo set?')
+                    ->modalSubmitActionLabel('Archive')
+                    ->action(function (Logo $record) {
+                        $record->update([
+                            'is_archived' => true,
+                            'is_published' => false,
+                        ]);
+
+                        Notification::make()
+                            ->title('Logo Set Archived')
+                            ->body('The logo set has been archived successfully.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkAction::make('archive')
+                    ->label('Archive Selected')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Archive Logo Sets')
+                    ->modalDescription('Are you sure you want to archive the selected logo sets?')
+                    ->modalSubmitActionLabel('Archive')
+                    ->action(function ($records) {
+                        $records->each->update([
+                            'is_archived' => true,
+                            'is_published' => false,
+                        ]);
+
+                        Notification::make()
+                            ->title('Logo Sets Archived')
+                            ->body('Selected logo sets have been archived successfully.')
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 

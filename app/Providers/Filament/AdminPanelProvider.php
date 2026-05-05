@@ -19,6 +19,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Navigation\NavigationItem;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Profile;
+use App\Http\Middleware\EnsureUserIsActive;
+use App\Http\Middleware\NoCache;
 use Filament\Navigation\MenuItem;
 
 
@@ -45,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandName('Legislative Tracking')
             ->brandLogo(fn () => view('filament.brand'))
+            ->favicon(asset('images/Logo.png'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -62,6 +65,7 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
                 \App\Http\Middleware\EnsureUserIsActive::class,
+                NoCache::class,
             ])
             ->userMenuItems([
                 MenuItem::make()
@@ -72,6 +76,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                'force.challenge',
             ]);
     }
 }

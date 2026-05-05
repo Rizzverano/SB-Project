@@ -54,11 +54,13 @@ class Profile extends Page implements HasForms
                     ->required()
                     ->minLength(5)
                     ->maxLength(255)
+                    ->regex('/^\S*$/')
                     ->unique(table: 'users', column: 'email', ignoreRecord: true)
                     ->validationMessages([
                         'required' => 'Email is required.',
                         'email' => 'Enter a valid email address.',
                         'unique' => 'This email is already taken.',
+                        'regex' => 'Email must not contain spaces.',
                     ]),
 
                 TextInput::make('current_password')

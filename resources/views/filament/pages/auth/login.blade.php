@@ -1,7 +1,10 @@
 {{-- resources/views/filament/pages/auth/login.blade.php --}}
 
 @php
-    $activeLogo = \App\Models\Logo::where('is_published', true)->latest()->first();
+    $activeLogo = \App\Models\Logo::published()->latest()->first();
+    $lockoutUntil = session('login_lockout_until');
+    $initialLockoutSeconds = $lockoutUntil ? max(0, $lockoutUntil - now()->timestamp) : 0;
+    $shouldRedirectToChallenge = session('login_needs_challenge') && (! $lockoutUntil || now()->timestamp >= $lockoutUntil);
 @endphp
 
 <x-filament-panels::page.simple>
@@ -254,6 +257,17 @@
             margin-bottom: 26px;
         }
 
+        .lockout-alert {
+            background: rgba(127, 29, 29, 0.28);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            border-left: 4px solid #ef4444;
+            padding: 13px 16px;
+            border-radius: 12px;
+            color: #fecaca;
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
         .right-inner input {
             background: rgba(2, 6, 23, 0.72) !important;
             border: 1px solid rgba(71, 85, 105, 0.7) !important;
@@ -482,7 +496,7 @@
 
                     <div class="left-metric">
                         <div class="metric-label">Core modules</div>
-                        <div class="metric-value">Orbus, Ordinances, and Announcements</div>
+                        <div class="metric-value">ORBOS, Ordinances, and Announcements</div>
                     </div>
                 </div>
             </div>
@@ -510,13 +524,42 @@
         </div>
     </div>
 
+
     <footer class="login-footer">
         © 2026 SB Hilongos Legislative Tracking System
     </footer>
 
     @script
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            function initLoginPageScripts() {
+                let challengeRedirectTimer = null;
+                const challengeUrl = @js(route('login.challenge'));
+                const initialLockoutSeconds = @js($initialLockoutSeconds);
+                const shouldRedirectToChallenge = @js($shouldRedirectToChallenge);
+
+                function scheduleChallengeRedirect(seconds) {
+                    if (challengeRedirectTimer) {
+                        return;
+                    }
+
+                    if (!Number.isFinite(seconds)) {
+                        return;
+                    }
+
+                    challengeRedirectTimer = setTimeout(function() {
+                        window.location.href = challengeUrl;
+                    }, Math.max(seconds, 0) * 1000);
+                }
+
+                function scheduleChallengeRedirectFromText(text) {
+                    const match = text.match(/Account locked for\s+(\d+)\s+seconds/i);
+
+                    if (!match) {
+                        return;
+                    }
+
+                    scheduleChallengeRedirect(Number.parseInt(match[1], 10));
+                }
 
                 function clearPasswordField() {
                     const passwordInputs = document.querySelectorAll('input[type="password"]');
@@ -539,6 +582,12 @@
 
                 const observer = new MutationObserver(function(mutations) {
                     mutations.forEach(function(mutation) {
+                        if (mutation.type === 'characterData') {
+                            const text = mutation.target.textContent || '';
+                            clearPasswordField();
+                            scheduleChallengeRedirectFromText(text);
+                        }
+
                         if (mutation.addedNodes.length > 0) {
                             mutation.addedNodes.forEach(function(node) {
                                 if (node.nodeType === 1) {
@@ -550,6 +599,7 @@
                                         text.includes('lock')
                                     ) {
                                         clearPasswordField();
+                                        scheduleChallengeRedirectFromText(text);
                                     }
 
                                     if (
@@ -567,10 +617,37 @@
                     });
                 });
 
+                window.addEventListener('login-lockout-triggered', function(event) {
+                    const seconds = Number.parseInt(event.detail?.seconds ?? 0, 10);
+
+                    scheduleChallengeRedirect(seconds);
+                });
+
+                if (shouldRedirectToChallenge) {
+                    scheduleChallengeRedirect(0);
+                } else if (initialLockoutSeconds > 0) {
+                    scheduleChallengeRedirect(initialLockoutSeconds);
+                }
+
+                scheduleChallengeRedirectFromText(document.body.textContent || '');
+
                 observer.observe(document.body, {
                     childList: true,
+                    characterData: true,
                     subtree: true
                 });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initLoginPageScripts);
+            } else {
+                initLoginPageScripts();
+            }
+
+            window.addEventListener("pageshow", function (event) {
+                if (event.persisted) {
+                    window.location.reload();
+                }
             });
         </script>
     @endscript

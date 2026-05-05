@@ -66,5 +66,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'active' => \App\Http\Middleware\EnsureUserIsActive::class,
         'permission' => \App\Http\Middleware\CheckPermission::class,
+        'force.challenge' => \App\Http\Middleware\ForceLoginChallenge::class,
+        'nocache' => \App\Http\Middleware\NoCache::class,
     ];
 }

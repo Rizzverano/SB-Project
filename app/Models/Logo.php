@@ -13,15 +13,19 @@ class Logo extends Model
         'pres_gov',
         'lgu_hilongos',
         'is_published',
+        'is_archived',
     ];
 
     protected $casts = [
         'is_published' => 'boolean',
+        'is_archived' => 'boolean',
     ];
 
     public function scopePublished($query)
     {
-        return $query->where('is_published', true);
+        return $query
+            ->where('is_published', true)
+            ->where('is_archived', false);
     }
 
     public function publishAsActive(): void

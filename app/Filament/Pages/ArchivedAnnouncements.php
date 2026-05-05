@@ -21,23 +21,6 @@ class ArchivedAnnouncements extends Page implements HasTable
     protected static ?string $navigationLabel = 'Archived Announcements';
     protected static ?int $navigationSort = 7;
 
-
-    // 👇 PUT IT HERE
-    public static function shouldRegisterNavigation(): bool
-    {
-        $user = auth()->user();
-
-        return $user?->hasPermission(\App\Enums\Permission::ANNOUNCEMENTS) ?? false;
-    }
-
-    // (optional but recommended)
-    public static function canAccess(): bool
-    {
-        $user = auth()->user();
-
-        return $user?->hasPermission(\App\Enums\Permission::ANNOUNCEMENTS) ?? false;
-    }
-
     public function table(Table $table): Table
     {
         return $table

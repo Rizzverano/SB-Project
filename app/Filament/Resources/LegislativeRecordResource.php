@@ -19,13 +19,27 @@ class LegislativeRecordResource extends Resource
 {
     protected static ?string $model = LegislativeRecord::class;
 
-    protected static ?string $navigationLabel = 'Orbus Records';
+    protected static ?string $navigationLabel = 'ORBOS Records';
+
+    protected static ?string $modelLabel = 'ORBOS Record';
+
+    protected static ?string $pluralModelLabel = 'ORBOS Records';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationGroup = 'Orbus';
+    protected static ?string $navigationGroup = 'ORBOS';
 
     protected static ?int $navigationSort = 1;
+
+    public function getTitle(): string
+    {
+        return 'ORBOS Records';
+    }
+
+    public function getHeading(): string
+    {
+        return 'ORBOS Records';
+    }
 
     // 👇 PUT IT HERE
     public static function shouldRegisterNavigation(): bool
@@ -96,10 +110,12 @@ class LegislativeRecordResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('session')->required(),
+            Forms\Components\TextInput::make('session')->placeholder('e.g., First Relugar Session, etc.')->required(),
             Forms\Components\DatePicker::make('date')->required(),
-            Forms\Components\TextInput::make('title')->label('Legislative Title')->required()->columnSpanFull(),
-            Forms\Components\MarkdownEditor::make('description')->columnSpanFull()->required(), Forms\Components\TextInput::make('sponsor')->label('Sponsor')->required(), Forms\Components\TextInput::make('action_taken')->label('Action Taken')->required()]);
+            Forms\Components\TextInput::make('title')->label('Legislative Title')->placeholder('e.g., Local Chief Executive Hour, etc.')->required()->columnSpanFull(),
+            Forms\Components\MarkdownEditor::make('description')->columnSpanFull()->placeholder('e.g., In relation for franchise 3WETAXI, etc.')->required(),
+            Forms\Components\TextInput::make('sponsor')->label('Sponsor')->placeholder('e.g., Hon. John Doe, etc.')->required(),
+            Forms\Components\TextInput::make('action_taken')->label('Action Taken')->placeholder('e.g., Approved, Marked as Noted, etc.')->required()]);
     }
 
     public static function table(Table $table): Table

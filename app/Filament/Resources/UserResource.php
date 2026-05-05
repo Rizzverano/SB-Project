@@ -28,7 +28,7 @@ class UserResource extends Resource
 
     protected static ?string $navigationGroup = 'Users';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 8;
 
     protected static function hasPermission(Permission $permission): bool
     {
@@ -73,11 +73,13 @@ class UserResource extends Resource
                 ->email()
                 ->required()
                 ->maxLength(255)
+                ->regex('/^\S*$/')
                 ->unique(ignoreRecord: true)
                 ->validationMessages([
                     'required' => 'Email is required.',
                     'email' => 'Please enter a valid email address.',
                     'unique' => 'This email is already taken.',
+                    'regex' => 'Email must not contain spaces.',
                 ]),
 
             TextInput::make('password')
@@ -86,6 +88,7 @@ class UserResource extends Resource
                 ->revealable()
                 ->minLength(8)
                 ->maxLength(255)
+                ->regex('/^\S*$/')
                 ->required(fn(string $operation) => $operation === 'create')
                 ->dehydrateStateUsing(fn($state) => filled($state) ? Hash::make($state) : null)
                 ->dehydrated(fn($state) => filled($state))
@@ -93,9 +96,21 @@ class UserResource extends Resource
                 ->validationMessages([
                     'min' => 'Password must be at least 8 characters.',
                     'confirmed' => 'Password confirmation does not match.',
+                    'regex' => 'Password must not contain spaces.',
                 ]),
 
-            TextInput::make('password_confirmation')->label('Confirm Password')->password()->revealable()->same('password')->dehydrated(false)->required(fn(string $operation) => $operation === 'create'),
+            TextInput::make('password_confirmation')
+                ->label('Confirm Password')
+                ->password()
+                ->revealable()
+                ->same('password')
+                ->regex('/^\S*$/') // ✅ no spaces
+                ->dehydrated(false)
+                ->required(fn(string $operation) => $operation === 'create')
+                ->validationMessages([
+                    'same' => 'Passwords do not match.',
+                    'regex' => 'Password confirmation cannot contain spaces.',
+                ]),
 
             Select::make('role')
                 ->label('Role')

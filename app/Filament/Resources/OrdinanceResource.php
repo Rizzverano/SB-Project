@@ -17,6 +17,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Collection;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\CheckboxColumn;
 
 class OrdinanceResource extends Resource
 {
@@ -50,25 +53,41 @@ class OrdinanceResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            TextInput::make('title')->required()->maxLength(150)->columnSpanFull(),
+            TextInput::make('title')->required()->maxLength(150)->columnSpanFull()->placeholder('e.g. Strict Curfew-001, etc.'),
 
-            Textarea::make('description')->rows(5)->columnSpanFull(),
+            Textarea::make('description')->rows(5)->columnSpanFull()->required()->placeholder('e.g. Strict Curfew for minors 10:00 P.M. Onwards, etc.'),
 
-            TextInput::make('sponsor'),
+            TextInput::make('sponsor')
+                ->label('Sponsor')
+                ->placeholder('e.g. Hon. John Doe, etc.')->required(),
 
-            TextInput::make('action'),
+            TextInput::make('action')
+                ->label('Action Taken')
+                ->placeholder('e.g. Approved, Marked as Noted, NONE, etc.')->required(),
 
             DatePicker::make('date')
-                ->label('Date')
+                ->label('Date Published')
+                ->placeholder('MM/DD/YYYY')
                 ->native(false),
 
-            TextInput::make('publish_through'),
+            TextInput::make('publish_through')
+                ->label('Publish Through')
+                ->placeholder('e.g. Eastern Samar or Sangguniang Panlalawigan, Ormoc, City')
+                ->required(),
+
+            Section::make('Not Applicable')
+                ->schema([
+                    Toggle::make('not_applicable')
+                        ->label('Mark as Not Applicable')
+                        ->helperText('Enable to mark this ordinance as not applicable.')
+                        ->default(false),
+                ]),
 
             FileUpload::make('file')
                 ->directory('ordinances')
                 ->disk('public')
                 ->acceptedFileTypes(['application/pdf'])
-                ->maxSize(51200)->columnSpanFull(),
+                ->maxSize(102400)->columnSpanFull(),
         ]);
     }
 
@@ -88,15 +107,34 @@ class OrdinanceResource extends Resource
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('action')
-                    ->label('Action taken'),
+                    ->label('Action Taken')
+                    ->badge()
+                    ->color(
+                        fn($state) => match ($state) {
+                            'Approved' => 'success',
+                            'Marked as Noted' => 'gray',
+                            'NONE' => 'secondary',
+                            default => 'warning',
+                        },
+                    )
+                    ->searchable(),
 
                 TextColumn::make('publish_through')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('date')
+               TextColumn::make('date')
                     ->label('Date Published')
-                    ->date('M d, Y')
+                    ->formatStateUsing(function ($state) {
+                        return $state
+                            ? \Carbon\Carbon::parse($state)->format('M d, Y')
+                            : 'No Date Published';
+                    })
                     ->sortable(),
+
+                CheckboxColumn::make('not_applicable')
+                    ->label('Not Applicable')
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('file')
                     ->label('PDF')

@@ -25,7 +25,7 @@ class DeactivatedUsers extends Page implements HasTable
     protected static ?string $navigationIcon = 'heroicon-o-user-minus';
     protected static ?string $navigationLabel = 'Deactivated Accounts';
     protected static ?string $navigationGroup = 'Users';
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 9;
 
     protected static string $view = 'filament.pages.deactivated-users';
 

@@ -21,22 +21,6 @@ class ArchivedOrdinances extends Page implements HasTable
     protected static ?string $navigationGroup = 'Ordinance';
     protected static ?string $navigationLabel = 'Archived Ordinances';
 
-    // 👇 PUT IT HERE
-    public static function shouldRegisterNavigation(): bool
-    {
-        $user = auth()->user();
-
-        return $user?->hasPermission(\App\Enums\Permission::ORDINANCE) ?? false;
-    }
-
-    // (optional but recommended)
-    public static function canAccess(): bool
-    {
-        $user = auth()->user();
-
-        return $user?->hasPermission(\App\Enums\Permission::ORDINANCE) ?? false;
-    }
-
     public function table(Table $table): Table
     {
         return $table
@@ -61,7 +45,11 @@ class ArchivedOrdinances extends Page implements HasTable
 
                 Tables\Columns\TextColumn::make('date')
                     ->label('Date Published')
-                    ->date('M d, Y')
+                    ->formatStateUsing(function ($state) {
+                        return $state
+                            ? \Carbon\Carbon::parse($state)->format('M d, Y')
+                            : 'No Date Published';
+                    })
                     ->sortable(),
 
                 TextColumn::make('file')

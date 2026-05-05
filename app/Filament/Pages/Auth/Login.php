@@ -10,6 +10,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Pages\Auth\Login as BaseLogin;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Throwable;
 
 class Login extends BaseLogin
@@ -29,14 +30,39 @@ class Login extends BaseLogin
                 'email' => $data['email'] ?? '',
             ]);
 
+            $lockoutUntil = session('login_lockout_until');
+
+            if ($lockoutUntil) {
+
+                if (now()->timestamp < $lockoutUntil) {
+                    $seconds = $lockoutUntil - now()->timestamp;
+
+                    $this->resetForm($data);
+
+                    throw ValidationException::withMessages([
+                        'data.email' =>
+                            "Too many failed attempts. Account locked for {$seconds} seconds.",
+                    ]);
+                }
+
+                // lock expired → go to challenge
+                session()->forget('login_lockout_until');
+
+                throw new HttpResponseException(
+                    redirect('/admin/login-challenge')
+                );
+            }
+
             if ($loginRateLimiter->tooManyAttempts(request())) {
                 $seconds = $loginRateLimiter->availableIn(request());
 
                 $this->resetForm($data);
 
+                $this->rememberChallengeLockout($data['email'] ?? '', $seconds);
+
                 throw ValidationException::withMessages([
                     'data.email' =>
-                        "Too many failed attempts. Please wait {$seconds} seconds before trying again.",
+                        "Too many failed attempts. Account locked for {$seconds} seconds.",
                 ]);
             }
 
@@ -55,6 +81,8 @@ class Login extends BaseLogin
 
                 if ($attempts >= $maxAttempts) {
                     $seconds = $loginRateLimiter->availableIn(request());
+
+                    $this->rememberChallengeLockout($data['email'] ?? '', $seconds);
 
                     throw ValidationException::withMessages([
                         'data.email' =>
@@ -75,7 +103,6 @@ class Login extends BaseLogin
                 ! $user->canAccessPanel(Filament::getCurrentPanel())
             ) {
                 Filament::auth()->logout();
-
                 $loginRateLimiter->increment(request());
 
                 throw ValidationException::withMessages([
@@ -84,7 +111,6 @@ class Login extends BaseLogin
             }
 
             $loginRateLimiter->clear(request());
-
             session()->regenerate();
 
             return app(LoginResponse::class);
@@ -112,6 +138,15 @@ class Login extends BaseLogin
             'email' => $data['email'] ?? '',
             'password' => '',
             'remember' => $data['remember'] ?? false,
+        ]);
+    }
+
+    protected function rememberChallengeLockout(string $email, int $seconds): void
+    {
+        session([
+            'login_needs_challenge' => true,
+            'login_challenge_email' => $email,
+            'login_lockout_until' => now()->addSeconds($seconds)->timestamp,
         ]);
     }
 }

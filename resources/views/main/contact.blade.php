@@ -2,6 +2,12 @@
 
 @section('content')
 
+<style>
+.grecaptcha-badge {
+    display: none !important;
+}
+</style>
+
 <section class="bg-slate-50 py-16 px-4 sm:px-6 lg:px-12">
 
     <div class="max-w-5xl mx-auto">
@@ -67,26 +73,43 @@
                         Send Message
                     </h2>
 
-                    <form class="space-y-4">
+                    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                    <form class="space-y-4" method="POST" action="{{ route('contact.store') }}">
+                        @csrf
 
-                        <input type="text"
+                        @if(session('success'))
+                            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        <input type="text" name="name"
                             class="w-full p-3 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Full Name">
+                            placeholder="Full Name" required>
 
-                        <input type="text"
+                        <input type="text" name="phone"
                             class="w-full p-3 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
                             placeholder="Mobile Number">
 
-                        <input type="email"
+                        <input type="email" name="email"
                             class="w-full p-3 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Email Address">
+                            placeholder="Email Address" required>
 
-                        <textarea rows="4"
+                        <textarea rows="4" name="message"
                             class="w-full p-3 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Your Message"></textarea>
+                            placeholder="Your Message" required></textarea>
 
-                        <button type="submit"
-                            class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-md transition-all">
+                            <p class="text-xs text-slate-500 mt-3 text-center">
+                                Protected by reCAPTCHA &mdash;
+                                <a href="https://policies.google.com/privacy" class="underline">Privacy</a> &amp;
+                                <a href="https://policies.google.com/terms" class="underline">Terms</a>
+                            </p>
+
+                        <button
+                            class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-md transition-all g-recaptcha"
+                            data-sitekey="{{ config('services.recaptcha.site_key') }}"
+                            data-callback="onSubmit"
+                            data-action="submit">
                             Send Message
                         </button>
 
@@ -101,5 +124,11 @@
     </div>
 
 </section>
+
+<script>
+function onSubmit(token) {
+    document.querySelector('form').submit();
+}
+</script>
 
 @endsection

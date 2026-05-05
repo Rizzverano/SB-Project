@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LegislativeController;
 use App\Http\Controllers\DirectoryController;
 use App\Models\LegislativeRecord;
+use App\Http\Controllers\LoginChallengeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,9 +17,8 @@ use App\Models\LegislativeRecord;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+
+Route::get('/', [DirectoryController::class, 'welcome'])->name('home');
 
 Route::get('/legislative_index', [LegislativeController::class, 'index'])
     ->name('legislative_index');
@@ -36,3 +36,26 @@ Route::get('/about', [DirectoryController::class, 'about'])
 
 Route::get('/contact', [DirectoryController::class, 'contact'])
     ->name('contact');
+
+Route::post('/contact', [DirectoryController::class, 'storeContact'])
+    ->name('contact.store')
+    ->middleware('throttle:5,1'); // 5 requests per minute
+
+Route::get('/gallery', [DirectoryController::class, 'gallery'])
+    ->name('gallery');
+
+
+
+Route::middleware('nocache')->group(function () {
+    Route::get('/admin/login-challenge', [LoginChallengeController::class, 'show'])
+        ->name('login.challenge');
+
+    Route::post('/admin/login-challenge', [LoginChallengeController::class, 'verify'])
+        ->name('login.challenge.verify');
+});
+
+Route::get('/legislative-process', [DirectoryController::class, 'legislativeProcess'])
+    ->name('legislative.process');
+
+Route::get('/sb-members', [DirectoryController::class, 'sbmember'])
+    ->name('sb.members');

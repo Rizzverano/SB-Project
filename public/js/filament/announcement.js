@@ -1,19 +1,9 @@
-document.addEventListener('DOMContentLoaded', function () {
+  const slides = document.querySelectorAll('.announcement-slide');
+  let current = 0;
 
-    const slides = document.querySelectorAll('.announcement-slide');
+  function goTo(n) {
+    slides.forEach((s, i) => s.classList.toggle('hidden', i !== n));
+    current = n;
+  }
 
-    if (slides.length <= 1) return;
-
-    let current = 0;
-
-    setInterval(() => {
-
-        slides[current].classList.add('hidden');
-
-        current = (current + 1) % slides.length;
-
-        slides[current].classList.remove('hidden');
-
-    }, 4000);
-
-});
+  if (slides.length > 1) setInterval(() => goTo((current + 1) % slides.length), 4000);
