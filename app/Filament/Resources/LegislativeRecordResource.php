@@ -155,8 +155,74 @@ class LegislativeRecordResource extends Resource
             ->striped()
             ->paginated([10, 25, 50])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('session')
+                    ->label('Filter by Session')
+                    ->options(
+                        \App\Models\LegislativeRecord::whereNotNull('session')
+                            ->distinct()
+                            ->orderBy('session')
+                            ->pluck('session', 'session')
+                            ->toArray()
+                    )
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('sponsor')
+                    ->label('Filter by Sponsor')
+                    ->options(
+                        \App\Models\LegislativeRecord::whereNotNull('sponsor')
+                            ->distinct()
+                            ->orderBy('sponsor')
+                            ->pluck('sponsor', 'sponsor')
+                            ->toArray()
+                    )
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\Filter::make('date_range')
+                    ->form([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\DatePicker::make('date_from')
+                                    ->label('From')
+                                    ->placeholder('Start date')
+                                    ->native(false),
+                                Forms\Components\DatePicker::make('date_until')
+                                    ->label('Until')
+                                    ->placeholder('End date')
+                                    ->native(false),
+                            ]),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when(
+                                $data['date_from'],
+                                fn ($q) => $q->whereDate('date', '>=', $data['date_from'])
+                            )
+                            ->when(
+                                $data['date_until'],
+                                fn ($q) => $q->whereDate('date', '<=', $data['date_until'])
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['date_from'] ?? null) {
+                            $indicators[] = Tables\Filters\Indicator::make(
+                                'From ' . \Carbon\Carbon::parse($data['date_from'])->toFormattedDateString()
+                            )->removeField('date_from');
+                        }
+
+                        if ($data['date_until'] ?? null) {
+                            $indicators[] = Tables\Filters\Indicator::make(
+                                'Until ' . \Carbon\Carbon::parse($data['date_until'])->toFormattedDateString()
+                            )->removeField('date_until');
+                        }
+
+                        return $indicators;
+                    }),
             ])
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),

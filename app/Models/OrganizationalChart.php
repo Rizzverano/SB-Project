@@ -10,12 +10,15 @@ class OrganizationalChart extends Model
     use HasFactory;
 
     protected $fillable = [
+        'title',
         'file',
         'is_publish',
+        'is_archived',
     ];
 
     protected $casts = [
         'is_publish' => 'boolean',
+        'is_archived' => 'boolean',
     ];
 
 }

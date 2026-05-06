@@ -9,10 +9,11 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\ImageColumn;
-use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
 
 class OrganizationalChartResource extends Resource
@@ -32,6 +33,13 @@ class OrganizationalChartResource extends Resource
                     ->description('Upload and manage the organizational chart image.')
                     ->columns(2)
                     ->schema([
+
+                        Forms\Components\TextInput::make('title')
+                            ->label('Chart Title')
+                            ->placeholder('Enter chart title')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpan(2),
 
                         FileUpload::make('file')
                             ->label('Upload Chart Image')
@@ -56,12 +64,13 @@ class OrganizationalChartResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(static::getEloquentQuery()->where('is_archived', false))
             ->columns([
 
-                TextColumn::make('id')
-                    ->label('#')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('title')
+                    ->label('Title')
+                    ->searchable()
+                    ->sortable(),
 
                 ImageColumn::make('file')
                     ->label('Chart Preview')
@@ -69,10 +78,10 @@ class OrganizationalChartResource extends Resource
                     ->defaultImageUrl(asset('images/default.jpg'))
                     ->height(80),
 
-                IconColumn::make('is_publish')
+                CheckboxColumn::make('is_publish')
                     ->label('Published')
-                    ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('created_at')
                     ->label('Uploaded Date')
@@ -81,20 +90,44 @@ class OrganizationalChartResource extends Resource
 
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('is_publish')
-                    ->label('Publication Status')
-                    ->trueLabel('Published Only')
-                    ->falseLabel('Unpublished Only')
-                    ->placeholder('All'),
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('archive')
+                    ->label('Archive')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Archive Organizational Chart')
+                    ->modalDescription('Are you sure you want to archive this organizational chart?')
+                    ->action(function ($record) {
+                        $record->update([
+                            'is_archived' => true,
+                        ]);
+
+                        Notification::make()
+                            ->title('Organizational Chart Archived')
+                            ->body('Organizational chart has been successfully archived.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkAction::make('archive')
+                    ->label('Archive Selected')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->action(function ($records) {
+                        $records->each->update(['is_archived' => true]);
+
+                        Notification::make()
+                            ->title('Organizational Charts Archived')
+                            ->body('Selected organizational charts have been successfully archived.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->defaultSort('created_at', 'desc');
     }

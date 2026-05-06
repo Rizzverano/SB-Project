@@ -83,11 +83,18 @@ class OrdinanceResource extends Resource
                         ->default(false),
                 ]),
 
+            Section::make('Ordinance Documents')
+                    ->description('Upload and manage ordinance documents. PDF Only.')
+                    ->columns(2)
+                    ->schema([
             FileUpload::make('file')
+                ->label('Upload PDF')
                 ->directory('ordinances')
                 ->disk('public')
                 ->acceptedFileTypes(['application/pdf'])
                 ->maxSize(102400)->columnSpanFull(),
+
+            ])
         ]);
     }
 
@@ -145,8 +152,33 @@ class OrdinanceResource extends Resource
                     ->openUrlInNewTab(),
             ])
             ->filters([
-                //
+                        Tables\Filters\SelectFilter::make('sponsor')
+                ->label('Filter by Sponsor')
+                ->options(
+                    \App\Models\Ordinance::where('is_archived', false)
+                        ->whereNotNull('sponsor')
+                        ->distinct()
+                        ->orderBy('sponsor')
+                        ->pluck('sponsor', 'sponsor')
+                        ->toArray()
+                )
+                ->searchable()
+                ->preload(),
+
+            Tables\Filters\SelectFilter::make('publish_through')
+                ->label('Filter by Publish Through')
+                ->options(
+                    \App\Models\Ordinance::where('is_archived', false)
+                        ->whereNotNull('publish_through')
+                        ->distinct()
+                        ->orderBy('publish_through')
+                        ->pluck('publish_through', 'publish_through')
+                        ->toArray()
+                )
+                ->searchable()
+                ->preload(),
             ])
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\EditAction::make(),
 

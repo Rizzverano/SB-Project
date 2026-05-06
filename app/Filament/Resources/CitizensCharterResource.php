@@ -6,9 +6,11 @@ use App\Filament\Resources\CitizensCharterResource\Pages;
 use App\Models\CitizensCharter;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\CheckboxColumn;
 
 class CitizensCharterResource extends Resource
 {
@@ -24,12 +26,19 @@ class CitizensCharterResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Citizens Charter Details')
-                    ->description('Upload and manage the official Citizens Charter document.')
+                    ->description('Upload and manage the official Citizens Charter document. PDF Upload Only.')
                     ->columns(2)
                     ->schema([
 
+                        Forms\Components\TextInput::make('title')
+                            ->label('Document Title')
+                            ->placeholder('Enter document title')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpan(2),
+
                         Forms\Components\FileUpload::make('file')
-                            ->label('Upload PDF File')
+                            ->label('Upload PDF')
                             ->disk('public')
                             ->directory('citizens-charter')
                             ->acceptedFileTypes(['application/pdf'])
@@ -54,27 +63,27 @@ class CitizensCharterResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(static::getEloquentQuery()->where('is_archived', false))
             ->columns([
 
-                Tables\Columns\TextColumn::make('id')
-                    ->label('#')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('title')
+                    ->label('Title')
+                    ->searchable()
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('file')
                     ->label('Document')
-                    ->formatStateUsing(fn ($state) => $state ? '📄 View PDF' : 'No File')
+                    ->formatStateUsing(fn ($state) => $state ? '📄View PDF' : 'No File')
                     ->url(fn ($record) => $record->file
                         ? asset('storage/' . $record->file)
                         : null)
                     ->openUrlInNewTab()
-                    ->color('primary')
-                    ->searchable(),
+                    ->color('primary'),
 
-                Tables\Columns\IconColumn::make('is_publish')
+                CheckboxColumn::make('is_publish')
                     ->label('Published')
-                    ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Uploaded Date')
@@ -83,20 +92,44 @@ class CitizensCharterResource extends Resource
 
             ])
             ->filters([
-                Tables\Filters\TernaryFilter::make('is_publish')
-                    ->label('Publication Status')
-                    ->trueLabel('Published Only')
-                    ->falseLabel('Unpublished Only')
-                    ->placeholder('All'),
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('archive')
+                    ->label('Archive')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Archive Citizens Charter')
+                    ->modalDescription('Are you sure you want to archive this citizens charter?')
+                    ->action(function ($record) {
+                        $record->update([
+                            'is_archived' => true,
+                        ]);
+
+                        Notification::make()
+                            ->title('Citizens Charter Archived')
+                            ->body('Citizens charter has been successfully archived.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkAction::make('archive')
+                    ->label('Archive Selected')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->action(function ($records) {
+                        $records->each->update(['is_archived' => true]);
+
+                        Notification::make()
+                            ->title('Citizens Charters Archived')
+                            ->body('Selected citizens charters have been successfully archived.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->defaultSort('created_at', 'desc');
     }

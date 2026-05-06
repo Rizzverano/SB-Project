@@ -5,7 +5,7 @@
         <div class="fi-card p-5 rounded-xl flex items-center gap-8 ml-auto">
 
             <div>
-                <p class="text-sm text-gray-500">Orbus Records</p>
+                <p class="text-sm text-gray-500">ORBOS Records</p>
                 <p class="text-2xl font-bold">
                     {{ \App\Models\LegislativeRecord::count() }}
                 </p>
@@ -34,7 +34,7 @@
                         {{ $activeTab === 'orbus'
                             ? 'bg-primary-600 text-white'
                             : 'bg-gray-200 dark:bg-gray-700' }}">
-                    Orbus
+                    ORBOS
                 </button>
 
                 <button

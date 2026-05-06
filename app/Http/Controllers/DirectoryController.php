@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\ContactMessage;
 use Illuminate\Support\Facades\Http;
 use App\Models\Sbmember;
+use App\Models\CitizensCharter;
+use App\Models\OrganizationalChart;
 
 class DirectoryController extends Controller
 {
@@ -20,7 +22,12 @@ class DirectoryController extends Controller
 
     public function about()
     {
-        return view('main.about');
+        $orgCharts = OrganizationalChart::where('is_publish', true)
+                        ->where('is_archived', false)
+                        ->latest()
+                        ->get();
+
+        return view('main.about', compact('orgCharts'));
     }
 
     public function contact()
@@ -80,7 +87,13 @@ class DirectoryController extends Controller
 
     public function legislativeProcess()
     {
-        return view('main.legislative-process');
+
+        $charters = CitizensCharter::where('is_publish', true)
+                    ->where('is_archived', false)
+                    ->latest()
+                    ->get(); // get ALL published
+
+        return view('main.legislative-process', compact('charters'));
     }
 
     public function sbmember()
