@@ -127,7 +127,6 @@ class UserResource extends Resource
                 ->label('Your Password (Confirmation)')
                 ->password()
                 ->required()
-                ->dehydrated(false)
                 ->rules(['required', 'string', 'min:8'])
                 ->validationMessages([
                     'required' => 'Please enter your admin password to continue.',

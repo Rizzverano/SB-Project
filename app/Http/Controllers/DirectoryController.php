@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Sbmember;
 use App\Models\CitizensCharter;
 use App\Models\OrganizationalChart;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification;
 
 class DirectoryController extends Controller
 {
@@ -67,14 +69,29 @@ class DirectoryController extends Controller
         );
 
         // ✅ NOTIFY ADMINS
-        $admins = \App\Models\User::where('role', \App\Models\User::ADMIN)->get();
+        $admins = \App\Models\User::where('role', \App\Models\User::ADMIN)
+            ->where('is_active', true)
+            ->get();
+
+        $url = route('filament.admin.resources.contact-messages.index', ['record' => $contactMessage]);
 
         foreach ($admins as $admin) {
-            \Filament\Notifications\Notification::make()
+            Notification::make()
                 ->title('New Contact Message')
                 ->body("New message from {$contactMessage->name}")
                 ->icon('heroicon-o-envelope')
-                ->sendToDatabase($admin);
+                ->iconColor('warning')
+                ->viewData([
+                    'module' => 'Contact Message',
+                    'url' => $url,
+                ])
+                ->actions([
+                    Action::make('view')
+                        ->label('View message')
+                        ->url($url)
+                        ->markAsRead(),
+                ])
+                ->sendToDatabase($admin, isEventDispatched: true);
         }
 
         return back()->with('success', 'Your message has been sent successfully!');

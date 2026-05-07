@@ -42,14 +42,17 @@ class EditUser extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if (!Hash::check($data['admin_password'], Auth::user()->password)) {
-            Notification::make()->title('Incorrect admin password')->danger()->send();
+        // ✅ Validate admin password
+        if (!Hash::check($data['admin_password'], auth()->user()->password)) {
+            Notification::make()
+                ->title('Incorrect admin password')
+                ->danger()
+                ->send();
 
-            $this->halt();
+            $this->halt(); // stops the save
         }
 
-        unset($data['admin_password']);
-
+        unset($data['admin_password']); // remove before saving
         return $data;
     }
 }

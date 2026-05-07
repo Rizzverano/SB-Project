@@ -101,7 +101,6 @@ class ContactMessageResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('toggleRead')
                     ->label(fn ($record) => $record->is_read ? 'Mark as Unread' : 'Mark as Read')
                     ->action(fn (ContactMessage $record) => $record->update(['is_read' => ! $record->is_read]))
@@ -155,7 +154,6 @@ class ContactMessageResource extends Resource
         return [
             'index' => Pages\ListContactMessages::route('/'),
             'create' => Pages\CreateContactMessage::route('/create'),
-            'edit' => Pages\EditContactMessage::route('/{record}/edit'),
         ];
     }
 }

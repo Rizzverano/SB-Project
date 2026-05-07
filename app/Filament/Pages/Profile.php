@@ -55,7 +55,7 @@ class Profile extends Page implements HasForms
                     ->minLength(5)
                     ->maxLength(255)
                     ->regex('/^\S*$/')
-                    ->unique(table: 'users', column: 'email', ignoreRecord: true)
+                    ->unique(table: 'users', column: 'email', ignorable: auth()->user())
                     ->validationMessages([
                         'required' => 'Email is required.',
                         'email' => 'Enter a valid email address.',
@@ -67,7 +67,6 @@ class Profile extends Page implements HasForms
                     ->label('Current Password')
                     ->password()
                     ->revealable()
-                    ->dehydrated(false)
                     ->required(fn($get) => filled($get('password')))
                     ->rules([
                         fn() => function ($attribute, $value, $fail) {
@@ -91,30 +90,25 @@ class Profile extends Page implements HasForms
                         'regex' => 'Password cannot contain spaces.',
                     ]),
 
-                TextInput::make('password_confirmation')->label('Confirm Password')->password()->revealable()->dehydrated(false),
+                TextInput::make('password_confirmation')->label('Confirm Password')->password(),
             ])
             ->statePath('data');
     }
     public function update(): void
     {
         $data = $this->form->getState();
-        /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // Check current password only if user is trying to change password
         if (!empty($data['password'])) {
             if (empty($data['current_password']) || !Hash::check($data['current_password'], $user->password)) {
                 Notification::make()->title('Current password is incorrect!')->danger()->send();
-
                 return;
             }
-
             $user->password = Hash::make($data['password']);
         }
 
         $user->name = $data['name'];
         $user->email = $data['email'];
-
         $user->save();
 
         Notification::make()->title('Profile updated successfully!')->success()->send();

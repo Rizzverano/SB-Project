@@ -20,6 +20,7 @@ use Filament\Navigation\NavigationItem;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Profile;
 use App\Http\Middleware\EnsureUserIsActive;
+use \App\Http\Middleware\HideNotificationsForMembers;
 use App\Http\Middleware\NoCache;
 use Filament\Navigation\MenuItem;
 
@@ -48,6 +49,8 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Legislative Tracking')
             ->brandLogo(fn () => view('filament.brand'))
             ->favicon(asset('images/Logo.png'))
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('15s')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -64,7 +67,8 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                \App\Http\Middleware\EnsureUserIsActive::class,
+                EnsureUserIsActive::class,
+                HideNotificationsForMembers::class,
                 NoCache::class,
             ])
             ->userMenuItems([
