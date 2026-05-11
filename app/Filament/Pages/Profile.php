@@ -70,7 +70,7 @@ class Profile extends Page implements HasForms
                     ->required(fn($get) => filled($get('password')))
                     ->rules([
                         fn() => function ($attribute, $value, $fail) {
-                            if (!Hash::check($value, auth()->user()->password)) {
+                            if (filled($value) && !Hash::check($value, auth()->user()->password)) {
                                 $fail('Current password is incorrect.');
                             }
                         },
@@ -81,13 +81,23 @@ class Profile extends Page implements HasForms
                     ->password()
                     ->revealable()
                     ->nullable()
-                    ->minLength(8)
-                    ->rules(['string', 'min:8', 'regex:/^\S*$/'])
+                    ->minLength(12)
+                    ->maxLength(255)
+                    ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])\S+$/')
                     ->same('password_confirmation')
+                    ->helperText(str('
+                        <div class="grid grid-cols-2 gap-x-6 gap-y-1 mt-2 text-xs text-gray-400">
+                            <span>• At least 12 characters</span>
+                            <span>• One uppercase letter</span>
+                            <span>• One lowercase letter</span>
+                            <span>• One number</span>
+                            <span>• One symbol (! @ # $ % ^ & *)</span>
+                        </div>
+                    ')->toHtmlString())
                     ->validationMessages([
-                        'min' => 'Password must be at least 8 characters.',
-                        'same' => 'Passwords do not match.',
-                        'regex' => 'Password cannot contain spaces.',
+                        'min'       => 'Password must be at least 12 characters.',
+                        'same'      => 'Passwords do not match.',
+                        'regex'     => 'Password must have at least 12 characters, one uppercase letter, one lowercase letter, one number, and one symbol (! @ # $ % ^ & *).',
                     ]),
 
                 TextInput::make('password_confirmation')->label('Confirm Password')->password(),

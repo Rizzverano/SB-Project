@@ -17,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Support\Collection;
 use Filament\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 
 class UserResource extends Resource
 {
@@ -38,9 +39,9 @@ class UserResource extends Resource
         }
 
         $permissions = match ($user->role) {
-            UserModel::ADMIN => Permission::adminPermissions(),
+            UserModel::ADMIN  => Permission::adminPermissions(),
             UserModel::MEMBER => Permission::memberPermissions(),
-            default => [],
+            default           => [],
         };
 
         $permissionValues = array_map(fn($p) => $p->value, $permissions);
@@ -86,17 +87,26 @@ class UserResource extends Resource
                 ->label('Password')
                 ->password()
                 ->revealable()
-                ->minLength(8)
+                ->minLength(12)
                 ->maxLength(255)
-                ->regex('/^\S*$/')
                 ->required(fn(string $operation) => $operation === 'create')
                 ->dehydrateStateUsing(fn($state) => filled($state) ? Hash::make($state) : null)
                 ->dehydrated(fn($state) => filled($state))
                 ->rule('confirmed')
+                ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])\S+$/')
+                ->helperText(new HtmlString('
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-1 mt-2 text-xs text-gray-400">
+                        <span>• At least 12 characters</span>
+                        <span>• One uppercase letter</span>
+                        <span>• One lowercase letter</span>
+                        <span>• One number</span>
+                        <span>• One symbol (! @ # $ % ^ & *)</span>
+                    </div>
+                '))
                 ->validationMessages([
-                    'min'       => 'Password must be at least 8 characters.',
+                    'min'       => 'Password must be at least 12 characters.',
                     'confirmed' => 'Password confirmation does not match.',
-                    'regex'     => 'Password must not contain spaces.',
+                    'regex'     => 'Password must have at least 12 characters, one uppercase letter, one lowercase letter, one number, and one symbol (! @ # $ % ^ & *).',
                 ]),
 
             TextInput::make('password_confirmation')
@@ -104,12 +114,10 @@ class UserResource extends Resource
                 ->password()
                 ->revealable()
                 ->same('password')
-                ->regex('/^\S*$/')
                 ->dehydrated(false)
                 ->required(fn(string $operation) => $operation === 'create')
                 ->validationMessages([
-                    'same'  => 'Passwords do not match.',
-                    'regex' => 'Password confirmation cannot contain spaces.',
+                    'same' => 'Passwords do not match.',
                 ]),
 
             Select::make('role')
@@ -140,34 +148,24 @@ class UserResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')->label('ID')->sortable(),
-
                 TextColumn::make('name')->label('Name')->searchable(),
-
                 TextColumn::make('email')->label('Email')->searchable(),
-
                 TextColumn::make('role')
                     ->label('Role')
-                    ->formatStateUsing(
-                        fn($state) => match ($state) {
-                            0 => 'Admin',
-                            1 => 'Member',
-                        },
-                    )
+                    ->formatStateUsing(fn($state) => match ($state) {
+                        0 => 'Admin',
+                        1 => 'Member',
+                    })
                     ->badge()
-                    ->color(
-                        fn($state) => match ($state) {
-                            0 => 'danger',
-                            1 => 'success',
-                        },
-                    ),
-
+                    ->color(fn($state) => match ($state) {
+                        0 => 'danger',
+                        1 => 'success',
+                    }),
                 TextColumn::make('created_at')->dateTime()->label('Created'),
             ])
             ->striped()
             ->paginated([10, 25, 50])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -196,7 +194,6 @@ class UserResource extends Resource
                                 ->body('The admin password you entered is incorrect.')
                                 ->danger()
                                 ->send();
-
                             return;
                         }
 
@@ -231,7 +228,6 @@ class UserResource extends Resource
                                 ->title('Incorrect admin password')
                                 ->danger()
                                 ->send();
-
                             return;
                         }
 

@@ -42,7 +42,7 @@ class LoginChallengeController extends Controller
             session([
                 'challenge_num1' => $num1,
                 'challenge_num2' => $num2,
-                'challenge_answer' => "$num1 + $num2",
+                'challenge_answer' => "x = $num1 . $num2",
             ]);
         }
 
