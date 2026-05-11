@@ -12,6 +12,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Grid;
 
 class ArchivedLogos extends Page implements HasTable
 {
@@ -53,7 +59,67 @@ class ArchivedLogos extends Page implements HasTable
                     ->dateTime('M d, Y h:i A')
                     ->sortable(),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->actions([
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading(fn (Logo $record) => 'Logo Set #' . $record->id)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->infolist(fn (Infolist $infolist, Logo $record) => $infolist
+                        ->record($record)
+                        ->schema([
+                            Section::make('Logo Images')
+                                ->icon('heroicon-o-photo')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            Section::make('Provincial Logo')
+                                                ->schema([
+                                                    ImageEntry::make('pres_gov')
+                                                        ->label('')
+                                                        ->disk('public')
+                                                        ->height(140)
+                                                        ->extraImgAttributes(['class' => 'object-contain mx-auto']),
+                                                ]),
+
+                                            Section::make('LGU Hilongos Logo')
+                                                ->schema([
+                                                    ImageEntry::make('lgu_hilongos')
+                                                        ->label('')
+                                                        ->disk('public')
+                                                        ->height(140)
+                                                        ->extraImgAttributes(['class' => 'object-contain mx-auto']),
+                                                ]),
+                                        ]),
+                                ]),
+
+                            Section::make('Set Details')
+                                ->icon('heroicon-o-information-circle')
+                                ->schema([
+                                    Grid::make(3)
+                                        ->schema([
+                                            TextEntry::make('id')
+                                                ->label('Logo Set')
+                                                ->formatStateUsing(fn ($state) => 'Logo Set #' . $state)
+                                                ->badge()
+                                                ->color('gray'),
+
+                                            IconEntry::make('is_published')
+                                                ->label('Active Status')
+                                                ->boolean(),
+
+                                            TextEntry::make('created_at')
+                                                ->label('Created At')
+                                                ->dateTime('F d, Y h:i A'),
+                                        ]),
+                                ]),
+                        ])
+                    ),
+
                 Tables\Actions\Action::make('restore')
                     ->label('Restore')
                     ->icon('heroicon-o-arrow-uturn-left')
@@ -73,6 +139,7 @@ class ArchivedLogos extends Page implements HasTable
                             ->success()
                             ->send();
                     }),
+
                 Tables\Actions\DeleteAction::make()
                     ->label('Delete Permanently')
                     ->icon('heroicon-o-trash')

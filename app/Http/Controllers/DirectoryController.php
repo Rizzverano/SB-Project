@@ -15,19 +15,14 @@ class DirectoryController extends Controller
 {
     public function welcome()
     {
-        $membersCount = Sbmember::where('is_publish', true)
-            ->where('is_archived', false)
-            ->count();
+        $membersCount = Sbmember::where('is_publish', true)->where('is_archived', false)->count();
 
         return view('welcome', compact('membersCount'));
     }
 
     public function about()
     {
-        $orgCharts = OrganizationalChart::where('is_publish', true)
-                        ->where('is_archived', false)
-                        ->latest()
-                        ->get();
+        $orgCharts = OrganizationalChart::where('is_publish', true)->where('is_archived', false)->latest()->get();
 
         return view('main.about', compact('orgCharts'));
     }
@@ -39,39 +34,53 @@ class DirectoryController extends Controller
 
     public function storeContact(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'message' => 'required|string|max:2000',
-            'g-recaptcha-response' => 'required',
-        ]);
-
-        // ✅ VERIFY CAPTCHA
-        $response = Http::asForm()->post(
-            'https://www.google.com/recaptcha/api/siteverify',
+        $request->validate(
             [
-                'secret' => config('services.recaptcha.secret_key'),
-                'response' => $request->input('g-recaptcha-response'),
-                'remoteip' => $request->ip(),
-            ]
+                'name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    'regex:/^[^<>{}|\[\]\\\\^`]*$/', // no HTML/special chars
+                    'regex:/^(?!.*https?:\/\/)(?!.*www\.)(?!.*\.(com|net|org|io|php|html))/i', // no URLs
+                ],
+                'email' => ['required', 'email:rfc,dns', 'max:255', 'regex:/^\S*$/'],
+                'phone' => ['nullable', 'string', 'max:20', 'regex:/^\S*$/', 'regex:/^(09|\+639)\d{9}$/'],
+                'message' => [
+                    'required',
+                    'string',
+                    'max:2000',
+                    'regex:/^[^<>{}|\[\]\\\\^`]*$/', // no HTML/special chars
+                    'regex:/^(?!.*https?:\/\/)(?!.*www\.)(?!.*\.(com|net|org|io|php|html))/i', // no URLs
+                ],
+                'g-recaptcha-response' => 'required',
+            ],
+            [
+                'name.regex' => 'Full name must not contain URLs, links, or special characters.',
+                'message.regex' => 'Message must not contain URLs, links, or special characters.',
+                'g-recaptcha-response.required' => 'Please complete the captcha.',
+            ],
         );
 
-        if (! $response->json('success')) {
-            return back()->withErrors([
-                'captcha' => 'Captcha verification failed. Please try again.',
-            ])->withInput();
+        // ✅ VERIFY CAPTCHA
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => config('services.recaptcha.secret_key'),
+            'response' => $request->input('g-recaptcha-response'),
+            'remoteip' => $request->ip(),
+        ]);
+
+        if (!$response->json('success')) {
+            return back()
+                ->withErrors([
+                    'captcha' => 'Captcha verification failed. Please try again.',
+                ])
+                ->withInput();
         }
 
         // ✅ SAVE MESSAGE
-        $contactMessage = ContactMessage::create(
-            $request->only(['name', 'email', 'phone', 'message'])
-        );
+        $contactMessage = ContactMessage::create($request->only(['name', 'email', 'phone', 'message']));
 
         // ✅ NOTIFY ADMINS
-        $admins = \App\Models\User::where('role', \App\Models\User::ADMIN)
-            ->where('is_active', true)
-            ->get();
+        $admins = \App\Models\User::where('role', \App\Models\User::ADMIN)->where('is_active', true)->get();
 
         $url = route('filament.admin.resources.contact-messages.index', ['record' => $contactMessage]);
 
@@ -85,12 +94,7 @@ class DirectoryController extends Controller
                     'module' => 'Contact Message',
                     'url' => $url,
                 ])
-                ->actions([
-                    Action::make('view')
-                        ->label('View message')
-                        ->url($url)
-                        ->markAsRead(),
-                ])
+                ->actions([Action::make('view')->label('View message')->url($url)->markAsRead()])
                 ->sendToDatabase($admin, isEventDispatched: true);
         }
 
@@ -104,26 +108,16 @@ class DirectoryController extends Controller
 
     public function legislativeProcess()
     {
-
-        $charters = CitizensCharter::where('is_publish', true)
-                    ->where('is_archived', false)
-                    ->latest()
-                    ->get(); // get ALL published
+        $charters = CitizensCharter::where('is_publish', true)->where('is_archived', false)->latest()->get(); // get ALL published
 
         return view('main.legislative-process', compact('charters'));
     }
 
     public function sbmember()
     {
-        $members = Sbmember::where('is_publish', true)
-            ->where('is_archived', false)
-            ->latest()
-            ->get();
+        $members = Sbmember::where('is_publish', true)->where('is_archived', false)->latest()->get();
 
-        $formerMembers = Sbmember::where('is_archived', true)
-            ->where('is_publish', true)
-            ->latest()
-            ->get();
+        $formerMembers = Sbmember::where('is_archived', true)->where('is_publish', true)->latest()->get();
 
         return view('main.sb-members', compact('members', 'formerMembers'));
     }

@@ -10,6 +10,12 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Tables;
+use Filament\Forms;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Grid;
 
 class ArchivedLegislativeRecords extends Page implements HasTable
 {
@@ -66,7 +72,147 @@ class ArchivedLegislativeRecords extends Page implements HasTable
             ])
             ->striped()
             ->paginated([10, 25, 50])
+            ->filters([
+                Tables\Filters\SelectFilter::make('session')
+                    ->label('Filter by Session')
+                    ->options(
+                        \App\Models\LegislativeRecord::whereNotNull('session')
+                            ->distinct()
+                            ->orderBy('session')
+                            ->pluck('session', 'session')
+                            ->toArray()
+                    )
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\SelectFilter::make('sponsor')
+                    ->label('Filter by Sponsor')
+                    ->options(
+                        \App\Models\LegislativeRecord::whereNotNull('sponsor')
+                            ->distinct()
+                            ->orderBy('sponsor')
+                            ->pluck('sponsor', 'sponsor')
+                            ->toArray()
+                    )
+                    ->searchable()
+                    ->preload(),
+
+                Tables\Filters\Filter::make('date_range')
+                    ->form([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\DatePicker::make('date_from')
+                                    ->label('From')
+                                    ->placeholder('Start date')
+                                    ->native(false),
+                                Forms\Components\DatePicker::make('date_until')
+                                    ->label('Until')
+                                    ->placeholder('End date')
+                                    ->native(false),
+                            ]),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when(
+                                $data['date_from'],
+                                fn ($q) => $q->whereDate('date', '>=', $data['date_from'])
+                            )
+                            ->when(
+                                $data['date_until'],
+                                fn ($q) => $q->whereDate('date', '<=', $data['date_until'])
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['date_from'] ?? null) {
+                            $indicators[] = Tables\Filters\Indicator::make(
+                                'From ' . \Carbon\Carbon::parse($data['date_from'])->toFormattedDateString()
+                            )->removeField('date_from');
+                        }
+
+                        if ($data['date_until'] ?? null) {
+                            $indicators[] = Tables\Filters\Indicator::make(
+                                'Until ' . \Carbon\Carbon::parse($data['date_until'])->toFormattedDateString()
+                            )->removeField('date_until');
+                        }
+
+                        return $indicators;
+                    }),
+            ])
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
+                Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading(fn (LegislativeRecord $record) => $record->title)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->infolist(fn (Infolist $infolist, LegislativeRecord $record) => $infolist
+                        ->record($record)
+                        ->schema([
+
+                            Section::make('Session Information')
+                                ->icon('heroicon-o-calendar-days')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextEntry::make('session')
+                                                ->label('Session')
+                                                ->badge()
+                                                ->color('info'),
+
+                                            TextEntry::make('date')
+                                                ->label('Date of Session')
+                                                ->date('F d, Y'),
+                                        ]),
+                                ]),
+
+                            Section::make('Legislative Content')
+                                ->icon('heroicon-o-document-text')
+                                ->schema([
+                                    TextEntry::make('title')
+                                        ->label('Title')
+                                        ->weight('bold')
+                                        ->size(TextEntry\TextEntrySize::Large)
+                                        ->columnSpanFull(),
+
+                                    TextEntry::make('description')
+                                        ->label('Description / Body')
+                                        ->markdown()
+                                        ->prose()
+                                        ->placeholder('No description provided.')
+                                        ->columnSpanFull(),
+                                ]),
+
+                            Section::make('Authorship & Resolution')
+                                ->icon('heroicon-o-user-circle')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextEntry::make('sponsor')
+                                                ->label('Authored / Sponsored by')
+                                                ->icon('heroicon-o-user')
+                                                ->placeholder('Not specified'),
+
+                                            TextEntry::make('action_taken')
+                                                ->label('Resolution / Action Taken')
+                                                ->badge()
+                                                ->color(
+                                                    fn ($state) => match ($state) {
+                                                        'Approved'        => 'success',
+                                                        'Marked as Noted' => 'gray',
+                                                        'NONE'            => 'secondary',
+                                                        default           => 'warning',
+                                                    }
+                                                ),
+                                        ]),
+                                ]),
+
+                        ])
+                    ),
+
                 Action::make('restore')
                     ->label('Restore')
                     ->color('success')

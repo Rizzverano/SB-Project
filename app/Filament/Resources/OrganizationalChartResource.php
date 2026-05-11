@@ -15,6 +15,12 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Grid;
 
 class OrganizationalChartResource extends Resource
 {
@@ -66,7 +72,6 @@ class OrganizationalChartResource extends Resource
         return $table
             ->query(static::getEloquentQuery()->where('is_archived', false))
             ->columns([
-
                 TextColumn::make('title')
                     ->label('Title')
                     ->searchable()
@@ -87,13 +92,59 @@ class OrganizationalChartResource extends Resource
                     ->label('Uploaded Date')
                     ->dateTime('F d, Y h:i A')
                     ->sortable(),
-
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->filters([
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading(fn (OrganizationalChart $record) => $record->title)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->infolist(fn (Infolist $infolist, OrganizationalChart $record) => $infolist
+                        ->record($record)
+                        ->schema([
+                            Section::make('Chart Preview')
+                                ->icon('heroicon-o-photo')
+                                ->schema([
+                                    ImageEntry::make('file')
+                                        ->label('')
+                                        ->disk('public')
+                                        ->defaultImageUrl(asset('images/default.jpg'))
+                                        ->height(400)
+                                        ->extraImgAttributes(['class' => 'object-contain w-full mx-auto'])
+                                        ->columnSpanFull(),
+                                ]),
+
+                            Section::make('Chart Details')
+                                ->icon('heroicon-o-information-circle')
+                                ->schema([
+                                    Grid::make(3)
+                                        ->schema([
+                                            TextEntry::make('title')
+                                                ->label('Chart Title')
+                                                ->weight('bold'),
+
+                                            IconEntry::make('is_publish')
+                                                ->label('Published')
+                                                ->boolean(),
+
+                                            TextEntry::make('created_at')
+                                                ->label('Uploaded Date')
+                                                ->dateTime('F d, Y h:i A'),
+                                        ]),
+                                ])
+                                ->collapsed(),
+                        ])
+                    ),
+
                 Tables\Actions\EditAction::make(),
+
                 Tables\Actions\Action::make('archive')
                     ->label('Archive')
                     ->icon('heroicon-o-archive-box')
@@ -134,17 +185,15 @@ class OrganizationalChartResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrganizationalCharts::route('/'),
+            'index'  => Pages\ListOrganizationalCharts::route('/'),
             'create' => Pages\CreateOrganizationalChart::route('/create'),
-            'edit' => Pages\EditOrganizationalChart::route('/{record}/edit'),
+            'edit'   => Pages\EditOrganizationalChart::route('/{record}/edit'),
         ];
     }
 }

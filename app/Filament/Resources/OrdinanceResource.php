@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Filament\Resources\OrdinanceResource\Pages;
 use App\Models\Ordinance;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -55,7 +55,7 @@ class OrdinanceResource extends Resource
         return $form->schema([
             TextInput::make('title')->required()->maxLength(150)->columnSpanFull()->placeholder('e.g. Strict Curfew-001, etc.'),
 
-            Textarea::make('description')->rows(5)->columnSpanFull()->required()->placeholder('e.g. Strict Curfew for minors 10:00 P.M. Onwards, etc.'),
+            MarkdownEditor::make('description')->columnSpanFull()->required()->placeholder('e.g. Strict Curfew for minors 10:00 P.M. Onwards, etc.'),
 
             TextInput::make('sponsor')
                 ->label('Sponsor')
@@ -92,7 +92,7 @@ class OrdinanceResource extends Resource
                 ->directory('ordinances')
                 ->disk('public')
                 ->acceptedFileTypes(['application/pdf'])
-                ->maxSize(102400)->columnSpanFull(),
+                ->maxSize(307200)->columnSpanFull(),
 
             ])
         ]);
@@ -151,6 +151,8 @@ class OrdinanceResource extends Resource
                     )
                     ->openUrlInNewTab(),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->filters([
                         Tables\Filters\SelectFilter::make('sponsor')
                 ->label('Filter by Sponsor')

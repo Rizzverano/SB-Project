@@ -54,10 +54,9 @@ class AnnouncementResource extends Resource
                         ->maxLength(255)
                         ->columnSpanFull(),
 
-                    Forms\Components\Textarea::make('description')
+                    Forms\Components\MarkdownEditor::make('description')
                         ->required()
                         ->placeholder('e.g. Proper Waste Management on Biodegradable Waste and Non-Biodegradable Waste for the citizens of Hilongos, etc.')
-                        ->rows(5)
                         ->columnSpanFull(),
                 ])
                 ->columns(1),
@@ -98,8 +97,10 @@ class AnnouncementResource extends Resource
                     ->label('Created'),
             ])
             ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->paginated([10, 25, 50])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->color('info'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('archive')
                     ->label('Archive')

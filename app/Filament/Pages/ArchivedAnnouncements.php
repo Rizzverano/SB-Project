@@ -10,6 +10,10 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Grid;
 
 class ArchivedAnnouncements extends Page implements HasTable
 {
@@ -32,13 +36,60 @@ class ArchivedAnnouncements extends Page implements HasTable
 
                 TextColumn::make('description')
                     ->limit(50)
+                    ->searchable()
                     ->wrap(),
 
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->actions([
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading(fn (Announcement $record) => $record->title)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->infolist(fn (Infolist $infolist, Announcement $record) => $infolist
+                        ->record($record)
+                        ->schema([
+                            Section::make('Announcement Details')
+                                ->icon('heroicon-o-megaphone')
+                                ->schema([
+                                    TextEntry::make('title')
+                                        ->label('Title')
+                                        ->weight('bold')
+                                        ->size(TextEntry\TextEntrySize::Large)
+                                        ->columnSpanFull(),
+
+                                    TextEntry::make('description')
+                                        ->label('Description')
+                                        ->prose()
+                                        ->placeholder('No description provided.')
+                                        ->columnSpanFull(),
+                                ]),
+
+                            Section::make('Timestamps')
+                                ->icon('heroicon-o-clock')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextEntry::make('created_at')
+                                                ->label('Created At')
+                                                ->dateTime('F d, Y h:i A'),
+
+                                            TextEntry::make('updated_at')
+                                                ->label('Last Updated')
+                                                ->dateTime('F d, Y h:i A'),
+                                        ]),
+                                ])
+                                ->collapsed(),
+                        ])
+                    ),
+
                 Tables\Actions\Action::make('restore')
                     ->label('Restore')
                     ->icon('heroicon-o-arrow-uturn-left')
@@ -59,8 +110,8 @@ class ArchivedAnnouncements extends Page implements HasTable
                             ->send();
                     }),
 
-                Tables\Actions\DeleteAction::make()->
-                    label('Delete Permanently')
+                Tables\Actions\DeleteAction::make()
+                    ->label('Delete Permanently')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()

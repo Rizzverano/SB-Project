@@ -11,17 +11,18 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-
-// ✅ Correct Filament 4 table columns
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\CheckboxColumn;
-
-// Forms
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Grid;
 
 class SbmemberResource extends Resource
 {
@@ -84,6 +85,7 @@ class SbmemberResource extends Resource
                     ->sortable(),
 
                 TextColumn::make('description')
+                    ->searchable()
                     ->limit(50),
 
                 CheckboxColumn::make('is_publish')
@@ -91,11 +93,57 @@ class SbmemberResource extends Resource
                     ->sortable()
                     ->toggleable(),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->filters([
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading(fn (Sbmember $record) => $record->name)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->infolist(fn (Infolist $infolist, Sbmember $record) => $infolist
+                        ->record($record)
+                        ->schema([
+                            Section::make()
+                                ->schema([
+                                    Grid::make(3)
+                                        ->schema([
+                                            ImageEntry::make('image')
+                                                ->label('')
+                                                ->defaultImageUrl(asset('images/default.jpg'))
+                                                ->height(160)
+                                                ->columnSpan(1),
+
+                                            Section::make()
+                                                ->schema([
+                                                    TextEntry::make('name')
+                                                        ->label('Full Name')
+                                                        ->weight('bold')
+                                                        ->size(TextEntry\TextEntrySize::Large),
+
+                                                    TextEntry::make('description')
+                                                        ->label('Position / Role')
+                                                        ->prose(),
+
+                                                    TextEntry::make('is_publish')
+                                                        ->label('Visibility')
+                                                        ->formatStateUsing(fn ($state) => $state ? 'Published' : 'Unpublished')
+                                                        ->badge()
+                                                        ->color(fn ($state) => $state ? 'success' : 'gray'),
+                                                ])
+                                                ->columnSpan(2),
+                                        ]),
+                                ]),
+                        ])
+                    ),
+
                 Tables\Actions\EditAction::make(),
+
                 Tables\Actions\Action::make('archive')
                     ->label('Mark as Former')
                     ->icon('heroicon-o-user-group')
@@ -107,7 +155,7 @@ class SbmemberResource extends Resource
                     ->action(function (Sbmember $record) {
                         $record->update([
                             'is_archived' => true,
-                            'is_publish' => false,
+                            'is_publish'  => false,
                         ]);
 
                         Notification::make()
@@ -129,7 +177,7 @@ class SbmemberResource extends Resource
                     ->action(function ($records) {
                         $records->each->update([
                             'is_archived' => true,
-                            'is_publish' => false,
+                            'is_publish'  => false,
                         ]);
 
                         Notification::make()
@@ -144,9 +192,9 @@ class SbmemberResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSbmembers::route('/'),
+            'index'  => Pages\ListSbmembers::route('/'),
             'create' => Pages\CreateSbmember::route('/create'),
-            'edit' => Pages\EditSbmember::route('/{record}/edit'),
+            'edit'   => Pages\EditSbmember::route('/{record}/edit'),
         ];
     }
 }

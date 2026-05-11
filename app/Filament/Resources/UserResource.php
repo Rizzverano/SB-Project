@@ -63,9 +63,9 @@ class UserResource extends Resource
                 ->regex('/^[a-zA-Z\s]+$/')
                 ->validationMessages([
                     'required' => 'Name is required.',
-                    'min' => 'Name must be at least 3 characters.',
-                    'max' => 'Name must not exceed 50 characters.',
-                    'regex' => 'Name can only contain letters and spaces.',
+                    'min'      => 'Name must be at least 3 characters.',
+                    'max'      => 'Name must not exceed 50 characters.',
+                    'regex'    => 'Name can only contain letters and spaces.',
                 ]),
 
             TextInput::make('email')
@@ -77,9 +77,9 @@ class UserResource extends Resource
                 ->unique(ignoreRecord: true)
                 ->validationMessages([
                     'required' => 'Email is required.',
-                    'email' => 'Please enter a valid email address.',
-                    'unique' => 'This email is already taken.',
-                    'regex' => 'Email must not contain spaces.',
+                    'email'    => 'Please enter a valid email address.',
+                    'unique'   => 'This email is already taken.',
+                    'regex'    => 'Email must not contain spaces.',
                 ]),
 
             TextInput::make('password')
@@ -94,9 +94,9 @@ class UserResource extends Resource
                 ->dehydrated(fn($state) => filled($state))
                 ->rule('confirmed')
                 ->validationMessages([
-                    'min' => 'Password must be at least 8 characters.',
+                    'min'       => 'Password must be at least 8 characters.',
                     'confirmed' => 'Password confirmation does not match.',
-                    'regex' => 'Password must not contain spaces.',
+                    'regex'     => 'Password must not contain spaces.',
                 ]),
 
             TextInput::make('password_confirmation')
@@ -104,11 +104,11 @@ class UserResource extends Resource
                 ->password()
                 ->revealable()
                 ->same('password')
-                ->regex('/^\S*$/') // ✅ no spaces
+                ->regex('/^\S*$/')
                 ->dehydrated(false)
                 ->required(fn(string $operation) => $operation === 'create')
                 ->validationMessages([
-                    'same' => 'Passwords do not match.',
+                    'same'  => 'Passwords do not match.',
                     'regex' => 'Password confirmation cannot contain spaces.',
                 ]),
 
@@ -130,7 +130,7 @@ class UserResource extends Resource
                 ->rules(['required', 'string', 'min:8'])
                 ->validationMessages([
                     'required' => 'Please enter your admin password to continue.',
-                    'min' => 'Password is too short.',
+                    'min'      => 'Password is too short.',
                 ]),
         ]);
     }
@@ -168,7 +168,51 @@ class UserResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([Tables\Actions\ViewAction::make(), Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+
+                Tables\Actions\Action::make('deactivate')
+                    ->label('Deactivate')
+                    ->icon('heroicon-o-user-minus')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Deactivate User Account')
+                    ->modalDescription('This will deactivate the user account. They will no longer be able to log in.')
+                    ->modalSubmitActionLabel('Yes, Deactivate')
+                    ->form([
+                        TextInput::make('admin_password')
+                            ->label('Your Password')
+                            ->password()
+                            ->required()
+                            ->validationMessages([
+                                'required' => 'Please enter your admin password to continue.',
+                            ]),
+                    ])
+                    ->action(function ($record, array $data) {
+                        if (!Hash::check($data['admin_password'], auth()->user()->password)) {
+                            Notification::make()
+                                ->title('Incorrect Password')
+                                ->body('The admin password you entered is incorrect.')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        $record->update(['is_active' => false]);
+
+                        if (auth()->id() === $record->id) {
+                            auth()->logout();
+                        }
+
+                        Notification::make()
+                            ->title('Account Deactivated')
+                            ->body("{$record->name}'s account has been deactivated successfully.")
+                            ->success()
+                            ->send();
+                    }),
+            ])
             ->bulkActions([
                 BulkAction::make('deactivate')
                     ->label('Deactivate selected')
@@ -182,8 +226,6 @@ class UserResource extends Resource
                             ->required(),
                     ])
                     ->action(function (Collection $records, array $data) {
-
-                        // 🔐 Validate admin password
                         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
                             Notification::make()
                                 ->title('Incorrect admin password')
@@ -193,13 +235,9 @@ class UserResource extends Resource
                             return;
                         }
 
-                        // 🔥 Deactivate selected users
                         foreach ($records as $record) {
-                            $record->update([
-                                'is_active' => false,
-                            ]);
+                            $record->update(['is_active' => false]);
 
-                            // logout if self-deactivated
                             if (auth()->id() === $record->id) {
                                 auth()->logout();
                             }
@@ -220,18 +258,16 @@ class UserResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-                //
-            ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
+            'index'  => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'view' => Pages\ViewUser::route('/{record}'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view'   => Pages\ViewUser::route('/{record}'),
+            'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 }

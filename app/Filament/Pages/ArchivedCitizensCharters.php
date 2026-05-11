@@ -52,6 +52,8 @@ class ArchivedCitizensCharters extends Page implements HasTable
                     ->dateTime('F d, Y h:i A')
                     ->sortable(),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->actions([
                 Tables\Actions\Action::make('restore')
                     ->label('Restore')

@@ -60,7 +60,36 @@ class ArchivedOrdinances extends Page implements HasTable
                     )
                     ->openUrlInNewTab(),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
+            ->filters([
+                        Tables\Filters\SelectFilter::make('sponsor')
+                ->label('Filter by Sponsor')
+                ->options(
+                    \App\Models\Ordinance::where('is_archived', false)
+                        ->whereNotNull('sponsor')
+                        ->distinct()
+                        ->orderBy('sponsor')
+                        ->pluck('sponsor', 'sponsor')
+                        ->toArray()
+                )
+                ->searchable()
+                ->preload(),
 
+            Tables\Filters\SelectFilter::make('publish_through')
+                ->label('Filter by Publish Through')
+                ->options(
+                    \App\Models\Ordinance::where('is_archived', false)
+                        ->whereNotNull('publish_through')
+                        ->distinct()
+                        ->orderBy('publish_through')
+                        ->pluck('publish_through', 'publish_through')
+                        ->toArray()
+                )
+                ->searchable()
+                ->preload(),
+            ])
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
 
                 Tables\Actions\Action::make('preview')

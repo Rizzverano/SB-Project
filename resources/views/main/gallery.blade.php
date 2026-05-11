@@ -67,9 +67,9 @@
             ];
 
             $committeeImages = [
-                ['src' => 'images/committee1.jpg', 'title' => 'Committee on Finance',        'desc' => 'Review of the annual budget and financial allocations for local programs.'],
-                ['src' => 'images/committee2.jpg', 'title' => 'Committee on Health',         'desc' => 'Health-related ordinances and community wellness programs are deliberated.'],
-                ['src' => 'images/committee3.jpg', 'title' => 'Committee on Infrastructure', 'desc' => 'Assessment of road, drainage, and public works improvement proposals.'],
+                ['src' => 'images/Committee/committee1.jpg', 'title' => 'Committee on Public Safety and Order, Public Utilities and Transportation',        'desc' => 'Reviews matters related to public safety, transportation, traffic management, and public utilities to promote community welfare and efficient services.'],
+                ['src' => 'images/Committee/committee2.jpg', 'title' => 'Committee on Housing, Land Use, Planning and Development',         'desc' => 'Reviews matters related to housing, land use, planning, and development to promote sustainable growth and improved community living.'],
+                ['src' => 'images/Committee/committee3.jpg', 'title' => 'Committee on Infrastructure', 'desc' => 'Assessment of road, drainage, and public works improvement proposals.'],
             ];
 
             $officeImages = [

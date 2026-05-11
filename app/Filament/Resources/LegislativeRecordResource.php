@@ -224,7 +224,7 @@ class LegislativeRecordResource extends Resource
             ])
             ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->color('info'),
                 Tables\Actions\EditAction::make(),
 
                 DeleteAction::make()

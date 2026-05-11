@@ -11,8 +11,11 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-
 use Filament\Tables\Columns\TextColumn;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Grid;
 
 class ContactMessageResource extends Resource
 {
@@ -26,9 +29,6 @@ class ContactMessageResource extends Resource
 
     protected static ?int $navigationSort = 16;
 
-    /**
-     * ✅ Filament 4 SAFE: only control entry access here
-     */
     public static function canViewAny(): bool
     {
         $user = auth()->user();
@@ -84,7 +84,8 @@ class ContactMessageResource extends Resource
                 TextColumn::make('phone'),
                 TextColumn::make('message')
                     ->limit(50)
-                    ->tooltip(fn ($state) => strlen($state) > 50 ? $state : null),
+                    ->tooltip(fn ($state) => strlen($state) > 50 ? $state : null)
+                    ->searchable(),
                 TextColumn::make('is_read')
                     ->label('Status')
                     ->formatStateUsing(fn ($state) => $state ? 'Read' : 'Unread')
@@ -96,15 +97,75 @@ class ContactMessageResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading(fn (ContactMessage $record) => "Message from {$record->name}")
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->infolist(fn (Infolist $infolist, ContactMessage $record) => $infolist
+                        ->record($record)
+                        ->schema([
+                            Section::make('Sender Details')
+                                ->icon('heroicon-o-user')
+                                ->schema([
+                                    Grid::make(3)
+                                        ->schema([
+                                            TextEntry::make('name')
+                                                ->label('Full Name'),
+
+                                            TextEntry::make('email')
+                                                ->label('Email Address')
+                                                ->icon('heroicon-o-envelope'),
+
+                                            TextEntry::make('phone')
+                                                ->label('Phone Number')
+                                                ->icon('heroicon-o-phone')
+                                                ->placeholder('Not provided'),
+                                        ]),
+                                ]),
+
+                            Section::make('Message')
+                                ->icon('heroicon-o-chat-bubble-left-ellipsis')
+                                ->schema([
+                                    TextEntry::make('message')
+                                        ->label('')
+                                        ->prose()
+                                        ->columnSpanFull(),
+                                ]),
+
+                            Section::make('Received')
+                                ->icon('heroicon-o-clock')
+                                ->schema([
+                                    TextEntry::make('created_at')
+                                        ->label('Received At')
+                                        ->dateTime('F d, Y h:i A'),
+                                ])
+                                ->collapsed(),
+                        ])
+                    ),
+
                 Tables\Actions\Action::make('toggleRead')
-                    ->label(fn ($record) => $record->is_read ? 'Mark as Unread' : 'Mark as Read')
-                    ->action(fn (ContactMessage $record) => $record->update(['is_read' => ! $record->is_read]))
-                    ->icon('heroicon-o-check'),
+                    ->label('Mark as Read')
+                    ->icon('heroicon-o-check')
+                    ->color('primary')
+                    ->visible(fn ($record) => ! $record->is_read)
+                    ->action(function (ContactMessage $record) {
+                        $record->update(['is_read' => true]);
+
+                        Notification::make()
+                            ->title('Marked as Read')
+                            ->success()
+                            ->send();
+                    }),
+
                 Tables\Actions\Action::make('archive')
                     ->label('Archive')
                     ->icon('heroicon-o-archive-box')
@@ -152,7 +213,7 @@ class ContactMessageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListContactMessages::route('/'),
+            'index'  => Pages\ListContactMessages::route('/'),
             'create' => Pages\CreateContactMessage::route('/create'),
         ];
     }

@@ -118,8 +118,10 @@ class LogoResource extends Resource
                     ->dateTime('M d, Y h:i A')
                     ->sortable(),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->color('info'),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('publish')
                     ->label('Set Active')

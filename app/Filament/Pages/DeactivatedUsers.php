@@ -6,6 +6,7 @@ use App\Models\User;
 use Filament\Tables;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\Action;
@@ -29,7 +30,6 @@ class DeactivatedUsers extends Page implements HasTable
 
     protected static string $view = 'filament.pages.deactivated-users';
 
-    // 🔒 Only Admin can access
     public static function canAccess(): bool
     {
         $user = auth()->user();
@@ -37,13 +37,11 @@ class DeactivatedUsers extends Page implements HasTable
         return $user && $user->role === \App\Models\User::ADMIN;
     }
 
-    // 📊 Query (same structure as UserResource)
     protected function getTableQuery(): Builder
     {
         return User::query()->where('is_active', false);
     }
 
-    // 📋 Columns (matched to UserResource style)
     public function table(Table $table): Table
     {
         return $table
@@ -83,8 +81,7 @@ class DeactivatedUsers extends Page implements HasTable
             ->paginated([10, 25, 50])
             ->defaultSort('updated_at', 'desc')
 
-            // 🔥 Actions (same style as UserResource)
-           ->actions([
+            ->actions([
                 Action::make('restore')
                     ->label('Restore')
                     ->icon('heroicon-o-arrow-path')
@@ -97,7 +94,6 @@ class DeactivatedUsers extends Page implements HasTable
                             ->required(),
                     ])
                     ->action(function (User $record, array $data) {
-
                         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
                             Notification::make()
                                 ->title('Incorrect admin password')
@@ -117,32 +113,68 @@ class DeactivatedUsers extends Page implements HasTable
                 Action::make('edit')
                     ->label('Edit')
                     ->icon('heroicon-o-pencil')
+                    ->modalHeading('Edit User Account')
+                    ->modalWidth('lg')
                     ->form([
-                        TextInput::make('name')->required()->maxLength(50),
-                        TextInput::make('email')->email()->required()->maxLength(50),
+                        Section::make('User Information')
+                            ->schema([
+                                TextInput::make('name')
+                                    ->required()
+                                    ->maxLength(50),
 
-                        TextInput::make('password')
-                            ->password()
-                            ->revealable()
-                            ->helperText('Leave blank if not changing'),
+                                TextInput::make('email')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(50),
 
-                        Select::make('role')
-                            ->options([
-                                0 => 'Admin',
-                                1 => 'Member',
-                            ])
-                            ->required(),
+                                TextInput::make('password')
+                                    ->password()
+                                    ->revealable()
+                                    ->helperText('Leave blank to keep current password.'),
+
+                                Select::make('role')
+                                    ->options([
+                                        0 => 'Admin',
+                                        1 => 'Member',
+                                    ])
+                                    ->required(),
+                            ]),
+
+                        Section::make('Admin Confirmation')
+                            ->description('Enter your password to authorize these changes.')
+                            ->schema([
+                                TextInput::make('admin_password')
+                                    ->label('Your Password')
+                                    ->password()
+                                    ->revealable()
+                                    ->required()
+                                    ->validationMessages([
+                                        'required' => 'Please enter your admin password to authorize this change.',
+                                    ]),
+                            ]),
                     ])
                     ->fillForm(fn (User $record) => [
-                        'name' => $record->name,
+                        'name'  => $record->name,
                         'email' => $record->email,
-                        'role' => $record->role,
+                        'role'  => $record->role,
                     ])
                     ->action(function (User $record, array $data) {
+                        // ── Verify admin password first ──────────────────
+                        if (!Hash::check($data['admin_password'], auth()->user()->password)) {
+                            Notification::make()
+                                ->title('Incorrect Password')
+                                ->body('The admin password you entered is incorrect. No changes were saved.')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        // ── Apply updates ────────────────────────────────
                         $update = [
-                            'name' => $data['name'],
+                            'name'  => $data['name'],
                             'email' => $data['email'],
-                            'role' => $data['role'],
+                            'role'  => $data['role'],
                         ];
 
                         if (!empty($data['password'])) {
@@ -152,7 +184,8 @@ class DeactivatedUsers extends Page implements HasTable
                         $record->update($update);
 
                         Notification::make()
-                            ->title('User updated successfully')
+                            ->title('User Updated')
+                            ->body("{$record->name}'s account has been updated successfully.")
                             ->success()
                             ->send();
                     }),
@@ -169,7 +202,6 @@ class DeactivatedUsers extends Page implements HasTable
                             ->required(),
                     ])
                     ->action(function (User $record, array $data) {
-
                         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
                             Notification::make()
                                 ->title('Incorrect admin password')
@@ -187,7 +219,6 @@ class DeactivatedUsers extends Page implements HasTable
                     }),
             ])
 
-            // 🔥 Bulk Actions (same style as UserResource)
             ->bulkActions([
                 BulkAction::make('restoreSelected')
                     ->label('Restore Selected')
@@ -201,7 +232,6 @@ class DeactivatedUsers extends Page implements HasTable
                             ->required(),
                     ])
                     ->action(function (Collection $records, array $data) {
-
                         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
                             Notification::make()
                                 ->title('Incorrect admin password')
@@ -232,7 +262,6 @@ class DeactivatedUsers extends Page implements HasTable
                             ->required(),
                     ])
                     ->action(function (Collection $records, array $data) {
-
                         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
                             Notification::make()
                                 ->title('Incorrect admin password')

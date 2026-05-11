@@ -12,6 +12,12 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Grid;
 
 class ArchivedOrganizationalCharts extends Page implements HasTable
 {
@@ -28,7 +34,6 @@ class ArchivedOrganizationalCharts extends Page implements HasTable
         return $table
             ->query(OrganizationalChart::query()->where('is_archived', true))
             ->columns([
-
                 TextColumn::make('title')
                     ->label('Title')
                     ->searchable()
@@ -50,7 +55,53 @@ class ArchivedOrganizationalCharts extends Page implements HasTable
                     ->dateTime('F d, Y h:i A')
                     ->sortable(),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->actions([
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading(fn (OrganizationalChart $record) => $record->title)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->infolist(fn (Infolist $infolist, OrganizationalChart $record) => $infolist
+                        ->record($record)
+                        ->schema([
+                            Section::make('Chart Preview')
+                                ->icon('heroicon-o-photo')
+                                ->schema([
+                                    ImageEntry::make('file')
+                                        ->label('')
+                                        ->disk('public')
+                                        ->defaultImageUrl(asset('images/default.jpg'))
+                                        ->height(400)
+                                        ->extraImgAttributes(['class' => 'object-contain w-full mx-auto'])
+                                        ->columnSpanFull(),
+                                ]),
+
+                            Section::make('Chart Details')
+                                ->icon('heroicon-o-information-circle')
+                                ->schema([
+                                    Grid::make(3)
+                                        ->schema([
+                                            TextEntry::make('title')
+                                                ->label('Chart Title')
+                                                ->weight('bold'),
+
+                                            IconEntry::make('is_publish')
+                                                ->label('Published')
+                                                ->boolean(),
+
+                                            TextEntry::make('created_at')
+                                                ->label('Uploaded Date')
+                                                ->dateTime('F d, Y h:i A'),
+                                        ]),
+                                ])
+                                ->collapsed(),
+                        ])
+                    ),
+
                 Tables\Actions\Action::make('restore')
                     ->label('Restore')
                     ->icon('heroicon-o-arrow-uturn-left')

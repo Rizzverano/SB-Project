@@ -101,7 +101,7 @@
 
         {{-- ══ ORBOS TAB ══ --}}
         <div id="orbusTab" class="tab-panel {{ $activeTab === 'orbus' ? '' : 'hidden' }}">
-            @if ($records && count($records) > 0)
+            @if ($records->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     @foreach ($records as $session => $items)
                         <div class="group bg-white border border-slate-200 rounded-2xl p-6 shadow-sm
@@ -129,6 +129,69 @@
                         </div>
                     @endforeach
                 </div>
+
+                {{-- ORBOS Pagination --}}
+                @if ($records->hasPages())
+                    <div class="flex justify-center mt-8">
+                        <nav class="flex items-center gap-1">
+
+                            {{-- Previous --}}
+                            @if ($records->onFirstPage())
+                                <span class="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest
+                                             text-slate-300 bg-white border border-slate-200 rounded-xl cursor-not-allowed select-none">
+                                    <i class="fa-solid fa-chevron-left text-[10px]"></i> Prev
+                                </span>
+                            @else
+                                <a href="{{ $records->previousPageUrl() }}"
+                                   class="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest
+                                          text-slate-500 bg-white border border-slate-200 rounded-xl hover:border-blue-400
+                                          hover:text-blue-700 transition-all duration-200">
+                                    <i class="fa-solid fa-chevron-left text-[10px]"></i> Prev
+                                </a>
+                            @endif
+
+                            {{-- Page Numbers --}}
+                            @foreach ($records->getUrlRange(1, $records->lastPage()) as $page => $url)
+                                @if ($page == $records->currentPage())
+                                    <span class="w-9 h-9 flex items-center justify-center text-xs font-bold
+                                                 bg-blue-800 text-white rounded-xl shadow-sm shadow-blue-800/30">
+                                        {{ $page }}
+                                    </span>
+                                @else
+                                    <a href="{{ $url }}"
+                                       class="w-9 h-9 flex items-center justify-center text-xs font-bold
+                                              text-slate-500 bg-white border border-slate-200 rounded-xl
+                                              hover:border-blue-400 hover:text-blue-700 transition-all duration-200">
+                                        {{ $page }}
+                                    </a>
+                                @endif
+                            @endforeach
+
+                            {{-- Next --}}
+                            @if ($records->hasMorePages())
+                                <a href="{{ $records->nextPageUrl() }}"
+                                   class="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest
+                                          text-slate-500 bg-white border border-slate-200 rounded-xl hover:border-blue-400
+                                          hover:text-blue-700 transition-all duration-200">
+                                    Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                </a>
+                            @else
+                                <span class="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest
+                                             text-slate-300 bg-white border border-slate-200 rounded-xl cursor-not-allowed select-none">
+                                    Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                </span>
+                            @endif
+
+                        </nav>
+                    </div>
+
+                    {{-- Page info --}}
+                    <p class="text-center text-slate-400 text-xs mt-3">
+                        Showing page {{ $records->currentPage() }} of {{ $records->lastPage() }}
+                        &nbsp;•&nbsp; {{ $records->total() }} session groups total
+                    </p>
+                @endif
+
             @else
                 <div class="text-center py-20">
                     <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
@@ -142,7 +205,7 @@
 
         {{-- ══ ORDINANCE TAB ══ --}}
         <div id="ordinanceTab" class="tab-panel {{ $activeTab === 'ordinance' ? '' : 'hidden' }}">
-            @if ($ordinances && count($ordinances) > 0)
+            @if ($ordinances->count() > 0)
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-gray-700">
@@ -196,7 +259,7 @@
                                             @else
                                                 <span class="inline-flex items-center px-2.5 py-1 text-[10px] font-bold
                                                              bg-slate-100 text-slate-400 border border-slate-200 rounded-full uppercase tracking-wide">
-                                                    None
+                                                    did not set as N/A
                                                 </span>
                                             @endif
                                         </td>
@@ -207,6 +270,68 @@
                         </table>
                     </div>
                 </div>
+
+                {{-- Ordinance Pagination --}}
+                @if ($ordinances->hasPages())
+                    <div class="flex justify-center mt-8">
+                        <nav class="flex items-center gap-1">
+
+                            {{-- Previous --}}
+                            @if ($ordinances->onFirstPage())
+                                <span class="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest
+                                             text-slate-300 bg-white border border-slate-200 rounded-xl cursor-not-allowed select-none">
+                                    <i class="fa-solid fa-chevron-left text-[10px]"></i> Prev
+                                </span>
+                            @else
+                                <a href="{{ $ordinances->previousPageUrl() }}"
+                                   class="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest
+                                          text-slate-500 bg-white border border-slate-200 rounded-xl hover:border-blue-400
+                                          hover:text-blue-700 transition-all duration-200">
+                                    <i class="fa-solid fa-chevron-left text-[10px]"></i> Prev
+                                </a>
+                            @endif
+
+                            {{-- Page Numbers --}}
+                            @foreach ($ordinances->getUrlRange(1, $ordinances->lastPage()) as $page => $url)
+                                @if ($page == $ordinances->currentPage())
+                                    <span class="w-9 h-9 flex items-center justify-center text-xs font-bold
+                                                 bg-blue-800 text-white rounded-xl shadow-sm shadow-blue-800/30">
+                                        {{ $page }}
+                                    </span>
+                                @else
+                                    <a href="{{ $url }}"
+                                       class="w-9 h-9 flex items-center justify-center text-xs font-bold
+                                              text-slate-500 bg-white border border-slate-200 rounded-xl
+                                              hover:border-blue-400 hover:text-blue-700 transition-all duration-200">
+                                        {{ $page }}
+                                    </a>
+                                @endif
+                            @endforeach
+
+                            {{-- Next --}}
+                            @if ($ordinances->hasMorePages())
+                                <a href="{{ $ordinances->nextPageUrl() }}"
+                                   class="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest
+                                          text-slate-500 bg-white border border-slate-200 rounded-xl hover:border-blue-400
+                                          hover:text-blue-700 transition-all duration-200">
+                                    Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                </a>
+                            @else
+                                <span class="flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest
+                                             text-slate-300 bg-white border border-slate-200 rounded-xl cursor-not-allowed select-none">
+                                    Next <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                </span>
+                            @endif
+
+                        </nav>
+                    </div>
+
+                    {{-- Page info --}}
+                    <p class="text-center text-slate-400 text-xs mt-3">
+                        Showing {{ $ordinances->firstItem() }}–{{ $ordinances->lastItem() }} of {{ $ordinances->total() }} ordinances
+                    </p>
+                @endif
+
             @else
                 <div class="text-center py-20">
                     <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
@@ -272,10 +397,10 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        const tabInput   = document.getElementById('activeTab');
-        const tabBtns    = document.querySelectorAll('.tab-btn');
-        const tabPanels  = document.querySelectorAll('.tab-panel');
-        const indicator  = document.getElementById('tabIndicator');
+        const tabInput  = document.getElementById('activeTab');
+        const tabBtns   = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        const indicator = document.getElementById('tabIndicator');
 
         function moveIndicator(el) {
             indicator.style.width = el.offsetWidth + 'px';
@@ -308,10 +433,10 @@
             });
         });
 
-        // Modal
-        const sessionData = @json($records);
-        const modal  = document.getElementById('legislativeModal');
-        const tbody  = document.getElementById('modal-table-body');
+        // Modal — only pass current page's items to JS
+        const sessionData = @json($records->items());
+        const modal = document.getElementById('legislativeModal');
+        const tbody = document.getElementById('modal-table-body');
 
         document.querySelectorAll('.session-card').forEach(card => {
             card.addEventListener('click', function () {

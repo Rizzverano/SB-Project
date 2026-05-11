@@ -42,8 +42,8 @@ class CitizensCharterResource extends Resource
                             ->disk('public')
                             ->directory('citizens-charter')
                             ->acceptedFileTypes(['application/pdf'])
-                            ->rules(['required', 'mimes:pdf', 'max:10240'])
-                            ->maxSize(10240) // 10MB
+                            ->rules(['required', 'mimes:pdf', 'max:307200'])
+                            ->maxSize(307200) // 300MB
                             ->downloadable()
                             ->openable()
                             ->required()
@@ -91,6 +91,8 @@ class CitizensCharterResource extends Resource
                     ->sortable(),
 
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->filters([
                 //
             ])

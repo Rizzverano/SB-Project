@@ -10,6 +10,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Grid;
 
 class ArchivedContactMessages extends Page implements HasTable
 {
@@ -45,7 +49,8 @@ class ArchivedContactMessages extends Page implements HasTable
                 TextColumn::make('phone'),
                 TextColumn::make('message')
                     ->limit(50)
-                    ->tooltip(fn ($state) => strlen($state) > 50 ? $state : null),
+                    ->tooltip(fn ($state) => strlen($state) > 50 ? $state : null)
+                    ->searchable(),
                 TextColumn::make('is_read')
                     ->label('Status')
                     ->formatStateUsing(fn ($state) => $state ? 'Read' : 'Unread')
@@ -56,7 +61,68 @@ class ArchivedContactMessages extends Page implements HasTable
                     ->dateTime()
                     ->sortable(),
             ])
+            ->striped()
+            ->paginated([10, 25, 50])
             ->actions([
+                Tables\Actions\Action::make('view')
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modalHeading(fn (ContactMessage $record) => "Message from {$record->name}")
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->infolist(fn (Infolist $infolist, ContactMessage $record) => $infolist
+                        ->record($record)
+                        ->schema([
+                            Section::make('Sender Details')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextEntry::make('name')
+                                                ->label('Name'),
+
+                                            TextEntry::make('email')
+                                                ->label('Email')
+                                                ->icon('heroicon-o-envelope'),
+
+                                            TextEntry::make('phone')
+                                                ->label('Phone')
+                                                ->icon('heroicon-o-phone')
+                                                ->placeholder('Not provided'),
+
+                                            TextEntry::make('is_read')
+                                                ->label('Status')
+                                                ->formatStateUsing(fn ($state) => $state ? 'Read' : 'Unread')
+                                                ->badge()
+                                                ->color(fn ($state) => $state ? 'success' : 'danger'),
+                                        ]),
+                                ]),
+
+                            Section::make('Message')
+                                ->schema([
+                                    TextEntry::make('message')
+                                        ->label('')
+                                        ->prose()
+                                        ->columnSpanFull(),
+                                ]),
+
+                            Section::make('Metadata')
+                                ->schema([
+                                    Grid::make(2)
+                                        ->schema([
+                                            TextEntry::make('created_at')
+                                                ->label('Received At')
+                                                ->dateTime('F d, Y h:i A'),
+
+                                            TextEntry::make('updated_at')
+                                                ->label('Last Updated')
+                                                ->dateTime('F d, Y h:i A'),
+                                        ]),
+                                ])
+                                ->collapsed(),
+                        ])
+                    ),
+
                 Tables\Actions\Action::make('restore')
                     ->label('Restore')
                     ->icon('heroicon-o-arrow-uturn-left')

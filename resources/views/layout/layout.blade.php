@@ -1,13 +1,7 @@
 @php
-    $activeLogo = \App\Models\Logo::where('is_published', true)
-        ->where('is_archived', false)
-        ->latest()
-        ->first();
+    $activeLogo = \App\Models\Logo::where('is_published', true)->where('is_archived', false)->latest()->first();
 
-    $announcements = \App\Models\Announcement::where('published', true)
-        ->where('is_archived', false)
-        ->latest()
-        ->get();
+    $announcements = \App\Models\Announcement::where('published', true)->where('is_archived', false)->latest()->get();
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -69,8 +63,7 @@
         <header class="relative overflow-hidden">
 
             <!-- Background -->
-            <img src="{{ asset('images/Hilongos-Lgu.jpg') }}"
-                class="absolute inset-0 w-full h-full object-cover z-0">
+            <img src="{{ asset('images/Hilongos-Lgu.jpg') }}" class="absolute inset-0 w-full h-full object-cover z-0">
 
             <div class="absolute inset-0 bg-blue-900/80 z-0"></div>
 
@@ -163,7 +156,7 @@
                 <!-- Home -->
                 <a href="{{ route('home') }}"
                     class="block px-4 py-2.5 text-xs font-semibold uppercase border-b border-white/10 transition-colors
-    {{ request()->routeIs('home') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
+        {{ request()->routeIs('home') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
                     Home
                 </a>
 
@@ -175,25 +168,25 @@
 
                     <a href="{{ route('about') }}"
                         class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
-   {{ request()->routeIs('about*')
-       ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
-       : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+            {{ request()->routeIs('about*')
+                ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
+                : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
                         About the SB
                     </a>
 
                     <a href="{{ route('sb.members') }}"
                         class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
-    {{ request()->routeIs('sb.members*')
-        ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
-        : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+            {{ request()->routeIs('sb.members*')
+                ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
+                : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
                         Members
                     </a>
 
                     <a href="{{ route('gallery') }}"
                         class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
-   {{ request()->routeIs('gallery*')
-       ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
-       : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+            {{ request()->routeIs('gallery*')
+                ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
+                : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
                         Activities
                     </a>
                 </div>
@@ -201,22 +194,43 @@
                 <!-- Legislative -->
                 <a href="{{ route('legislative_index') }}"
                     class="block px-4 py-2.5 text-xs font-semibold uppercase border-b border-white/10 transition-colors
-    {{ request()->routeIs('legislative_index') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
+        {{ request()->routeIs('legislative_index') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
                     Legislative Records
                 </a>
 
                 <!-- Legislative Process -->
                 <a href="{{ route('legislative.process') }}"
                     class="block px-4 py-2.5 text-xs font-semibold uppercase border-b border-white/10 transition-colors
-    {{ request()->routeIs('legislative.process') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
+        {{ request()->routeIs('legislative.process') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
                     Legislative Process
                 </a>
 
                 <!-- Contact -->
                 <a href="{{ route('contact') }}"
-                    class="block px-4 py-2.5 text-white text-xs font-semibold uppercase hover:bg-green-700 transition-colors">
+                    class="block px-4 py-2.5 text-xs font-semibold uppercase border-b border-white/10 transition-colors
+        {{ request()->routeIs('contact') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
                     Contact Us
                 </a>
+
+                <!-- Admin Links (mobile only) -->
+                <div class="sm:hidden border-t border-white/10 px-4 py-2.5 flex items-center gap-3">
+                    <a href="{{ route('filament.admin.auth.login') }}" title="Admin Portal"
+                        class="flex items-center gap-2 text-xs font-semibold uppercase text-blue-300 hover:text-white transition-colors">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span>Admin Portal</span>
+                    </a>
+
+                    @auth
+                        @if (auth()->user()->isAdmin() || auth()->user()->isMember())
+                            <a href="{{ route('filament.admin.pages.dashboard') }}" title="Go Back to Dashboard"
+                                class="flex items-center gap-2 text-xs font-semibold uppercase text-blue-300 hover:text-white transition-colors">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        @endif
+                    @endauth
+                </div>
+
             </div>
 
             <!-- Desktop nav row (CENTERED) -->
@@ -224,43 +238,42 @@
                 <div class="flex items-stretch">
                     <a href="{{ route('home') }}"
                         class="px-4 py-3 text-white text-xs font-semibold uppercase tracking-wide border-r border-white/10 whitespace-nowrap
-    {{ request()->routeIs('home') ? 'bg-green-700' : 'hover:bg-green-700' }}">
+            {{ request()->routeIs('home') ? 'bg-green-700' : 'hover:bg-green-700' }}">
                         Home
                     </a>
 
                     <!-- Dropdown: About -->
-                    <div class="dropdown relative border-r border-white/10"> <button
+                    <div class="dropdown relative border-r border-white/10">
+                        <button
                             class="px-4 py-3 text-white text-xs font-semibold uppercase tracking-wide flex items-center gap-1 hover:bg-green-700 transition-colors whitespace-nowrap h-full">
                             About the Office
-
                             <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 10 6">
                                 <path d="M0 0l5 6 5-6z" />
-                            </svg> </button>
+                            </svg>
+                        </button>
                         <div
                             class="dropdown-menu absolute top-full left-1/2 -translate-x-1/2 bg-blue-900 min-w-[200px] z-50 border-t-2 border-green-300 shadow-xl">
-
                             <a href="{{ route('about') }}"
                                 class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
-   {{ request()->routeIs('about*')
-       ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
-       : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+                    {{ request()->routeIs('about*')
+                        ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
+                        : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
                                 About the SB
                             </a>
 
-
                             <a href="{{ route('sb.members') }}"
                                 class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
-    {{ request()->routeIs('sb.members*')
-        ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
-        : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+                    {{ request()->routeIs('sb.members*')
+                        ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
+                        : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
                                 Members
                             </a>
 
                             <a href="{{ route('gallery') }}"
                                 class="block px-4 py-2.5 text-xs border-b border-white/10 transition-all duration-200
-   {{ request()->routeIs('gallery*')
-       ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
-       : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
+                    {{ request()->routeIs('gallery*')
+                        ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
+                        : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
                                 Activities
                             </a>
                         </div>
@@ -268,19 +281,19 @@
 
                     <a href="{{ route('legislative_index') }}"
                         class="px-4 py-3 text-white text-xs font-semibold uppercase tracking-wide border-r border-white/10 whitespace-nowrap transition-colors
-    {{ request()->routeIs('legislative_index') ? 'bg-green-700' : 'hover:bg-green-700' }}">
+            {{ request()->routeIs('legislative_index') ? 'bg-green-700' : 'hover:bg-green-700' }}">
                         Legislative Records
                     </a>
 
                     <a href="{{ route('legislative.process') }}"
                         class="px-4 py-3 text-white text-xs font-semibold uppercase tracking-wide border-r border-white/10 whitespace-nowrap transition-colors
-                        {{ request()->routeIs('legislative.process') ? 'bg-green-700' : 'hover:bg-green-700' }}">
+            {{ request()->routeIs('legislative.process') ? 'bg-green-700' : 'hover:bg-green-700' }}">
                         Legislative Process
                     </a>
 
                     <a href="{{ route('contact') }}"
                         class="px-4 py-3 text-white text-xs font-semibold uppercase tracking-wide whitespace-nowrap transition-colors
-    {{ request()->routeIs('contact') ? 'bg-green-700' : 'hover:bg-green-700' }}">
+            {{ request()->routeIs('contact') ? 'bg-green-700' : 'hover:bg-green-700' }}">
                         Contact Us
                     </a>
                 </div>
@@ -291,8 +304,8 @@
         <section class="relative flex items-center justify-center min-h-[340px] md:min-h-[420px] overflow-hidden">
 
             <!-- Background Image -->
-            <img src="{{ asset('images/legis-building.jpg') }}" class="absolute inset-0 w-full h-full object-cover z-0"
-                alt="">
+            <img src="{{ asset('images/legis-building.jpg') }}"
+                class="absolute inset-0 w-full h-full object-cover z-0" alt="">
 
             <!-- Optional dark overlay (for readability) -->
             <div class="absolute inset-0 bg-blue-950/70 z-0"></div>
@@ -300,7 +313,8 @@
             <!-- Decorative circles -->
             <div class="absolute -top-40 -right-32 w-[500px] h-[500px] rounded-full bg-green-300 opacity-[0.07] z-0">
             </div>
-            <div class="absolute -bottom-36 -left-24 w-[380px] h-[380px] rounded-full bg-blue-600 opacity-10 z-0"></div>
+            <div class="absolute -bottom-36 -left-24 w-[380px] h-[380px] rounded-full bg-blue-600 opacity-10 z-0">
+            </div>
 
             <!-- Content -->
             <div class="relative z-10 text-center px-4 animate-fadeUp">
@@ -330,81 +344,76 @@
         <!-- ══════════════════ QUICK LINKS ══════════════════ -->
         <div class="bg-slate-100 border-b border-slate-100 flex items-stretch relative">
             <!-- LEFT SPACER (balances right side) -->
-            <div class="w-10"></div> <!-- CENTER QUICK LINKS -->
-            <div class="flex justify-start md:justify-center flex-1 overflow-x-auto no-scrollbar">
+            <div class="w-10"></div>
 
-                <a href="{{ route('legislative_index') }}"
+            <!-- CENTER QUICK LINKS -->
+            <div class="flex justify-center flex-1 overflow-x-auto no-scrollbar">
+
+                <a href="{{ route('legislative_index') }}" title="Legislative Records"
                     class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide border-r border-slate-100 transition group
-    {{ request()->routeIs('legislative_index')
-        ? 'bg-blue-800 text-white'
-        : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
-
+            {{ request()->routeIs('legislative_index')
+                ? 'bg-blue-800 text-white'
+                : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
                     <i
                         class="fa-solid fa-file-lines text-xl transition-transform
-        {{ request()->routeIs('legislative_index') ? 'scale-110' : 'group-hover:scale-110' }}">
+                {{ request()->routeIs('legislative_index') ? 'scale-110' : 'group-hover:scale-110' }}">
                     </i>
-
-                    Legislative Records
+                    <span class="hidden sm:inline">Legislative Records</span>
                 </a>
 
-                <a href="{{ route('sb.members') }}"
+                <a href="{{ route('sb.members') }}" title="SB Members"
                     class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide border-r border-slate-100 transition group
-                    {{ request()->routeIs('sb.members*')
-                        ? 'bg-blue-800 text-white'
-                        : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
-
+            {{ request()->routeIs('sb.members*')
+                ? 'bg-blue-800 text-white'
+                : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
                     <i
                         class="fa-solid fa-users text-xl transition-transform
-                        {{ request()->routeIs('sb.members*') ? 'scale-110' : 'group-hover:scale-110' }}">
+                {{ request()->routeIs('sb.members*') ? 'scale-110' : 'group-hover:scale-110' }}">
                     </i>
-
-                    SB Members
+                    <span class="hidden sm:inline">SB Members</span>
                 </a>
 
-                <a href="{{ route('legislative.process') }}"
+                <a href="{{ route('legislative.process') }}" title="Legislative Process"
                     class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition group
-                    {{ request()->routeIs('legislative.process*')
-                        ? 'bg-blue-800 text-white'
-                        : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
-
+            {{ request()->routeIs('legislative.process*')
+                ? 'bg-blue-800 text-white'
+                : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
                     <i
                         class="fa-solid fa-list-check text-xl transition-transform
-                        {{ request()->routeIs('legislative.process*') ? 'scale-110' : 'group-hover:scale-110' }}">
+                {{ request()->routeIs('legislative.process*') ? 'scale-110' : 'group-hover:scale-110' }}">
                     </i>
-
-                    Legislative
-                    Process
+                    <span class="hidden sm:inline">Legislative Process</span>
                 </a>
 
-                <a href="{{ route('gallery') }}"
+                <a href="{{ route('gallery') }}" title="Activities"
                     class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide transition group
-   {{ request()->routeIs('gallery*')
-       ? 'bg-blue-800 text-white'
-       : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
-
+            {{ request()->routeIs('gallery*')
+                ? 'bg-blue-800 text-white'
+                : 'text-blue-800 hover:bg-blue-800 hover:text-white' }}">
                     <i
                         class="fa-solid fa-images text-xl transition-transform
-        {{ request()->routeIs('gallery*') ? 'scale-110' : 'group-hover:scale-110' }}">
+                {{ request()->routeIs('gallery*') ? 'scale-110' : 'group-hover:scale-110' }}">
                     </i>
-
-                    Activities
+                    <span class="hidden sm:inline">Activities</span>
                 </a>
 
             </div>
 
-            <div class="flex items-center justify-end pr-3 gap-2"> <a href="{{ route('filament.admin.auth.login') }}"
-                    title="Admin Portal"
-                    class="w-10 h-10 flex items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
-                    <i class="fa-solid fa-user-shield"></i> </a>
-                @auth
-                    @if (auth()->user()->isAdmin() || auth()->user()->isMember())
-                        <a href="{{ route('filament.admin.pages.dashboard') }}" title="Go Back"
-                            class="w-10 h-10 flex items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
-                            <i class="fa-solid fa-arrow-right"></i> </a>
-                    @endif
-                @endauth
-            </div>
+        <div class="flex items-center justify-end pr-3 gap-2">
+            <a href="{{ route('filament.admin.auth.login') }}" title="Admin Portal"
+                class="hidden sm:flex w-10 h-10 items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
+                <i class="fa-solid fa-user-shield"></i>
+            </a>
+            @auth
+                @if (auth()->user()->isAdmin() || auth()->user()->isMember())
+                    <a href="{{ route('filament.admin.pages.dashboard') }}" title="Go Back"
+                        class="hidden sm:flex w-10 h-10 items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </a>
+                @endif
+            @endauth
         </div>
+    </div>
     </div>
 
     <main class="flex-1 w-full">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\LegislativeRecord;
 use App\Models\Ordinance;
 use Carbon\Carbon;
@@ -24,30 +25,43 @@ class LegislativeController extends Controller
 
         if ($request->filled('date')) {
             $date = Carbon::parse($request->date);
-
             $orbusQuery->whereBetween('date', [
                 $date->copy()->startOfDay(),
                 $date->copy()->endOfDay()
             ]);
         }
 
-        $records = $orbusQuery
+        // Group all results first, then paginate the groups
+        $allGroups = $orbusQuery
             ->orderBy('date', 'asc')
             ->get()
             ->groupBy(fn ($r) => trim($r->session))
             ->map(function ($group) {
-                return $group->map(function ($record) {
-                    return [
-                        'session' => trim($record->session),
-                        'date' => Carbon::parse($record->date)->format('Y-m-d'),
-                        'title' => $record->title,
-                        'description' => $record->description,
-                        'sponsor' => $record->sponsor,
-                        'action_taken' => $record->action_taken,
-                    ];
-                })->values()->toArray();
-            })
-            ->toArray();
+                return $group->map(fn ($record) => [
+                    'session'     => trim($record->session),
+                    'date'        => Carbon::parse($record->date)->format('Y-m-d'),
+                    'title'       => $record->title,
+                    'description' => $record->description,
+                    'sponsor'     => $record->sponsor,
+                    'action_taken'=> $record->action_taken,
+                ])->values()->toArray();
+            });
+
+        $orbusPage    = $request->get('orbus_page', 1);
+        $orbusPerPage = 8;
+        $orbusSlice   = $allGroups->slice(($orbusPage - 1) * $orbusPerPage, $orbusPerPage);
+
+        $records = new LengthAwarePaginator(
+            $orbusSlice,                    // items for this page
+            $allGroups->count(),            // total items
+            $orbusPerPage,                  // per page
+            $orbusPage,                     // current page
+            [
+                'path'     => $request->url(),
+                'query'    => array_merge($request->query(), ['tab' => 'orbus']),
+                'pageName' => 'orbus_page',
+            ]
+        );
 
         /* =======================
             ORDINANCE QUERY
@@ -61,7 +75,6 @@ class LegislativeController extends Controller
 
         if ($request->filled('date')) {
             $date = Carbon::parse($request->date);
-
             $ordinancesQuery->whereBetween('date', [
                 $date->copy()->startOfDay(),
                 $date->copy()->endOfDay()
@@ -70,7 +83,8 @@ class LegislativeController extends Controller
 
         $ordinances = $ordinancesQuery
             ->orderBy('created_at', 'asc')
-            ->get();
+            ->paginate(10, ['*'], 'ordinance_page')
+            ->appends(array_merge($request->query(), ['tab' => 'ordinance']));
 
         return view('main.legislative_index', compact(
             'records',
