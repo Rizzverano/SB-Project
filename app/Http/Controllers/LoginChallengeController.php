@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Auth\FortifyLoginRateLimiter;
+use App\Models\AuditLog;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 
 class LoginChallengeController extends Controller
 {
@@ -27,8 +28,7 @@ class LoginChallengeController extends Controller
                 $seconds = $lockoutUntil - now()->timestamp;
 
                 return redirect('/admin/login')->withErrors([
-                    'data.email' =>
-                        "Too many failed attempts. Account locked for {$seconds} seconds.",
+                    'data.email' => "Too many failed attempts. Account locked for {$seconds} seconds.",
                 ]);
             }
 
@@ -77,6 +77,15 @@ class LoginChallengeController extends Controller
         )->json();
 
         if (! ($response['success'] ?? false)) {
+            $this->recordLoginAttempt(
+                (string) session('login_challenge_email', ''),
+                AuditLog::STATUS_FAILED,
+                'challenge_verification_failed',
+                false,
+                true,
+                $request,
+            );
+
             return back()->withErrors([
                 'answer' => 'Security verification failed.',
             ]);
@@ -92,6 +101,7 @@ class LoginChallengeController extends Controller
             if ($failedAttempts >= self::MAX_CHALLENGE_ATTEMPTS) {
 
                 $seconds = $this->triggerLoginLockout($request);
+                $email = (string) session('login_challenge_email', '');
 
                 session()->forget([
                     'challenge_num1',
@@ -105,17 +115,33 @@ class LoginChallengeController extends Controller
                     'login_lockout_until' => now()->addSeconds($seconds)->timestamp,
                 ]);
 
+                $this->recordLoginAttempt(
+                    $email,
+                    AuditLog::STATUS_FAILED,
+                    'wrong_challenge',
+                    true,
+                    true,
+                    $request,
+                );
+
                 return redirect('/admin/login')->withErrors(new MessageBag([
-                    'data.email' =>
-                        "Too many failed attempts. Account locked for {$seconds} seconds.",
+                    'data.email' => "Too many failed attempts. Account locked for {$seconds} seconds.",
                 ]));
             }
 
             $remaining = self::MAX_CHALLENGE_ATTEMPTS - $failedAttempts;
 
+            $this->recordLoginAttempt(
+                (string) session('login_challenge_email', ''),
+                AuditLog::STATUS_FAILED,
+                'wrong_challenge',
+                false,
+                true,
+                $request,
+            );
+
             return back()->withErrors([
-                'answer' =>
-                    "Incorrect answer. {$remaining} attempt(s) remaining.",
+                'answer' => "Incorrect answer. {$remaining} attempt(s) remaining.",
             ]);
         }
 
@@ -137,9 +163,27 @@ class LoginChallengeController extends Controller
                 Auth::login($user);
                 session()->regenerate();
 
+                $this->recordLoginAttempt(
+                    $email,
+                    AuditLog::STATUS_SUCCESS,
+                    null,
+                    false,
+                    true,
+                    $request,
+                );
+
                 return redirect('/admin/dashboard');
             }
         }
+
+        $this->recordLoginAttempt(
+            (string) $email,
+            AuditLog::STATUS_FAILED,
+            'user_not_found',
+            false,
+            true,
+            $request,
+        );
 
         return redirect('/admin/login');
     }
@@ -162,5 +206,25 @@ class LoginChallengeController extends Controller
         }
 
         return $loginRateLimiter->availableIn($rateLimitRequest);
+    }
+
+    protected function recordLoginAttempt(
+        string $email,
+        string $status,
+        ?string $failureReason,
+        bool $isLocked,
+        bool $hasChallenge,
+        Request $request,
+    ): void {
+        AuditLog::create([
+            'email' => $email,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'status' => $status,
+            'attempted_at' => now(),
+            'failure_reason' => $failureReason,
+            'is_locked' => $isLocked,
+            'has_challenge' => $hasChallenge,
+        ]);
     }
 }

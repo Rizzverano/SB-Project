@@ -18,9 +18,11 @@ class Ordinance extends Model
         'action',
         'publish_through',
         'date',
+        'not_applicable',
     ];
 
     protected $casts = [
         'is_archived' => 'boolean',
+        'not_applicable' => 'boolean',
     ];
 }
