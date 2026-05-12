@@ -102,16 +102,43 @@ class AuditLogResource extends Resource
                 SelectFilter::make('status')
                     ->options([
                         AuditLog::STATUS_SUCCESS => 'Success',
-                        AuditLog::STATUS_FAILED => 'Failed',
-                    ]),
+                        AuditLog::STATUS_FAILED  => 'Failed',
+                    ])
+                    ->searchable()
+                    ->preload(),
+
                 SelectFilter::make('failure_reason')
+                    ->label('Filter by Failure Reason')
                     ->options(fn (): array => AuditLog::query()
                         ->whereNotNull('failure_reason')
                         ->distinct()
                         ->orderBy('failure_reason')
                         ->pluck('failure_reason', 'failure_reason')
-                        ->all()),
+                        ->all())
+                    ->searchable()
+                    ->preload(),
+
+                SelectFilter::make('attempted_at')
+                    ->label('Filter by Date')
+                    ->options(fn (): array => AuditLog::query()
+                        ->whereNotNull('attempted_at')
+                        ->distinct()
+                        ->orderBy('attempted_at', 'desc')
+                        ->pluck('attempted_at')
+                        ->map(fn ($date) => \Carbon\Carbon::parse($date)->toDateString())
+                        ->unique()
+                        ->mapWithKeys(fn ($date) => [
+                            $date => \Carbon\Carbon::parse($date)->toFormattedDateString()
+                        ])
+                        ->all())
+                    ->searchable()
+                    ->preload()
+                    ->query(fn ($query, array $data) => $query->when(
+                        $data['value'],
+                        fn ($q) => $q->whereDate('attempted_at', $data['value'])
+                    )),
             ])
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->color('info')

@@ -85,17 +85,44 @@ class ArchivedAuditLogs extends Page implements HasTable
                 SelectFilter::make('status')
                     ->options([
                         AuditLog::STATUS_SUCCESS => 'Success',
-                        AuditLog::STATUS_FAILED => 'Failed',
-                    ]),
+                        AuditLog::STATUS_FAILED  => 'Failed',
+                    ])
+                    ->searchable()
+                    ->preload(),
+
                 SelectFilter::make('failure_reason')
+                    ->label('Filter by Failure Reason')
                     ->options(fn (): array => AuditLog::query()
                         ->where('is_archived', true)
                         ->whereNotNull('failure_reason')
                         ->distinct()
                         ->orderBy('failure_reason')
                         ->pluck('failure_reason', 'failure_reason')
-                        ->all()),
+                        ->all())
+                    ->searchable()
+                    ->preload(),
+
+                SelectFilter::make('attempted_at')
+                    ->label('Filter by Date')
+                    ->options(fn (): array => AuditLog::query()
+                        ->where('is_archived', true)
+                        ->whereNotNull('attempted_at')
+                        ->orderBy('attempted_at', 'desc')
+                        ->pluck('attempted_at')
+                        ->map(fn ($date) => \Carbon\Carbon::parse($date)->toDateString())
+                        ->unique()
+                        ->mapWithKeys(fn ($date) => [
+                            $date => \Carbon\Carbon::parse($date)->toFormattedDateString()
+                        ])
+                        ->all())
+                    ->searchable()
+                    ->preload()
+                    ->query(fn ($query, array $data) => $query->when(
+                        $data['value'],
+                        fn ($q) => $q->whereDate('attempted_at', $data['value'])
+                    )),
             ])
+            ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
                 Tables\Actions\Action::make('restore')
                     ->label('Restore')
