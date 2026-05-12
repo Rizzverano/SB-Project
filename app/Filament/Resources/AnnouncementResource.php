@@ -100,7 +100,35 @@ class AnnouncementResource extends Resource
             ->striped()
             ->paginated([10, 25, 50])
             ->actions([
-                Tables\Actions\ViewAction::make()->color('info'),
+                Tables\Actions\ViewAction::make()
+                    ->color('info')
+                    ->modal()
+                    ->infolist([
+                        \Filament\Infolists\Components\Section::make('Announcement overview')
+                            ->description('Review the content, visibility status, and publishing timestamp for this announcement.')
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('title')
+                                    ->label('Title')
+                                    ->weight('bold')
+                                    ->columnSpanFull(),
+                                \Filament\Infolists\Components\TextEntry::make('description')
+                                    ->label('Description')
+                                    ->markdown()
+                                    ->placeholder('No description provided.')
+                                    ->prose()
+                                    ->columnSpanFull(),
+                                \Filament\Infolists\Components\Grid::make(2)
+                                    ->schema([
+                                        \Filament\Infolists\Components\IconEntry::make('published')
+                                            ->label('Published')
+                                            ->boolean(),
+                                        \Filament\Infolists\Components\TextEntry::make('created_at')
+                                            ->label('Created')
+                                            ->dateTime('F d, Y h:i A'),
+                                    ]),
+                            ]),
+                    ]),
+
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('archive')
                     ->label('Archive')
@@ -144,7 +172,6 @@ class AnnouncementResource extends Resource
         return [
             'index' => Pages\ListAnnouncements::route('/'),
             'create' => Pages\CreateAnnouncement::route('/create'),
-            'view' => Pages\ViewAnnouncement::route('/{record}'),
             'edit' => Pages\EditAnnouncement::route('/{record}/edit'),
         ];
     }

@@ -167,7 +167,32 @@ class UserResource extends Resource
             ->paginated([10, 25, 50])
             ->filters([])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->color('info')
+                    ->modal()
+                    ->infolist([
+                        \Filament\Infolists\Components\TextEntry::make('id')
+                            ->label('ID'),
+                        \Filament\Infolists\Components\TextEntry::make('name')
+                            ->label('Name'),
+                        \Filament\Infolists\Components\TextEntry::make('email')
+                            ->label('Email'),
+                        \Filament\Infolists\Components\TextEntry::make('role')
+                            ->label('Role')
+                            ->badge()
+                            ->formatStateUsing(fn($state) => match ($state) {
+                                0 => 'Admin',
+                                1 => 'Member',
+                            })
+                            ->color(fn($state) => match ($state) {
+                                0 => 'danger',
+                                1 => 'success',
+                            }),
+                        \Filament\Infolists\Components\TextEntry::make('created_at')
+                            ->label('Created')
+                            ->dateTime(),
+                    ]),
+
                 Tables\Actions\EditAction::make(),
 
                 Tables\Actions\Action::make('deactivate')
@@ -262,7 +287,6 @@ class UserResource extends Resource
         return [
             'index'  => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'view'   => Pages\ViewUser::route('/{record}'),
             'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
     }

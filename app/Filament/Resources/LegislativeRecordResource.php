@@ -224,7 +224,53 @@ class LegislativeRecordResource extends Resource
             ])
             ->filtersLayout(Tables\Enums\FiltersLayout::AboveContent)
             ->actions([
-                Tables\Actions\ViewAction::make()->color('info'),
+                Tables\Actions\ViewAction::make()
+                    ->color('info')
+                    ->modal()
+                    ->infolist([
+                        \Filament\Infolists\Components\Section::make('Legislative record overview')
+                            ->description('Complete session context, authorship, and action status for this legislative entry.')
+                            ->schema([
+                                \Filament\Infolists\Components\Grid::make(2)
+                                    ->schema([
+                                        \Filament\Infolists\Components\TextEntry::make('session')
+                                            ->label('Session')
+                                            ->badge()
+                                            ->color('info'),
+                                        \Filament\Infolists\Components\TextEntry::make('date')
+                                            ->label('Session date')
+                                            ->date('F d, Y'),
+                                    ]),
+                                \Filament\Infolists\Components\TextEntry::make('title')
+                                    ->label('Title')
+                                    ->weight('bold')
+                                    ->columnSpanFull(),
+                                \Filament\Infolists\Components\TextEntry::make('description')
+                                    ->label('Description')
+                                    ->markdown()
+                                    ->placeholder('No description provided.')
+                                    ->prose()
+                                    ->columnSpanFull(),
+                                \Filament\Infolists\Components\Grid::make(2)
+                                    ->schema([
+                                        \Filament\Infolists\Components\TextEntry::make('sponsor')
+                                            ->label('Sponsor')
+                                            ->placeholder('Not specified'),
+                                        \Filament\Infolists\Components\TextEntry::make('action_taken')
+                                            ->label('Action taken')
+                                            ->badge()
+                                            ->color(
+                                                fn ($state) => match ($state) {
+                                                    'Approved' => 'success',
+                                                    'Marked as Noted' => 'gray',
+                                                    'NONE' => 'secondary',
+                                                    default => 'warning',
+                                                },
+                                            ),
+                                    ]),
+                            ]),
+                    ]),
+
                 Tables\Actions\EditAction::make(),
 
                 DeleteAction::make()
@@ -274,7 +320,6 @@ class LegislativeRecordResource extends Resource
         return [
             'index' => Pages\ListLegislativeRecords::route('/'),
             'create' => Pages\CreateLegislativeRecord::route('/create'),
-            'view' => Pages\ViewLegislativeRecord::route('/{record}'),
             'edit' => Pages\EditLegislativeRecord::route('/{record}/edit'),
         ];
     }

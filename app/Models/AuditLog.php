@@ -22,11 +22,13 @@ class AuditLog extends Model
         'failure_reason',
         'is_locked',
         'has_challenge',
+        'is_archived',
     ];
 
     protected $casts = [
         'attempted_at' => 'datetime',
         'is_locked' => 'boolean',
         'has_challenge' => 'boolean',
+        'is_archived' => 'boolean',
     ];
 }

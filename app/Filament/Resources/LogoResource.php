@@ -121,7 +121,36 @@ class LogoResource extends Resource
             ->striped()
             ->paginated([10, 25, 50])
             ->actions([
-                Tables\Actions\ViewAction::make()->color('info'),
+                Tables\Actions\ViewAction::make()
+                    ->color('info')
+                    ->modal()
+                    ->infolist([
+                        \Filament\Infolists\Components\Section::make('Logo set overview')
+                            ->description('Preview the uploaded logo assets and verify whether this set is the currently published version.')
+                            ->schema([
+                                \Filament\Infolists\Components\Grid::make(2)
+                                    ->schema([
+                                        \Filament\Infolists\Components\ImageEntry::make('pres_gov')
+                                            ->label('Provincial government logo')
+                                            ->disk('public')
+                                            ->height(160),
+                                        \Filament\Infolists\Components\ImageEntry::make('lgu_hilongos')
+                                            ->label('LGU Hilongos logo')
+                                            ->disk('public')
+                                            ->height(160),
+                                    ]),
+                                \Filament\Infolists\Components\Grid::make(2)
+                                    ->schema([
+                                        \Filament\Infolists\Components\IconEntry::make('is_published')
+                                            ->label('Active published set')
+                                            ->boolean(),
+                                        \Filament\Infolists\Components\TextEntry::make('created_at')
+                                            ->label('Created')
+                                            ->dateTime('F d, Y h:i A'),
+                                    ]),
+                            ]),
+                    ]),
+
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('publish')
                     ->label('Set Active')
@@ -198,7 +227,6 @@ class LogoResource extends Resource
         return [
             'index' => Pages\ListLogos::route('/'),
             'create' => Pages\CreateLogo::route('/create'),
-            'view' => Pages\ViewLogo::route('/{record}'),
             'edit' => Pages\EditLogo::route('/{record}/edit'),
         ];
     }

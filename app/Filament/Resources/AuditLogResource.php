@@ -5,8 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AuditLogResource\Pages;
 use App\Models\AuditLog;
 use App\Models\User;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -110,37 +113,100 @@ class AuditLogResource extends Resource
                         ->all()),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->color('info'),
+                Tables\Actions\ViewAction::make()
+                    ->color('info')
+                    ->modal()
+                    ->infolist([
+                        \Filament\Infolists\Components\Section::make('Login Attempt')
+                            ->schema([
+                                \Filament\Infolists\Components\Grid::make(2)
+                                    ->schema([
+                                        \Filament\Infolists\Components\TextEntry::make('email')
+                                            ->label('Email'),
+                                        \Filament\Infolists\Components\TextEntry::make('status')
+                                            ->badge()
+                                            ->color(fn (string $state): string => match ($state) {
+                                                'success' => 'success',
+                                                'failed'  => 'danger',
+                                                default   => 'gray',
+                                            }),
+                                        \Filament\Infolists\Components\TextEntry::make('ip_address')
+                                            ->label('IP Address'),
+                                        \Filament\Infolists\Components\TextEntry::make('attempted_at')
+                                            ->label('Attempted At')
+                                            ->dateTime(),
+                                        \Filament\Infolists\Components\TextEntry::make('failure_reason')
+                                            ->label('Failure Reason')
+                                            ->placeholder('-')
+                                            ->badge()
+                                            ->color('warning'),
+                                        \Filament\Infolists\Components\IconEntry::make('is_locked')
+                                            ->label('Locked')
+                                            ->boolean(),
+                                        \Filament\Infolists\Components\IconEntry::make('has_challenge')
+                                            ->label('Challenge')
+                                            ->boolean(),
+                                    ]),
+                                \Filament\Infolists\Components\TextEntry::make('user_agent')
+                                    ->label('User Agent')
+                                    ->columnSpanFull(),
+                            ]),
+                    ]),
 
-                Tables\Actions\DeleteAction::make()
+                Action::make('archive')
+                    ->label('Archive')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
                     ->requiresConfirmation()
-                    ->modalHeading('Delete Audit Log')
-                    ->modalDescription('Are you sure you want to delete this audit log? This action cannot be undone.')
-                    ->modalSubmitActionLabel('Yes, Delete')
-                    ->successNotificationTitle('Audit log deleted successfully.'),
+                    ->modalHeading('Archive Audit Log')
+                    ->modalDescription('Are you sure you want to archive this audit log?')
+                    ->modalSubmitActionLabel('Archive')
+                    ->action(function (AuditLog $record) {
+                        $record->update([
+                            'is_archived' => true,
+                        ]);
+
+                        Notification::make()
+                            ->title('Audit Log Archived')
+                            ->body('The audit log has been archived successfully.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make()
+                    BulkAction::make('archive')
+                        ->label('Archive Selected')
+                        ->icon('heroicon-o-archive-box')
+                        ->color('warning')
                         ->requiresConfirmation()
-                        ->modalHeading('Delete Selected Audit Logs')
-                        ->modalDescription('Are you sure you want to delete the selected audit logs? This action cannot be undone.')
-                        ->modalSubmitActionLabel('Yes, Delete Selected')
-                        ->successNotificationTitle('Selected audit logs deleted successfully.'),
-                ]),
+                        ->modalHeading('Archive Audit Logs')
+                        ->modalDescription('Are you sure you want to archive the selected audit logs?')
+                        ->modalSubmitActionLabel('Archive')
+                        ->action(function ($records) {
+                            $records->each->update([
+                                'is_archived' => true,
+                            ]);
+
+                            Notification::make()
+                                ->title('Audit Logs Archived')
+                                ->body('Selected audit logs have been archived successfully.')
+                                ->success()
+                                ->send();
+                        }),
             ]);
     }
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->latest('attempted_at');
+        return parent::getEloquentQuery()
+            ->where('is_archived', false)
+            ->latest('attempted_at');
     }
 
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListAuditLogs::route('/'),
-            'view' => Pages\ViewAuditLog::route('/{record}'),
         ];
     }
 }
