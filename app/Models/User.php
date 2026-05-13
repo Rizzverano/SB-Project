@@ -28,6 +28,7 @@ class User extends Authenticatable implements FilamentUser
         'password',
         'role',
         'is_active',
+        'login_otp_verified_at',
     ];
 
     /**
@@ -47,6 +48,7 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'login_otp_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 

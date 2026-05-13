@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\Permission;
 use App\Filament\Resources\UserResource\Pages;
+use App\Mail\UserAccountStatusMail;
 use App\Models\User as UserModel;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -18,6 +19,8 @@ use Filament\Tables\Actions\BulkAction;
 use Illuminate\Support\Collection;
 use Filament\Notifications\Notification;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class UserResource extends Resource
 {
@@ -46,6 +49,79 @@ class UserResource extends Resource
 
         $permissionValues = array_map(fn($p) => $p->value, $permissions);
         return in_array($permission->value, $permissionValues, true);
+    }
+
+    public static function getRoleLabel(int|string|null $role): string
+    {
+        return match ((int) $role) {
+            UserModel::ADMIN => 'Admin',
+            UserModel::MEMBER => 'Member',
+            default => 'User',
+        };
+    }
+
+    public static function sendAccountCreatedEmail(UserModel $user): void
+    {
+        $role = self::getRoleLabel($user->role);
+
+        self::sendAccountEmail($user, new UserAccountStatusMail(
+            $user->name,
+            "Your Account has been created by the admin as {$role}. Please Proceed to the legislative building and ask for your credentials.",
+            'Your Account Has Been Created',
+        ));
+    }
+
+    public static function sendAccountEditedEmail(UserModel $user): void
+    {
+        $role = self::getRoleLabel($user->role);
+
+        self::sendAccountEmail($user, new UserAccountStatusMail(
+            $user->name,
+            "Your Account has been edited by the admin as {$role}. Please Proceed to the legislative building and ask for your new credentials.",
+            'Your Account Has Been Edited',
+        ));
+    }
+
+    public static function sendAccountDeactivatedEmail(UserModel $user): void
+    {
+        self::sendAccountEmail($user, new UserAccountStatusMail(
+            $user->name,
+            'Your account has been deactivated by the admin. Please Proceed to the legislative building for permission to restore.',
+            'Your Account Has Been Deactivated',
+        ));
+    }
+
+    public static function sendAccountDeletedEmail(UserModel $user): void
+    {
+        self::sendAccountEmail($user, new UserAccountStatusMail(
+            $user->name,
+            'Your Account has been deleted by the admin.',
+            'Your Account Has Been Deleted',
+        ));
+    }
+
+    public static function sendAccountRestoredEmail(UserModel $user): void
+    {
+        self::sendAccountEmail($user, new UserAccountStatusMail(
+            $user->name,
+            'Your account has been restored by the admin.',
+            'Your Account Has Been Restored',
+        ));
+    }
+
+    protected static function sendAccountEmail(UserModel $user, UserAccountStatusMail $mail): void
+    {
+        try {
+            Mail::to($user->email)->send($mail);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            Notification::make()
+                ->title('Account email not sent')
+                ->body("The account was updated, but the email to {$user->email} could not be sent.")
+                ->warning()
+                ->send();
+        }
     }
 
     public static function canViewAny(): bool
@@ -87,7 +163,7 @@ class UserResource extends Resource
                 ->label('Password')
                 ->password()
                 ->revealable()
-                ->minLength(12)
+                ->minLength(8)
                 ->maxLength(255)
                 ->required(fn(string $operation) => $operation === 'create')
                 ->dehydrateStateUsing(fn($state) => filled($state) ? Hash::make($state) : null)
@@ -96,7 +172,7 @@ class UserResource extends Resource
                 ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])\S+$/')
                 ->helperText(new HtmlString('
                     <div class="grid grid-cols-2 gap-x-6 gap-y-1 mt-2 text-xs text-gray-400">
-                        <span>• At least 12 characters</span>
+                        <span>• At least 8 characters</span>
                         <span>• One uppercase letter</span>
                         <span>• One lowercase letter</span>
                         <span>• One number</span>
@@ -223,6 +299,7 @@ class UserResource extends Resource
                         }
 
                         $record->update(['is_active' => false]);
+                        self::sendAccountDeactivatedEmail($record);
 
                         if (auth()->id() === $record->id) {
                             auth()->logout();
@@ -258,6 +335,7 @@ class UserResource extends Resource
 
                         foreach ($records as $record) {
                             $record->update(['is_active' => false]);
+                            self::sendAccountDeactivatedEmail($record);
 
                             if (auth()->id() === $record->id) {
                                 auth()->logout();

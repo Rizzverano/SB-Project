@@ -67,6 +67,7 @@ class Kernel extends HttpKernel
         'active' => \App\Http\Middleware\EnsureUserIsActive::class,
         'permission' => \App\Http\Middleware\CheckPermission::class,
         'force.challenge' => \App\Http\Middleware\ForceLoginChallenge::class,
+        'login.otp' => \App\Http\Middleware\EnsureLoginOtpIsVerified::class,
         'nocache' => \App\Http\Middleware\NoCache::class,
     ];
 }

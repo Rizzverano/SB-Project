@@ -3,6 +3,7 @@
 namespace App\Filament\Pages\Auth;
 
 use App\Auth\FortifyLoginRateLimiter;
+use App\Http\Controllers\LoginOtpController;
 use App\Models\AuditLog;
 use App\Models\User;
 use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
@@ -10,7 +11,6 @@ use Filament\Facades\Filament;
 use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Pages\Auth\Login as BaseLogin;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -59,9 +59,9 @@ class Login extends BaseLogin
                 // lock expired → go to challenge
                 session()->forget('login_lockout_until');
 
-                throw new HttpResponseException(
-                    redirect('/admin/login-challenge')
-                );
+                $this->redirect('/admin/login-challenge');
+
+                return null;
             }
 
             if ($loginRateLimiter->tooManyAttempts(request())) {
@@ -161,6 +161,25 @@ class Login extends BaseLogin
             }
 
             $loginRateLimiter->clear(request());
+
+            if (LoginOtpController::userNeedsOtp($user)) {
+                $remember = (bool) ($data['remember'] ?? false);
+
+                if (! LoginOtpController::beginChallenge($user, $remember)) {
+                    Filament::auth()->logout();
+
+                    throw ValidationException::withMessages([
+                        'data.email' => 'Login OTP could not be sent. Please try again later.',
+                    ]);
+                }
+
+                Filament::auth()->logout();
+
+                $this->redirect('/admin/login?otp=1');
+
+                return null;
+            }
+
             session()->regenerate();
 
             $this->recordLoginAttempt($email, AuditLog::STATUS_SUCCESS);

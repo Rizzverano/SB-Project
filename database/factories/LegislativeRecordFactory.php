@@ -3,9 +3,12 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\LegislativeRecord;
 
 class LegislativeRecordFactory extends Factory
 {
+    protected $model = LegislativeRecord::class;
+
     public function definition(): array
     {
         return [

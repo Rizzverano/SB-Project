@@ -5,6 +5,7 @@
     $lockoutUntil = session('login_lockout_until');
     $initialLockoutSeconds = $lockoutUntil ? max(0, $lockoutUntil - now()->timestamp) : 0;
     $shouldRedirectToChallenge = session('login_needs_challenge') && (! $lockoutUntil || now()->timestamp >= $lockoutUntil);
+    $showLoginOtpModal = session()->has('login_otp_pending_user_id');
 @endphp
 
 <x-filament-panels::page.simple>
@@ -393,6 +394,115 @@
             border-top: 1px solid rgba(148, 163, 184, 0.08);
         }
 
+        .otp-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(2, 6, 23, 0.72);
+            backdrop-filter: blur(10px);
+        }
+
+        .otp-modal {
+            width: min(100%, 430px);
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            background: rgba(15, 23, 42, 0.96);
+            box-shadow: 0 28px 90px rgba(2, 6, 23, 0.58);
+            padding: 30px;
+            color: #e5e7eb;
+        }
+
+        .otp-modal-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            margin-bottom: 18px;
+        }
+
+        .otp-modal-eyebrow {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            color: #34d399;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .otp-modal h2 {
+            color: #f8fafc;
+            font-size: 26px;
+            line-height: 1.15;
+            font-weight: 800;
+            margin: 6px 0 10px;
+        }
+
+        .otp-modal-copy {
+            color: #cbd5e1;
+            margin-bottom: 22px;
+        }
+
+        .otp-modal-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .otp-modal label {
+            display: block;
+            margin-bottom: 8px;
+            color: #f8fafc;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .otp-modal input {
+            width: 100%;
+            min-height: 46px;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(71, 85, 105, 0.7);
+            background: rgba(2, 6, 23, 0.72);
+            color: #f8fafc;
+            font-size: 18px;
+            letter-spacing: 0.18em;
+            text-align: center;
+        }
+
+        .otp-modal input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+        }
+
+        .otp-modal button {
+            min-height: 46px;
+            width: 100%;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #10b981, #047857);
+            color: #ecfdf5;
+            font-weight: 800;
+            transition: 0.2s ease;
+        }
+
+        .otp-modal button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 30px rgba(16, 185, 129, 0.25);
+        }
+
+        .otp-modal-error {
+            margin-top: 8px;
+            color: #f87171;
+            font-size: 13px;
+        }
+
         @media (max-width: 1024px) {
             .left-panel {
                 padding: 40px;
@@ -445,6 +555,10 @@
 
             .right-inner h1 {
                 font-size: 24px;
+            }
+
+            .otp-modal {
+                padding: 24px 20px;
             }
         }
     </style>
@@ -528,6 +642,13 @@
     <footer class="login-footer">
         © 2026 SB Hilongos Legislative Tracking System
     </footer>
+
+    @if ($showLoginOtpModal)
+        @include('auth.login-otp', [
+            'email' => session('login_otp_email'),
+            'expiresAt' => session('login_otp_expires_at'),
+        ])
+    @endif
 
     @script
         <script>

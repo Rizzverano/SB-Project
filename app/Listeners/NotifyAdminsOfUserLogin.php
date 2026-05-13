@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Models\User;
+use App\Filament\Resources\UserResource;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Auth\Events\Login;
@@ -24,7 +25,7 @@ class NotifyAdminsOfUserLogin
             return;
         }
 
-        $url = route('filament.admin.resources.users.view', ['record' => $event->user]);
+        $url = UserResource::getUrl('edit', ['record' => $event->user]);
 
         Notification::make()
             ->title('User Logged In')
@@ -37,7 +38,7 @@ class NotifyAdminsOfUserLogin
             ])
             ->actions([
                 Action::make('view')
-                    ->label('View user')
+                    ->label('Open user')
                     ->url($url)
                     ->markAsRead(),
             ])

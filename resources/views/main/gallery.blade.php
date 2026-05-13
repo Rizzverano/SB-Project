@@ -79,6 +79,9 @@
                 ['src' => 'images/Offices/Record-Section.jpg',       'title' => 'Record Section',            'desc' => 'The Office Responsible for the Lifecycle of the entire Document of the Sanggunian'],
                 ['src' => 'images/Offices/SB-Session-Hall.jpg',  'title' => 'Sangguniang Bayan Session Hall',       'desc' => 'SB Official Chamber where the Sangguniang Bayan Meets to Conduct its Business'],
                 ['src' => 'images/Offices/Hon-Loreto-Hall.jpg',     'title' => 'Hon. Loreto P. Lora Hall',          'desc' => 'Committee Meetings and Public Hearing are Conducted'],
+                ['src' => 'images/Library/Library-1.jpg', 'title' => 'Municipal Library', 'desc' => ''],
+                ['src' => 'images/Library/Library-2.jpg', 'title' => 'Municipal Library', 'desc' => ''],
+                ['src' => 'images/Library/Library-3.jpg', 'title' => 'Municipal Library', 'desc' => ''],
             ];
 
             $allImages = array_merge($publicImages, $regularImages, $committeeImages, $officeImages);

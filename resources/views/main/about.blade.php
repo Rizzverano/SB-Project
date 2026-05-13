@@ -22,153 +22,204 @@
             Learn about the vision, mission, organizational structure, and location of the Sangguniang Bayan of Hilongos, Leyte.
         </p>
 
-        {{-- Anchor nav --}}
-        <div class="flex flex-wrap justify-center gap-3 mt-8">
-            @foreach ([['#vision','fa-eye','Vision'], ['#mission','fa-bullseye','Mission'], ['#org-chart','fa-sitemap','Org Chart'], ['#location','fa-location-dot','Location']] as $nav)
-                <a href="{{ $nav[0] }}"
-                   class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/15
-                          text-white text-xs font-semibold uppercase tracking-widest px-4 py-2 rounded-full
-                          transition-all duration-200 hover:-translate-y-0.5">
-                    <i class="fa-solid {{ $nav[1] }} text-green-400 text-[10px]"></i>
-                    {{ $nav[2] }}
-                </a>
-            @endforeach
-        </div>
     </div>
 </div>
 
 {{-- ══════════════════════════════════════════
-     VISION
+     VISION & MISSION
 ══════════════════════════════════════════ --}}
-<section id="vision" class="bg-slate-50 py-20 px-4 overflow-hidden scroll-mt-4">
+<section id="vision" class="bg-slate-50 py-20 px-4 scroll-mt-4">
     <div class="max-w-6xl mx-auto">
 
-        <div class="grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
+        {{-- Section heading --}}
+        <div class="text-center mb-14">
+            <span class="inline-block text-blue-800 text-xs tracking-[0.3em] uppercase font-bold
+                         border border-blue-200 bg-blue-50 rounded-full px-4 py-1.5 mb-3">
+                Office Mandate
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-bold text-blue-900" style="font-family: 'Playfair Display', serif;">
+                Vision &amp; Mission
+            </h2>
+            <p class="text-slate-400 text-sm mt-2">Guiding principles of the Sangguniang Bayan of Hilongos, Leyte</p>
+            <div class="w-14 h-0.5 bg-gradient-to-r from-blue-800 to-transparent mx-auto mt-4 rounded-full"></div>
+        </div>
 
-            {{-- Image --}}
-            <div class="relative group">
-                <div class="absolute -inset-2 bg-gradient-to-br from-blue-800 to-blue-600 rounded-2xl opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-500"></div>
-                <div class="relative rounded-2xl overflow-hidden shadow-xl border-4 border-white">
-                    <img src="{{ asset('images/legis-building.jpg') }}"
-                         alt="Legislative Building"
-                         class="w-full h-64 sm:h-80 md:h-96 object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div class="absolute inset-0 bg-gradient-to-t from-blue-950/60 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4">
-                        <span class="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-[10px] tracking-[2px] uppercase px-3 py-1.5 rounded-full">
-                            Legislative Building
-                        </span>
+        <div class="space-y-10">
+
+            {{-- ── CARD 1: Vice Mayor ── --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:border-blue-300 transition-all duration-300">
+
+                {{-- Card header --}}
+                <div class="bg-blue-900 px-6 py-5 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-user-tie text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-green-300 text-[10px] tracking-[3px] uppercase font-semibold">Office of the</p>
+                        <h3 class="text-white font-bold text-lg leading-tight" style="font-family: 'Playfair Display', serif;">
+                            Vice Mayor
+                        </h3>
                     </div>
                 </div>
-            </div>
 
-            {{-- Text --}}
-            <div>
-                <span class="inline-flex items-center gap-2 text-blue-600 text-xs font-bold uppercase tracking-[0.3em] mb-4">
-                    <span class="w-8 h-px bg-blue-600"></span>
-                    Our Vision
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-6 leading-tight" style="font-family: 'Playfair Display', serif;">
-                    Guided by a Clear<br class="hidden sm:block"> Vision
-                </h2>
-                <div class="relative pl-5 border-l-4 border-green-400 mb-8">
-                    <p class="text-slate-600 leading-8 text-sm sm:text-base">
-                        A transparent, accountable, and people-centered legislative office committed to crafting responsive
-                        and progressive laws that promote sustainable development, social justice, and improved quality of life
-                        for every citizen of Hilongos.
-                    </p>
-                </div>
+                {{-- Gradient divider --}}
+                <div class="h-[3px] bg-gradient-to-r from-blue-900 via-green-400 to-blue-900"></div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    @foreach ([
-                        ['fa-eye',          'Transparency', 'Open governance for all'],
-                        ['fa-scale-balanced','Accountability','Responsible legislation'],
-                        ['fa-seedling',     'Sustainability','Long-term community growth'],
-                        ['fa-people-group', 'People-Centered','Citizens first approach'],
-                    ] as $card)
-                        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm
-                                    hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5
-                                    transition-all duration-300">
-                            <i class="fa-solid {{ $card[0] }} text-blue-700 mb-2 text-lg block"></i>
-                            <p class="text-xs font-bold text-blue-900 uppercase tracking-wide">{{ $card[1] }}</p>
-                            <p class="text-xs text-slate-400 mt-0.5">{{ $card[2] }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
+                <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
 
-        </div>
-    </div>
-</section>
-
-{{-- Divider --}}
-<div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
-
-{{-- ══════════════════════════════════════════
-     MISSION
-══════════════════════════════════════════ --}}
-<section id="mission" class="bg-slate-50 py-20 px-4 overflow-hidden scroll-mt-4">
-    <div class="max-w-6xl mx-auto">
-
-        <div class="grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
-
-            {{-- Text (LEFT desktop, BOTTOM mobile) --}}
-            <div class="order-2 md:order-1">
-                <span class="inline-flex items-center gap-2 text-green-600 text-xs font-bold uppercase tracking-[0.3em] mb-4">
-                    <span class="w-8 h-px bg-green-600"></span>
-                    Our Mission
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-6 leading-tight" style="font-family: 'Playfair Display', serif;">
-                    Driven by a<br class="hidden sm:block"> Strong Mission
-                </h2>
-                <div class="relative pl-5 border-l-4 border-blue-800 mb-8">
-                    <p class="text-slate-600 leading-8 text-sm sm:text-base">
-                        To efficiently enact ordinances and resolutions that address community needs, uphold democratic principles,
-                        and strengthen collaboration between government and citizens for a progressive Hilongos.
-                    </p>
-                </div>
-
-                <div class="space-y-3">
-                    @foreach ([
-                        ['fa-gavel',    'Enact Sound Laws',    'Craft ordinances that reflect community needs'],
-                        ['fa-handshake','Foster Collaboration','Bridge government and citizen participation'],
-                        ['fa-landmark', 'Uphold Democracy',    'Protect democratic principles in governance'],
-                    ] as $pillar)
-                        <div class="flex items-center gap-4 bg-white rounded-xl p-4 border border-slate-200 shadow-sm
-                                    hover:border-green-400 hover:shadow-md transition-all duration-300">
-                            <div class="w-10 h-10 rounded-full bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
-                                <i class="fa-solid {{ $pillar[0] }} text-green-700 text-sm"></i>
+                    {{-- Vision --}}
+                    <div class="p-6 sm:p-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-eye text-blue-700 text-xs"></i>
                             </div>
-                            <div>
-                                <p class="text-xs font-bold text-blue-900 uppercase tracking-wide">{{ $pillar[1] }}</p>
-                                <p class="text-xs text-slate-400 mt-0.5">{{ $pillar[2] }}</p>
-                            </div>
+                            <span class="text-blue-800 text-xs font-bold uppercase tracking-[0.25em]">Vision</span>
                         </div>
-                    @endforeach
+                        <div class="pl-4 border-l-4 border-green-400">
+                            <p class="text-slate-600 text-sm leading-8">
+                                A dynamic, principled and visionary legislative leader committed to fostering inclusive
+                                development, accountable governance and responsive legislation that supports Hilongos as
+                                the agro-industrialized food capital and gateway of Eastern Visayas.
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Mission --}}
+                    <div class="p-6 sm:p-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-bullseye text-green-700 text-xs"></i>
+                            </div>
+                            <span class="text-green-700 text-xs font-bold uppercase tracking-[0.25em]">Mission</span>
+                        </div>
+                        <div class="pl-4 border-l-4 border-blue-800">
+                            <p class="text-slate-600 text-sm leading-8">
+                                To lead the Sangguniang Bayan in enacting quality, pro-people and development-oriented
+                                legislation; uphold participatory and transparent governance; and empower communities
+                                through policies that promote agriculture, industry, disaster resilience and social equity.
+                            </p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            {{-- Image (RIGHT desktop, TOP mobile) --}}
-            <div class="relative group order-1 md:order-2">
-                <div class="absolute -inset-2 bg-gradient-to-br from-green-700 to-green-500 rounded-2xl opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-500"></div>
-                <div class="relative rounded-2xl overflow-hidden shadow-xl border-4 border-white">
-                    <img src="{{ asset('images/legis-building.jpg') }}"
-                         alt="Sangguniang Bayan"
-                         class="w-full h-64 sm:h-80 md:h-96 object-cover group-hover:scale-105 transition-transform duration-700">
-                    <div class="absolute inset-0 bg-gradient-to-t from-green-950/60 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4">
-                        <span class="bg-white/10 backdrop-blur-sm border border-white/20 text-white text-[10px] tracking-[2px] uppercase px-3 py-1.5 rounded-full">
+            {{-- ── CARD 2: Sangguniang Bayan ── --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:border-green-300 transition-all duration-300">
+
+                <div class="bg-blue-900 px-6 py-5 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-landmark text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-green-300 text-[10px] tracking-[3px] uppercase font-semibold">Legislative Body</p>
+                        <h3 class="text-white font-bold text-lg leading-tight" style="font-family: 'Playfair Display', serif;">
                             Sangguniang Bayan
-                        </span>
+                        </h3>
                     </div>
+                </div>
+
+                <div class="h-[3px] bg-gradient-to-r from-blue-900 via-green-400 to-blue-900"></div>
+
+                <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+
+                    {{-- Vision --}}
+                    <div class="p-6 sm:p-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-eye text-blue-700 text-xs"></i>
+                            </div>
+                            <span class="text-blue-800 text-xs font-bold uppercase tracking-[0.25em]">Vision</span>
+                        </div>
+                        <div class="pl-4 border-l-4 border-green-400">
+                            <p class="text-slate-600 text-sm leading-8">
+                                A pro-active and principled legislative body that enacts responsive, inclusive and
+                                development-driven policies to support Hilongos as the premier gateway and agro-industrial
+                                food production capital of Eastern Visayas — anchored on resilience, integrity and
+                                empowerment of its people.
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Mission --}}
+                    <div class="p-6 sm:p-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-bullseye text-green-700 text-xs"></i>
+                            </div>
+                            <span class="text-green-700 text-xs font-bold uppercase tracking-[0.25em]">Mission</span>
+                        </div>
+                        <div class="pl-4 border-l-4 border-blue-800">
+                            <p class="text-slate-600 text-sm leading-8">
+                                To craft and enact quality local legislation that upholds transparency, accountability
+                                and participatory governance and to protect the welfare, values and aspirations of every
+                                Hilongosnon through competent and God-centered public service.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {{-- ── CARD 3: Office of the Secretary ── --}}
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:border-blue-300 transition-all duration-300">
+
+                <div class="bg-blue-900 px-6 py-5 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-file-pen text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-green-300 text-[10px] tracking-[3px] uppercase font-semibold">Support Office</p>
+                        <h3 class="text-white font-bold text-lg leading-tight" style="font-family: 'Playfair Display', serif;">
+                            Office of the Secretary to the Sangguniang Bayan
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="h-[3px] bg-gradient-to-r from-blue-900 via-green-400 to-blue-900"></div>
+
+                <div class="grid md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+
+                    {{-- Vision --}}
+                    <div class="p-6 sm:p-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-eye text-blue-700 text-xs"></i>
+                            </div>
+                            <span class="text-blue-800 text-xs font-bold uppercase tracking-[0.25em]">Vision</span>
+                        </div>
+                        <div class="pl-4 border-l-4 border-green-400">
+                            <p class="text-slate-600 text-sm leading-8">
+                                A highly efficient and professional legislative support office that upholds transparency,
+                                accuracy and integrity — empowering responsive governance towards a progressive,
+                                disaster-resilient and God-centered Hilongos.
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Mission --}}
+                    <div class="p-6 sm:p-8">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid fa-bullseye text-green-700 text-xs"></i>
+                            </div>
+                            <span class="text-green-700 text-xs font-bold uppercase tracking-[0.25em]">Mission</span>
+                        </div>
+                        <div class="pl-4 border-l-4 border-blue-800">
+                            <p class="text-slate-600 text-sm leading-8">
+                                To provide timely, accurate and transparent legislative documentation and administrative
+                                support to the Sangguniang Bayan through efficient secretariat services and accessible
+                                legislative records that promote responsive, lawful and inclusive policy-making.
+                            </p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
         </div>
     </div>
 </section>
-
-{{-- Divider --}}
-<div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
 
 {{-- ══════════════════════════════════════════
      ORGANIZATIONAL CHART

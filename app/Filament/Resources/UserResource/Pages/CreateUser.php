@@ -5,7 +5,6 @@ namespace App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 
 class CreateUser extends CreateRecord
@@ -26,5 +25,10 @@ class CreateUser extends CreateRecord
 
         unset($data['admin_password']); // remove before saving
         return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        UserResource::sendAccountCreatedEmail($this->record);
     }
 }

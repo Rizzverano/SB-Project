@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Resources\UserResource;
 use App\Models\User;
 use Filament\Tables;
 use Filament\Forms\Components\TextInput;
@@ -103,6 +104,7 @@ class DeactivatedUsers extends Page implements HasTable
                         }
 
                         $record->update(['is_active' => true]);
+                        UserResource::sendAccountRestoredEmail($record);
 
                         Notification::make()
                             ->title('Account restored successfully')
@@ -182,6 +184,7 @@ class DeactivatedUsers extends Page implements HasTable
                         }
 
                         $record->update($update);
+                        UserResource::sendAccountEditedEmail($record);
 
                         Notification::make()
                             ->title('User Updated')
@@ -210,6 +213,7 @@ class DeactivatedUsers extends Page implements HasTable
                             return;
                         }
 
+                        UserResource::sendAccountDeletedEmail($record);
                         $record->delete();
 
                         Notification::make()
@@ -242,6 +246,7 @@ class DeactivatedUsers extends Page implements HasTable
 
                         foreach ($records as $record) {
                             $record->update(['is_active' => true]);
+                            UserResource::sendAccountRestoredEmail($record);
                         }
 
                         Notification::make()
@@ -271,6 +276,7 @@ class DeactivatedUsers extends Page implements HasTable
                         }
 
                         foreach ($records as $record) {
+                            UserResource::sendAccountDeletedEmail($record);
                             $record->delete();
                         }
 

@@ -10,6 +10,9 @@ use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Filament\Notifications\Notification;
+use App\Mail\UserAccountStatusMail;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class Profile extends Page implements HasForms
 {
@@ -24,11 +27,16 @@ class Profile extends Page implements HasForms
 
     public ?array $data = [];
 
+    public bool $awaitingProfileOtp = false;
+
     public function mount(): void
     {
+        $this->awaitingProfileOtp = session()->has($this->profileOtpSessionKey());
+
         $this->form->fill([
             'name' => Auth::user()->name,
             'email' => Auth::user()->email,
+            'profile_otp' => '',
         ]);
     }
 
@@ -81,13 +89,13 @@ class Profile extends Page implements HasForms
                     ->password()
                     ->revealable()
                     ->nullable()
-                    ->minLength(12)
+                    ->minLength(8)
                     ->maxLength(255)
                     ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])\S+$/')
                     ->same('password_confirmation')
                     ->helperText(str('
                         <div class="grid grid-cols-2 gap-x-6 gap-y-1 mt-2 text-xs text-gray-400">
-                            <span>• At least 12 characters</span>
+                            <span>• At least 8 characters</span>
                             <span>• One uppercase letter</span>
                             <span>• One lowercase letter</span>
                             <span>• One number</span>
@@ -101,10 +109,32 @@ class Profile extends Page implements HasForms
                     ]),
 
                 TextInput::make('password_confirmation')->label('Confirm Password')->password(),
+
+                TextInput::make('profile_otp')
+                    ->label('OTP Verification Code')
+                    ->numeric()
+                    ->length(6)
+                    ->visible(fn () => $this->awaitingProfileOtp)
+                    ->dehydrated(false)
+                    ->validationMessages([
+                        'numeric' => 'OTP must contain numbers only.',
+                        'length' => 'OTP must be 6 digits.',
+                    ]),
             ])
             ->statePath('data');
     }
+
     public function update(): void
+    {
+        if ($this->awaitingProfileOtp && session()->has($this->profileOtpSessionKey())) {
+            $this->verifyOtpAndUpdateProfile();
+            return;
+        }
+
+        $this->sendOtpBeforeProfileUpdate();
+    }
+
+    protected function sendOtpBeforeProfileUpdate(): void
     {
         $data = $this->form->getState();
         $user = Auth::user();
@@ -114,13 +144,122 @@ class Profile extends Page implements HasForms
                 Notification::make()->title('Current password is incorrect!')->danger()->send();
                 return;
             }
-            $user->password = Hash::make($data['password']);
         }
 
-        $user->name = $data['name'];
-        $user->email = $data['email'];
+        $pendingChanges = [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => !empty($data['password']) ? Hash::make($data['password']) : null,
+        ];
+
+        $otp = (string) random_int(100000, 999999);
+
+        if (! $this->sendProfileOtpEmail($user->email, $user->name, $otp)) {
+            return;
+        }
+
+        session([
+            $this->profileOtpSessionKey() => [
+                'otp_hash' => Hash::make($otp),
+                'expires_at' => now()->addMinutes(10)->timestamp,
+                'pending_changes' => $pendingChanges,
+            ],
+        ]);
+
+        $this->awaitingProfileOtp = true;
+        $this->data['profile_otp'] = '';
+
+        Notification::make()
+            ->title('OTP sent')
+            ->body('A verification code was sent to your email. Enter it to save your profile changes.')
+            ->success()
+            ->send();
+    }
+
+    protected function verifyOtpAndUpdateProfile(): void
+    {
+        $otp = (string) ($this->data['profile_otp'] ?? '');
+        $sessionData = session($this->profileOtpSessionKey());
+
+        if (! $sessionData || now()->timestamp > ($sessionData['expires_at'] ?? 0)) {
+            $this->clearProfileOtpSession();
+
+            Notification::make()
+                ->title('OTP expired')
+                ->body('Please save your profile changes again to receive a new OTP.')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        if (! preg_match('/^\d{6}$/', $otp) || ! Hash::check($otp, $sessionData['otp_hash'])) {
+            Notification::make()
+                ->title('Invalid OTP')
+                ->body('The verification code you entered is incorrect.')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        $pendingChanges = $sessionData['pending_changes'];
+        $user = Auth::user();
+
+        $user->name = $pendingChanges['name'];
+        $user->email = $pendingChanges['email'];
+
+        if (! empty($pendingChanges['password'])) {
+            $user->password = $pendingChanges['password'];
+        }
+
         $user->save();
+        $this->clearProfileOtpSession();
+
+        $this->form->fill([
+            'name' => $user->name,
+            'email' => $user->email,
+            'current_password' => '',
+            'password' => '',
+            'password_confirmation' => '',
+            'profile_otp' => '',
+        ]);
 
         Notification::make()->title('Profile updated successfully!')->success()->send();
+    }
+
+    protected function sendProfileOtpEmail(string $email, string $name, string $otp): bool
+    {
+        try {
+            Mail::to($email)->send(new UserAccountStatusMail(
+                $name,
+                "Your OTP verification code is {$otp}. This code will expire in 10 minutes. Your profile changes will only be saved after this code is verified.",
+                'Profile Update OTP Verification',
+            ));
+
+            return true;
+        } catch (Throwable $exception) {
+            report($exception);
+
+            Notification::make()
+                ->title('OTP email not sent')
+                ->body('Your profile changes were not saved because the OTP email could not be sent.')
+                ->danger()
+                ->send();
+
+            return false;
+        }
+    }
+
+    protected function profileOtpSessionKey(): string
+    {
+        return 'profile_update_otp.'.Auth::id();
+    }
+
+    protected function clearProfileOtpSession(): void
+    {
+        session()->forget($this->profileOtpSessionKey());
+        $this->awaitingProfileOtp = false;
+        $this->data['profile_otp'] = '';
     }
 }

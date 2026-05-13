@@ -5,6 +5,7 @@ use App\Http\Controllers\LegislativeController;
 use App\Http\Controllers\DirectoryController;
 use App\Models\LegislativeRecord;
 use App\Http\Controllers\LoginChallengeController;
+use App\Http\Controllers\LoginOtpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,12 @@ Route::middleware('nocache')->group(function () {
 
     Route::post('/admin/login-challenge', [LoginChallengeController::class, 'verify'])
         ->name('login.challenge.verify');
+
+    Route::get('/admin/login-otp', [LoginOtpController::class, 'show'])
+        ->name('login.otp');
+
+    Route::post('/admin/login-otp', [LoginOtpController::class, 'verify'])
+        ->name('login.otp.verify');
 });
 
 Route::get('/legislative-process', [DirectoryController::class, 'legislativeProcess'])

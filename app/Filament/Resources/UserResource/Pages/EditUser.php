@@ -4,6 +4,7 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use Filament\Actions\Action;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -21,10 +22,25 @@ class EditUser extends EditRecord
                 ->icon('heroicon-o-user-minus')
                 ->color('warning')
                 ->requiresConfirmation()
-                ->form([\Filament\Forms\Components\TextInput::make('admin_password')->label('Your Password')->password()->required()])
+                ->modalHeading('Deactivate User Account')
+                ->modalDescription('This will deactivate the user account. They will no longer be able to log in.')
+                ->modalSubmitActionLabel('Yes, Deactivate')
+                ->form([
+                    TextInput::make('admin_password')
+                        ->label('Your Password')
+                        ->password()
+                        ->required()
+                        ->validationMessages([
+                            'required' => 'Please enter your admin password to continue.',
+                        ]),
+                ])
                 ->action(function (array $data) {
                     if (!Hash::check($data['admin_password'], Auth::user()->password)) {
-                        Notification::make()->title('Incorrect admin password')->danger()->send();
+                        Notification::make()
+                            ->title('Incorrect Password')
+                            ->body('The admin password you entered is incorrect.')
+                            ->danger()
+                            ->send();
 
                         return;
                     }
@@ -32,8 +48,17 @@ class EditUser extends EditRecord
                     $this->record->update([
                         'is_active' => false,
                     ]);
+                    UserResource::sendAccountDeactivatedEmail($this->record);
 
-                    Notification::make()->title('User deactivated successfully')->success()->send();
+                    if (auth()->id() === $this->record->id) {
+                        auth()->logout();
+                    }
+
+                    Notification::make()
+                        ->title('Account Deactivated')
+                        ->body("{$this->record->name}'s account has been deactivated successfully.")
+                        ->success()
+                        ->send();
 
                     return redirect($this->getResource()::getUrl('index'));
                 }),
@@ -54,5 +79,10 @@ class EditUser extends EditRecord
 
         unset($data['admin_password']); // remove before saving
         return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        UserResource::sendAccountEditedEmail($this->record);
     }
 }

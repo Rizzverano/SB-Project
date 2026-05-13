@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ContactMessageResource\Pages;
+use App\Mail\ContactMessageReadMail;
 use App\Models\ContactMessage;
 use Filament\Forms\Form;
 use Filament\Forms;
@@ -16,6 +17,8 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class ContactMessageResource extends Resource
 {
@@ -160,10 +163,23 @@ class ContactMessageResource extends Resource
                     ->action(function (ContactMessage $record) {
                         $record->update(['is_read' => true]);
 
-                        Notification::make()
-                            ->title('Marked as Read')
-                            ->success()
-                            ->send();
+                        try {
+                            Mail::to($record->email)->send(new ContactMessageReadMail($record));
+
+                            Notification::make()
+                                ->title('Marked as Read')
+                                ->body('An email notification was sent to the sender.')
+                                ->success()
+                                ->send();
+                        } catch (Throwable $exception) {
+                            report($exception);
+
+                            Notification::make()
+                                ->title('Marked as Read')
+                                ->body('The message was marked as read, but the email could not be sent.')
+                                ->warning()
+                                ->send();
+                        }
                     }),
 
                 Tables\Actions\Action::make('archive')

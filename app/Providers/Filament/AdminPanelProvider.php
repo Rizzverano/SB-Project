@@ -81,6 +81,7 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 'force.challenge',
+                'login.otp',
             ]);
     }
 }
