@@ -380,6 +380,25 @@
             min-height: 48px;
         }
 
+        .forgot-password-row {
+            margin-top: -6px;
+            margin-bottom: 16px;
+            text-align: right;
+        }
+
+        .forgot-password-link {
+            color: #93c5fd !important;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .forgot-password-link:hover {
+            color: #34d399 !important;
+            text-decoration: underline;
+        }
+
         .right-inner button:hover {
             transform: translateY(-1px);
             box-shadow: 0 14px 30px rgba(16, 185, 129, 0.25);
@@ -628,6 +647,14 @@
 
                 <x-filament-panels::form wire:submit="authenticate">
                     {{ $this->form }}
+
+                    @if (filament()->hasPasswordReset())
+                        <div class="forgot-password-row">
+                            <a class="forgot-password-link" href="{{ filament()->getRequestPasswordResetUrl() }}">
+                                Forgot password?
+                            </a>
+                        </div>
+                    @endif
 
                     <x-filament::button type="submit" size="lg" wire:loading.attr="disabled"
                         wire:target="authenticate"> <span wire:loading.remove wire:target="authenticate">Sign In</span>
