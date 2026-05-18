@@ -2,28 +2,7 @@
 
 @section('content')
 
-{{-- ══════════════════════════════════════════
-     HERO
-══════════════════════════════════════════ --}}
-<div class="relative bg-gradient-to-br from-blue-950 via-blue-900 to-slate-900 py-24 px-4 overflow-hidden">
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-white/5 pointer-events-none"></div>
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] rounded-full border border-white/5 pointer-events-none"></div>
-    <div class="absolute -bottom-24 -right-24 w-72 h-72 rounded-full bg-green-500/10 blur-3xl pointer-events-none"></div>
-    <div class="absolute -top-12 -left-12 w-56 h-56 rounded-full bg-blue-400/10 blur-2xl pointer-events-none"></div>
 
-    <div class="relative z-10 text-center max-w-2xl mx-auto">
-        <span class="inline-block text-green-400 text-xs tracking-[0.4em] uppercase font-semibold mb-4">
-            Hilongos, Leyte • LGU
-        </span>
-        <h1 class="text-white text-4xl sm:text-5xl font-bold leading-tight mb-4" style="font-family: 'Playfair Display', serif;">
-            About the Office
-        </h1>
-        <p class="text-white/50 text-sm leading-relaxed max-w-md mx-auto">
-            Learn about the vision, mission, organizational structure, and location of the Sangguniang Bayan of Hilongos, Leyte.
-        </p>
-
-    </div>
-</div>
 
 {{-- ══════════════════════════════════════════
      VISION & MISSION

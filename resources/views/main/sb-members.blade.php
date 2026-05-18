@@ -128,7 +128,7 @@
                                 {{-- Image with grayscale effect for former members --}}
                                 <div class="relative w-full aspect-[3/4] overflow-hidden">
                                     <img src="{{ $member->image ? asset('storage/' . $member->image) : asset('images/default.jpg') }}"
-                                        class="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500">
+                                        class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
                                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
                                     <div class="absolute bottom-0 left-0 right-0 p-4">
                                         <h3 class="text-white font-bold text-sm leading-tight">{{ $member->name }}</h3>

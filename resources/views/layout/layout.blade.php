@@ -327,17 +327,11 @@
                     Sangguniang<br>Bayan
                 </h2>
 
-                <p class="text-white/60 text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed mb-7 px-2">
+                <p class="text-white/60 text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed mb-2 px-2">
                     The legislative body of the Local Government of Hilongos — serving the people through principled
                     governance and transparent lawmaking.
                 </p>
 
-                <div class="flex flex-wrap gap-3 justify-center">
-                    <a href="{{ route('legislative_index') }}"
-                        class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 text-xs font-bold uppercase tracking-widest transition-all hover:-translate-y-0.5">
-                        View Legislative Records
-                    </a>
-                </div>
             </div>
         </section>
 
@@ -481,15 +475,8 @@
 
     @stack('scripts')
 
-    <!-- ══════════════════ CTA BANNER ══════════════════ -->
-    <section class="bg-gradient-to-r from-blue-900 to-blue-800 text-white text-center py-12 px-4">
-        <h2 class="font-playfair text-2xl md:text-3xl mb-3">Access Legislative Documents</h2>
-        <p class="text-white/70 text-sm max-w-md mx-auto mb-6 leading-relaxed">View ordinances, resolutions, and
-            other legislative articles from the Sangguniang Bayan Hilongos, Leyte.</p> <a
-            href="{{ route('legislative_index') }}"
-            class="inline-block bg-green-600 hover:bg-green-500 text-white px-8 py-3 text-xs font-bold uppercase tracking-widest transition-all hover:-translate-y-0.5">
-            Go to Legislative Library </a>
-    </section>
+    <!-- ══════════════════ Divider Line ══════════════════ -->
+    <section class="bg-gradient-to-r from-blue-900 to-blue-800 h-2 w-full"></section>
 
     <!-- ══════════════════ FOOTER ══════════════════ -->
     <footer class="bg-blue-950 text-white/70 px-4 md:px-8 pt-10 pb-6">

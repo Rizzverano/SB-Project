@@ -1,30 +1,6 @@
 @extends('layout.layout')
 
 @section('content')
-    {{-- ══════════════════ PAGE HERO ══════════════════ --}}
-    <div class="relative bg-gradient-to-br from-blue-950 via-blue-900 to-slate-900 py-20 px-4 overflow-hidden">
-        <div
-            class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-white/5">
-        </div>
-        <div
-            class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-white/5">
-        </div>
-        <div class="absolute -bottom-24 -right-24 w-64 h-64 rounded-full bg-green-500/10 blur-3xl"></div>
-        <div class="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-blue-400/10 blur-2xl"></div>
-
-        <div class="relative z-10 text-center max-w-2xl mx-auto">
-            <span class="inline-block text-green-400 text-xs tracking-[0.4em] uppercase font-semibold mb-4">
-                Hilongos, Leyte • LGU
-            </span>
-            <h1 class="text-white text-4xl sm:text-5xl font-bold leading-tight mb-4"
-                style="font-family: 'Playfair Display', serif;">
-                News & Updates
-            </h1>
-            <p class="text-white/50 text-sm leading-relaxed max-w-md mx-auto">
-                Stay connected with the latest activities and announcements from the Sangguniang Bayan of Hilongos, Leyte.
-            </p>
-        </div>
-    </div>
 
     {{-- ══════════════════ MAIN CONTENT ══════════════════ --}}
     <div class="bg-slate-50 py-16 px-4 sm:px-6 lg:px-8">
@@ -148,41 +124,73 @@
                             </span>
                         </div>
                         {{-- Additional Tags --}}
-                        <div class="flex flex-wrap gap-2 mt-5 pt-5 border-t border-slate-100">
-                            <span
-                                class="flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <i class="fa-solid fa-list-ol text-[10px]"></i> ORBOS
-                            </span>
-                            <span
-                                class="flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <i class="fa-solid fa-file-lines text-[10px]"></i> Ordinance
-                            </span>
-                            <span
-                                class="flex items-center gap-1.5 bg-yellow-50 text-yellow-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <i class="fa-solid fa-bullhorn text-[10px]"></i> Announcements
-                            </span>
-                            <span
-                                class="flex items-center gap-1.5 bg-violet-50 text-violet-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <i class="fa-solid fa-users text-[10px]"></i> SB Members
-                            </span>
-                            <span
-                                class="flex items-center gap-1.5 bg-orange-50 text-orange-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <i class="fa-solid fa-user-clock text-[10px]"></i> Former SB Members
-                            </span>
-                            <span
-                                class="flex items-center gap-1.5 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <i class="fa-solid fa-clipboard-list text-[10px]"></i> Citizens Charter
-                            </span>
-                            <span
-                                class="flex items-center gap-1.5 bg-pink-50 text-pink-700 text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <i class="fa-solid fa-sitemap text-[10px]"></i> Organizational Chart
-                            </span>
+                        {{-- Types of Information and Records --}}
+                        <div class="mt-6">
+                            {{-- Section Title --}}
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-1 h-8 rounded-full bg-green-400"></div>
+                                <h4 class="text-blue-900 font-bold text-base">
+                                    Types of Information and Records
+                                </h4>
+                            </div>
+
+                            {{-- Tags Container --}}
+                            <div class="flex flex-wrap gap-3 pt-5 border-t border-slate-200">
+
+                                {{-- ORBOS --}}
+                                <span
+                                    class="flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+                                    <i class="fa-solid fa-list-ol text-[11px]"></i>
+                                    ORBOS
+                                </span>
+
+                                {{-- Ordinance --}}
+                                <span
+                                    class="flex items-center gap-2 bg-green-50 text-green-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+                                    <i class="fa-solid fa-file-lines text-[11px]"></i>
+                                    Ordinance
+                                </span>
+
+                                {{-- Announcements --}}
+                                <span
+                                    class="flex items-center gap-2 bg-yellow-50 text-yellow-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+                                    <i class="fa-solid fa-bullhorn text-[11px]"></i>
+                                    Announcements
+                                </span>
+
+                                {{-- SB Members --}}
+                                <span
+                                    class="flex items-center gap-2 bg-violet-50 text-violet-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+                                    <i class="fa-solid fa-users text-[11px]"></i>
+                                    SB Members
+                                </span>
+
+                                {{-- Former SB Members --}}
+                                <span
+                                    class="flex items-center gap-2 bg-orange-50 text-orange-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+                                    <i class="fa-solid fa-user-clock text-[11px]"></i>
+                                    Former SB Members
+                                </span>
+
+                                {{-- Citizens Charter --}}
+                                <span
+                                    class="flex items-center gap-2 bg-teal-50 text-teal-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+                                    <i class="fa-solid fa-clipboard-list text-[11px]"></i>
+                                    Citizens Charter
+                                </span>
+
+                                {{-- Organizational Chart --}}
+                                <span
+                                    class="flex items-center gap-2 bg-pink-50 text-pink-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
+                                    <i class="fa-solid fa-sitemap text-[11px]"></i>
+                                    Organizational Chart
+                                </span>
+
+                            </div>
                         </div>
 
                     </div>
-
                 </div>
             </div>
         </div>
-    </div>
-@endsection
+    @endsection
