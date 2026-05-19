@@ -67,6 +67,25 @@ class AuditLogResource extends Resource
                     ->label('Email')
                     ->searchable()
                     ->sortable(),
+
+                // ADD HERE
+                TextColumn::make('action')
+                    ->badge()
+                    ->sortable(),
+
+                TextColumn::make('module')
+                    ->badge()
+                    ->color('info'),
+
+                TextColumn::make('performed_by')
+                    ->label('Performed By')
+                    ->searchable(),
+
+                TextColumn::make('description')
+                    ->limit(50)
+                    ->tooltip(fn ($record) => $record->description),
+
+                // END ADD
                 TextColumn::make('ip_address')
                     ->label('IP Address')
                     ->searchable(),

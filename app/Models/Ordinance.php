@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\AuditHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,4 +26,25 @@ class Ordinance extends Model
         'is_archived' => 'boolean',
         'not_applicable' => 'boolean',
     ];
+
+    protected static function booted()
+    {
+        static::created(function ($record) {
+            AuditHelper::log(
+                'Created',
+                'Ordinance',
+                $record->id,
+                'Created Ordinance: ' . $record->title
+            );
+        });
+
+        static::updated(function ($record) {
+            AuditHelper::log(
+                'Updated',
+                'Ordinance',
+                $record->id,
+                'Updated Ordinance: ' . $record->title
+            );
+        });
+    }
 }

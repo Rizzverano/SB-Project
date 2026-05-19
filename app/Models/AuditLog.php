@@ -23,6 +23,13 @@ class AuditLog extends Model
         'is_locked',
         'has_challenge',
         'is_archived',
+
+         // NEW
+        'action',
+        'module',
+        'record_id',
+        'performed_by',
+        'description',
     ];
 
     protected $casts = [
