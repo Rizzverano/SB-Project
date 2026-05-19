@@ -31,9 +31,9 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->navigationItems([
-                NavigationItem::make('Legislative Records')
-                    ->url(fn () => route('legislative_index'))
-                    ->icon('heroicon-o-folder')
+                NavigationItem::make('Home Page')
+                    ->url(fn () => route('home'))
+                    ->icon('heroicon-o-home')
                     ->group('Public View')
                     ->sort(5),
             ])

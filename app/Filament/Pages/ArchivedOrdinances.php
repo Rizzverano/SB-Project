@@ -8,6 +8,7 @@ use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Session;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 
@@ -15,16 +16,53 @@ class ArchivedOrdinances extends Page implements HasTable
 {
     use InteractsWithTable;
 
+    public bool $accessGranted = false;
+
+    public ?string $archivePassword = null;
+
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
     protected static string $view = 'filament.pages.archived-ordinances';
     protected static ?int $navigationSort = 4;
     protected static ?string $navigationGroup = 'Ordinance';
     protected static ?string $navigationLabel = 'Archived Ordinances';
 
+    public function mount(): void
+    {
+        $this->accessGranted = session()->get('ordinance_archive_access', false);
+    }
+
+    public function verifyPassword(): void
+    {
+        $correctPassword = env('ARCHIVE_ORDINANCE_PASSWORD');
+
+        if ($this->archivePassword !== $correctPassword) {
+
+            Notification::make()
+                ->title('Invalid Password')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        session()->put('ordinance_archive_access', true);
+
+        $this->accessGranted = true;
+
+        Notification::make()
+            ->title('Access Granted')
+            ->success()
+            ->send();
+    }
+
     public function table(Table $table): Table
     {
         return $table
-            ->query(Ordinance::query()->where('is_archived', true))
+            ->query(
+                    $this->accessGranted
+                        ? Ordinance::query()->where('is_archived', true)
+                        : Ordinance::query()->whereRaw('1 = 0')
+                    )
             ->columns([
 
                 TextColumn::make('title')

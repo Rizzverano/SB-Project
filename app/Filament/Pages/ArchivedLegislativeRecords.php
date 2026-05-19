@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
 use App\Models\LegislativeRecord;
+use Illuminate\Support\Facades\Session;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
@@ -17,15 +18,49 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
 
+
 class ArchivedLegislativeRecords extends Page implements HasTable
 {
     use InteractsWithTable;
+
+    public bool $accessGranted = false;
+
+    public ?string $archivePassword = null;
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box';
     protected static ?string $navigationLabel = 'Archived ORBOS';
     protected static ?string $navigationGroup = 'ORBOS';
     protected static ?int $navigationSort = 2;
     protected static string $view = 'filament.pages.archived-legislative-records';
+
+    public function mount(): void
+    {
+        $this->accessGranted = session()->get('orbos_archive_access', false);
+    }
+
+    public function verifyPassword(): void
+    {
+        $correctPassword = env('ARCHIVE_ORBOS_PASSWORD');
+
+        if ($this->archivePassword !== $correctPassword) {
+
+            Notification::make()
+                ->title('Invalid Password')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        session()->put('orbos_archive_access', true);
+
+        $this->accessGranted = true;
+
+        Notification::make()
+            ->title('Access Granted')
+            ->success()
+            ->send();
+    }
 
     public function getTitle(): string
     {
@@ -45,7 +80,11 @@ class ArchivedLegislativeRecords extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(LegislativeRecord::onlyTrashed()->latest())
+            ->query(
+                    $this->accessGranted
+                    ? LegislativeRecord::onlyTrashed()->latest()
+                    : LegislativeRecord::query()->whereRaw('1 = 0')
+                    )
             ->columns([
                 TextColumn::make('session')
                     ->label('Session')
