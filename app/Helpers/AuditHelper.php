@@ -13,16 +13,17 @@ class AuditHelper
         string $description
     ): void {
         AuditLog::create([
-            'email' => auth()->user()?->email,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
+            'email' => auth()->user()?->email ?? 'system',
+            'ip_address' => request()?->ip() ?? '127.0.0.1',
+            'user_agent' => request()?->userAgent() ?? 'System',
+
             'status' => AuditLog::STATUS_SUCCESS,
             'attempted_at' => now(),
 
             'action' => $action,
             'module' => $module,
             'record_id' => $recordId,
-            'performed_by' => auth()->user()?->name ?? 'Unknown',
+            'performed_by' => auth()->user()?->name ?? 'System',
             'description' => $description,
 
             'is_locked' => false,

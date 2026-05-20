@@ -287,6 +287,228 @@
 </section>
 
 {{-- ══════════════════════════════════════════
+     FAQ
+══════════════════════════════════════════ --}}
+<section id="questions" class="bg-slate-50 py-20 px-4 scroll-mt-4">
+    <div class="max-w-4xl mx-auto">
+
+        {{-- Section heading --}}
+        <div class="text-center mb-12">
+            <span class="inline-block text-blue-800 text-xs tracking-[0.3em] uppercase font-bold
+                         border border-blue-200 bg-blue-50 rounded-full px-4 py-1.5 mb-3">
+                Office Resources
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-bold text-blue-900" style="font-family: 'Playfair Display', serif;">
+                Frequently Asked Questions
+            </h2>
+            <p class="text-slate-400 text-sm mt-2">Common questions about the Sangguniang Bayan Hilongos Web Platform</p>
+            <div class="w-14 h-0.5 bg-gradient-to-r from-blue-800 to-transparent mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <div class="space-y-3" id="faq-list">
+
+            @foreach ([
+                [
+                    'icon'     => 'fa-circle-info',
+                    'question' => 'What is the purpose of the Sangguniang Bayan Hilongos Web Platform?',
+                    'answer'   => 'The platform aims to promote transparency, improve document tracking, and simplify the management of legislative documents.',
+                ],
+                [
+                    'icon'     => 'fa-file-lines',
+                    'question' => 'What types of legislative documents can be tracked?',
+                    'answer'   => 'The system currently supports tracking and viewing of ORBOS and Ordinances only.',
+                ],
+                [
+                    'icon'     => 'fa-user-check',
+                    'question' => 'Do I need an account to access the system?',
+                    'answer'   => 'No account is required for public access, but viewing is limited to basic information. Registered users can view, download, print, and manage documents. Only authorized users with admin approval can create accounts and access full system features.',
+                ],
+                [
+                    'icon'     => 'fa-phone',
+                    'question' => 'Who can I contact for concerns or corrections?',
+                    'answer'   => 'You may contact the Office of the Sangguniang Bayan Secretary through the Contact Us page for inquiries, corrections, or technical concerns.',
+                ],
+                [
+                    'icon'     => 'fa-mobile-screen',
+                    'question' => 'Does the system work on mobile devices?',
+                    'answer'   => 'Yes, the Sangguniang Bayan Hilongos Web Platform is fully responsive and can be accessed on desktops, tablets, and mobile devices.',
+                ],
+            ] as $i => $faq)
+
+                <div class="faq-item bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-300">
+
+                    {{-- Question row --}}
+                    <button class="faq-trigger w-full flex items-center gap-4 px-5 py-5 text-left focus:outline-none"
+                            aria-expanded="false">
+
+                        {{-- Icon --}}
+                        <div class="faq-icon w-10 h-10 rounded-xl border border-blue-200 bg-blue-50
+                                    flex items-center justify-center flex-shrink-0 transition-colors duration-300">
+                            <i class="fa-solid {{ $faq['icon'] }} text-sm text-blue-700 transition-colors duration-300"></i>
+                        </div>
+
+                        {{-- Text --}}
+                        <span class="faq-question flex-1 text-sm font-semibold text-blue-900 leading-snug transition-colors duration-300">
+                            {{ $faq['question'] }}
+                        </span>
+
+                        {{-- Chevron --}}
+                        <div class="faq-chevron w-7 h-7 rounded-full bg-slate-100
+                                    flex items-center justify-center flex-shrink-0 transition-all duration-300">
+                            <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-colors duration-300"></i>
+                        </div>
+                    </button>
+
+                    {{-- Answer (collapsed by default) --}}
+                    <div class="faq-body overflow-hidden" style="max-height: 0; transition: max-height 0.35s ease;">
+                        <div class="border-t border-slate-100 px-5 pb-5 pt-4 pl-[4.75rem]">
+                            <div class="h-0.5 w-10 bg-gradient-to-r from-green-400 to-blue-800 rounded-full mb-3"></div>
+                            <p class="text-slate-500 text-sm leading-7">{{ $faq['answer'] }}</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            @endforeach
+
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const items = document.querySelectorAll('#faq-list .faq-item');
+
+    items.forEach(function (item) {
+        const trigger  = item.querySelector('.faq-trigger');
+        const body     = item.querySelector('.faq-body');
+        const icon     = item.querySelector('.faq-icon');
+        const iconEl   = icon.querySelector('i');
+        const question = item.querySelector('.faq-question');
+        const chevron  = item.querySelector('.faq-chevron');
+        const chevronI = chevron.querySelector('i');
+
+        trigger.addEventListener('click', function () {
+            const isOpen = item.classList.contains('faq-open');
+
+            // Close all other items first
+            items.forEach(function (other) {
+                if (other !== item && other.classList.contains('faq-open')) {
+                    closeItem(other);
+                }
+            });
+
+            // Toggle current item
+            if (isOpen) {
+                closeItem(item);
+            } else {
+                openItem(item);
+            }
+        });
+
+        // Hover: green tint (only when not open)
+        trigger.addEventListener('mouseenter', function () {
+            if (!item.classList.contains('faq-open')) {
+                item.classList.add('border-green-300', 'shadow');
+                item.classList.remove('border-slate-200');
+                icon.classList.add('bg-green-50', 'border-green-200');
+                icon.classList.remove('bg-blue-50', 'border-blue-200');
+                iconEl.classList.add('text-green-700');
+                iconEl.classList.remove('text-blue-700');
+                question.classList.add('text-green-700');
+                question.classList.remove('text-blue-900');
+                chevron.classList.add('bg-green-100');
+                chevron.classList.remove('bg-slate-100');
+                chevronI.classList.add('text-green-600');
+                chevronI.classList.remove('text-slate-400');
+            }
+        });
+
+        trigger.addEventListener('mouseleave', function () {
+            if (!item.classList.contains('faq-open')) {
+                item.classList.remove('border-green-300', 'shadow');
+                item.classList.add('border-slate-200');
+                icon.classList.remove('bg-green-50', 'border-green-200');
+                icon.classList.add('bg-blue-50', 'border-blue-200');
+                iconEl.classList.remove('text-green-700');
+                iconEl.classList.add('text-blue-700');
+                question.classList.remove('text-green-700');
+                question.classList.add('text-blue-900');
+                chevron.classList.remove('bg-green-100');
+                chevron.classList.add('bg-slate-100');
+                chevronI.classList.remove('text-green-600');
+                chevronI.classList.add('text-slate-400');
+            }
+        });
+    });
+
+    function openItem(item) {
+        const body     = item.querySelector('.faq-body');
+        const icon     = item.querySelector('.faq-icon');
+        const iconEl   = icon.querySelector('i');
+        const question = item.querySelector('.faq-question');
+        const chevron  = item.querySelector('.faq-chevron');
+        const chevronI = chevron.querySelector('i');
+        const trigger  = item.querySelector('.faq-trigger');
+
+        item.classList.add('faq-open', 'border-blue-400', 'shadow-md');
+        item.classList.remove('border-slate-200', 'border-green-300', 'shadow');
+
+        // Expand body smoothly to its real height
+        body.style.maxHeight = body.scrollHeight + 'px';
+
+        // Icon → blue-900 filled
+        icon.classList.add('bg-blue-900', 'border-blue-900');
+        icon.classList.remove('bg-blue-50', 'border-blue-200', 'bg-green-50', 'border-green-200');
+        iconEl.classList.add('text-white');
+        iconEl.classList.remove('text-blue-700', 'text-green-700');
+
+        // Question text back to blue
+        question.classList.add('text-blue-900');
+        question.classList.remove('text-green-700');
+
+        // Chevron → rotate + green
+        chevron.classList.add('bg-green-100', 'rotate-180');
+        chevron.classList.remove('bg-slate-100', 'bg-green-100');
+        chevronI.classList.add('text-green-700');
+        chevronI.classList.remove('text-slate-400', 'text-green-600');
+
+        trigger.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeItem(item) {
+        const body     = item.querySelector('.faq-body');
+        const icon     = item.querySelector('.faq-icon');
+        const iconEl   = icon.querySelector('i');
+        const question = item.querySelector('.faq-question');
+        const chevron  = item.querySelector('.faq-chevron');
+        const chevronI = chevron.querySelector('i');
+        const trigger  = item.querySelector('.faq-trigger');
+
+        item.classList.remove('faq-open', 'border-blue-400', 'shadow-md');
+        item.classList.add('border-slate-200');
+
+        // Collapse body
+        body.style.maxHeight = '0';
+
+        // Icon → back to blue-50
+        icon.classList.remove('bg-blue-900', 'border-blue-900');
+        icon.classList.add('bg-blue-50', 'border-blue-200');
+        iconEl.classList.remove('text-white');
+        iconEl.classList.add('text-blue-700');
+
+        // Chevron → back to default
+        chevron.classList.remove('bg-green-100', 'rotate-180');
+        chevron.classList.add('bg-slate-100');
+        chevronI.classList.remove('text-green-700');
+        chevronI.classList.add('text-slate-400');
+
+        trigger.setAttribute('aria-expanded', 'false');
+    }
+});
+</script>
+
+{{-- ══════════════════════════════════════════
      MAP / LOCATION
 ══════════════════════════════════════════ --}}
 <section id="location" class="bg-blue-950 py-20 px-4 scroll-mt-4">

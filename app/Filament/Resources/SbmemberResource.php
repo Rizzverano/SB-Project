@@ -56,7 +56,6 @@ class SbmemberResource extends Resource
             Textarea::make('description')
                 ->placeholder('e.g. SB Member, Majority Floor Leader, etc.')
                 ->rows(4)
-                ->required()
                 ->columnSpanFull(),
 
             Forms\Components\Section::make('Visibility')

@@ -563,7 +563,6 @@
     <script src="{{ asset('js/filament/announcement.js') }}"></script>
     <script src="{{ asset('js/filament/hamburger.js') }}"></script>
     <script src="{{ asset('js/filament/activities.js') }}"></script>
-    {{-- <script src="{{ asset('js/filament/sb-member.js') }}"></script> --}}
 </body>
 
 </html>

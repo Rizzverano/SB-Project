@@ -58,7 +58,7 @@ class LogoResource extends Resource
                 ->description('Upload the official logo set used across the admin panel and related pages.')
                 ->schema([
                     FileUpload::make('pres_gov')
-                        ->label('Provincial government logo')
+                        ->label('National government logo')
                         ->image()
                         ->imageEditor()
                         ->disk('public')
@@ -100,7 +100,7 @@ class LogoResource extends Resource
                     ->color('gray')
                     ->sortable(),
                 ImageColumn::make('pres_gov')
-                    ->label('Provincial')
+                    ->label('National')
                     ->disk('public')
                     ->square()
                     ->size(72),

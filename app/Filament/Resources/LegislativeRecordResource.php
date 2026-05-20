@@ -112,7 +112,7 @@ class LegislativeRecordResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('session')->placeholder('e.g., First Relugar Session, etc.')->required(),
             Forms\Components\DatePicker::make('date')->required(),
-            Forms\Components\TextInput::make('title')->label('Legislative Title')->placeholder('e.g., Local Chief Executive Hour, etc.')->required()->columnSpanFull(),
+            Forms\Components\TextInput::make('title')->label('Title')->placeholder('e.g., Local Chief Executive Hour, etc.')->required()->columnSpanFull(),
             Forms\Components\MarkdownEditor::make('description')->columnSpanFull()->placeholder('e.g., In relation for franchise 3WETAXI, etc.')->required(),
             Forms\Components\TextInput::make('sponsor')->label('Sponsor')->placeholder('e.g., Hon. John Doe, etc.')->required(),
             Forms\Components\TextInput::make('action_taken')->label('Action Taken')->placeholder('e.g., Approved, Marked as Noted, etc.')->required()]);
