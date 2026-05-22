@@ -8,7 +8,6 @@ use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Session;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 

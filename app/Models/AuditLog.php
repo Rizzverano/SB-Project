@@ -24,7 +24,6 @@ class AuditLog extends Model
         'has_challenge',
         'is_archived',
 
-         // NEW
         'action',
         'module',
         'record_id',

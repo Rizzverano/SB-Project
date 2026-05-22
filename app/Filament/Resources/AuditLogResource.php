@@ -110,7 +110,7 @@ class AuditLogResource extends Resource
                     ->label('Locked')
                     ->boolean(),
                 IconColumn::make('has_challenge')
-                    ->label('Challenge')
+                    ->label('Challenge/OTP')
                     ->boolean(),
                 TextColumn::make('attempted_at')
                     ->label('Attempted At')

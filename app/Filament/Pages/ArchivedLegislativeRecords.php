@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
 use App\Models\LegislativeRecord;
-use Illuminate\Support\Facades\Session;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;

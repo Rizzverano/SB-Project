@@ -10,14 +10,31 @@ class AuditHelper
         string $action,
         string $module,
         int $recordId,
-        string $description
+        string $description,
+        ?string $status = null,
+        ?bool $isLocked = null,
+        ?bool $hasChallenge = null,
+        ?string $failureReason = null
     ): void {
+
+        // ✅ ONLY allow status-related fields for LOGIN
+        if (strtolower($module) !== 'auth' && strtolower($action) !== 'login') {
+            $status = null;
+            $isLocked = null;
+            $hasChallenge = null;
+            $failureReason = null;
+        }
+
         AuditLog::create([
             'email' => auth()->user()?->email ?? 'system',
             'ip_address' => request()?->ip() ?? '127.0.0.1',
             'user_agent' => request()?->userAgent() ?? 'System',
 
-            'status' => AuditLog::STATUS_SUCCESS,
+            'status' => $status,
+            'failure_reason' => $failureReason,
+            'is_locked' => $isLocked,
+            'has_challenge' => $hasChallenge,
+
             'attempted_at' => now(),
 
             'action' => $action,
@@ -26,8 +43,6 @@ class AuditHelper
             'performed_by' => auth()->user()?->name ?? 'System',
             'description' => $description,
 
-            'is_locked' => false,
-            'has_challenge' => false,
             'is_archived' => false,
         ]);
     }
