@@ -160,6 +160,33 @@ class ArchivedOrdinances extends Page implements HasTable
                             ->success()
                             ->send();
                     }),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkAction::make('bulk_restore')
+                    ->label('Bulk Restore')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Restore Selected Ordinances')
+                    ->modalDescription('Are you sure you want to restore the selected ordinances?')
+                    ->modalSubmitActionLabel('Restore All')
+                    ->action(function (\Illuminate\Support\Collection $records, HasTable $livewire) {
+
+                        foreach ($records as $record) {
+                            $record->update([
+                                'is_archived' => false,
+                            ]);
+                        }
+
+                        // ✅ CLEAR SELECTION (your requested refresher)
+                        $livewire->deselectAllTableRecords();
+
+                        Notification::make()
+                            ->title('Selected Ordinances Restored')
+                            ->body('All selected ordinances have been restored successfully.')
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 }

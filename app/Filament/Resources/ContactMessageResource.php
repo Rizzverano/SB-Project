@@ -18,6 +18,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
 use Illuminate\Support\Facades\Mail;
+use Filament\Tables\Contracts\HasTable;
 use Throwable;
 
 class ContactMessageResource extends Resource
@@ -211,10 +212,14 @@ class ContactMessageResource extends Resource
                     ->modalHeading('Archive Contact Messages')
                     ->modalDescription('Are you sure you want to archive the selected contact messages?')
                     ->modalSubmitActionLabel('Archive')
-                    ->action(function ($records) {
+                        ->action(function ($records, HasTable $livewire) {
+
                         $records->each->update([
-                            'is_archived' => true,
+                            'is_archived' => true
                         ]);
+
+                        // ✅ CLEAR SELECTION (IMPORTANT)
+                        $livewire->deselectAllTableRecords();
 
                         Notification::make()
                             ->title('Contact Messages Archived')

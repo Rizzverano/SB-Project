@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Contracts\HasTable;
 
 class AuditLogResource extends Resource
 {
@@ -228,10 +229,13 @@ class AuditLogResource extends Resource
                         ->modalHeading('Archive Audit Logs')
                         ->modalDescription('Are you sure you want to archive the selected audit logs?')
                         ->modalSubmitActionLabel('Archive')
-                        ->action(function ($records) {
+                        ->action(function ($records, HasTable $livewire) {
+
                             $records->each->update([
                                 'is_archived' => true,
                             ]);
+
+                            $livewire->deselectAllTableRecords();
 
                             Notification::make()
                                 ->title('Audit Logs Archived')

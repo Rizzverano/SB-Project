@@ -21,7 +21,7 @@ use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
-use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Contracts\HasTable;
 
 class OrganizationalChartResource extends Resource
 {
@@ -171,8 +171,14 @@ class OrganizationalChartResource extends Resource
                     ->icon('heroicon-o-archive-box')
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->action(function ($records) {
-                        $records->each->update(['is_archived' => true]);
+                    ->action(function ($records, HasTable $livewire) {
+
+                    $records->each->update([
+                        'is_archived' => true
+                    ]);
+
+                    // ✅ CLEAR SELECTION (IMPORTANT)
+                    $livewire->deselectAllTableRecords();
 
                         Notification::make()
                             ->title('Organizational Charts Archived')

@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Contracts\HasTable;
 
 class AnnouncementResource extends Resource
 {
@@ -155,8 +156,14 @@ class AnnouncementResource extends Resource
                     ->icon('heroicon-o-archive-box')
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->action(function ($records) {
-                        $records->each->update(['is_archived' => true]);
+                    ->action(function ($records, HasTable $livewire) {
+
+                    $records->each->update([
+                        'is_archived' => true
+                    ]);
+
+                    // ✅ CLEAR SELECTION (IMPORTANT)
+                    $livewire->deselectAllTableRecords();
 
                         Notification::make()
                             ->title('Announcements Archived')

@@ -88,7 +88,6 @@ class ArchivedContactMessages extends Page implements HasTable
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\BulkAction::make('restore')
                         ->label('Restore Selected')
                         ->icon('heroicon-o-arrow-uturn-left')
@@ -97,8 +96,14 @@ class ArchivedContactMessages extends Page implements HasTable
                         ->modalHeading('Restore Selected Messages')
                         ->modalDescription('Are you sure you want to restore the selected contact messages?')
                         ->modalSubmitActionLabel('Restore')
-                        ->action(function ($records) {
-                            $records->each->update(['is_archived' => false]);
+                        ->action(function (\Illuminate\Support\Collection $records, HasTable $livewire) {
+
+                        foreach ($records as $record) {
+                            $record->update(['is_archived' => false]);
+                        }
+
+                        // ✅ REFRESHER (THIS IS WHAT YOU NEED)
+                        $livewire->deselectAllTableRecords();
 
                             Notification::make()->title('Contact Messages Restored')->body('Selected contact messages have been restored successfully.')->success()->send();
                         }),
@@ -111,12 +116,17 @@ class ArchivedContactMessages extends Page implements HasTable
                         ->modalHeading('Delete Selected Messages Permanently')
                         ->modalDescription('Are you sure you want to permanently delete the selected messages? This action cannot be undone.')
                         ->modalSubmitActionLabel('Delete Permanently')
-                        ->action(function ($records) {
-                            $records->each->delete();
+                        ->action(function (\Illuminate\Support\Collection $records, HasTable $livewire) {
+
+                        foreach ($records as $record) {
+                            $record->delete();
+                        }
+
+                        // ✅ REFRESHER (CLEAR SELECTION)
+                        $livewire->deselectAllTableRecords();
 
                             Notification::make()->title('Contact Messages Deleted')->body('Selected contact messages have been permanently deleted.')->success()->send();
                         }),
-                ]),
             ]);
     }
 }

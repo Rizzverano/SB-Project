@@ -16,6 +16,8 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Support\Collection;
 
 
 class ArchivedLegislativeRecords extends Page implements HasTable
@@ -268,6 +270,32 @@ class ArchivedLegislativeRecords extends Page implements HasTable
                     })
                     ->requiresConfirmation(),
             ])
-            ->defaultSort('date', 'desc');
+            ->defaultSort('date', 'desc')
+            ->bulkActions([
+                BulkAction::make('restoreSelected')
+                    ->label('Restore Selected')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Restore Legislative Records')
+                    ->modalDescription('Are you sure you want to restore the selected legislative records?')
+                    ->modalSubmitActionLabel('Restore')
+                    ->action(function (Collection $records, HasTable $livewire) {
+
+                        foreach ($records as $record) {
+                            $record->restore();
+                        }
+
+                        // ✅ CLEAR SELECTION
+                        $livewire->deselectAllTableRecords();
+
+                        Notification::make()
+                            ->title('Legislative Records Restored')
+                            ->body('Selected records have been restored successfully.')
+                            ->success()
+                            ->send();
+                    }),
+            ]);
+
     }
 }

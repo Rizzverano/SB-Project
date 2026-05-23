@@ -22,6 +22,7 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
+use Filament\Tables\Contracts\HasTable;
 use Filament\Infolists\Components\Grid;
 
 class SbmemberResource extends Resource
@@ -173,11 +174,15 @@ class SbmemberResource extends Resource
                     ->modalHeading('Mark SB Members as Former')
                     ->modalDescription('Are you sure you want to mark the selected SB members as former?')
                     ->modalSubmitActionLabel('Mark as Former')
-                    ->action(function ($records) {
-                        $records->each->update([
-                            'is_archived' => true,
-                            'is_publish'  => false,
-                        ]);
+                    ->action(function ($records, HasTable $livewire) {
+
+                    $records->each->update([
+                        'is_archived' => true,
+                        'is_published' => false,
+                    ]);
+
+                    // ✅ CLEAR SELECTION
+                    $livewire->deselectAllTableRecords();
 
                         Notification::make()
                             ->title('SB Members Marked as Former')

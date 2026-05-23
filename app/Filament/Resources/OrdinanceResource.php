@@ -20,6 +20,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\CheckboxColumn;
+use Filament\Tables\Contracts\HasTable;
 
 class OrdinanceResource extends Resource
 {
@@ -222,10 +223,14 @@ class OrdinanceResource extends Resource
                     ->icon('heroicon-o-archive-box')
                     ->color('warning')
                     ->requiresConfirmation()
-                    ->action(function (Collection $records) {
-                        $records->each->update([
-                            'is_archived' => true,
-                        ]);
+                    ->action(function (Collection $records, HasTable $livewire) {
+
+                    $records->each->update([
+                        'is_archived' => true,
+                    ]);
+
+                    // ✅ CLEAR SELECTION
+                    $livewire->deselectAllTableRecords();
 
                         Notification::make()
                             ->title('Ordinances Archived')

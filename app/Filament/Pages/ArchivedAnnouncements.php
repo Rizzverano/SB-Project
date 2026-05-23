@@ -127,6 +127,58 @@ class ArchivedAnnouncements extends Page implements HasTable
                             ->success()
                             ->send();
                     }),
-            ]);
+            ])
+            ->bulkActions([
+            Tables\Actions\BulkAction::make('bulk_restore')
+                ->label('Bulk Restore')
+                ->icon('heroicon-o-arrow-uturn-left')
+                ->color('success')
+                ->requiresConfirmation()
+                ->modalHeading('Restore Selected Announcements')
+                ->modalDescription('Are you sure you want to restore the selected announcements?')
+                ->modalSubmitActionLabel('Restore All')
+                ->action(function (\Illuminate\Support\Collection $records, HasTable $livewire) {
+
+                    foreach ($records as $record) {
+                        $record->update([
+                            'is_archived' => false,
+                        ]);
+                    }
+
+                    // ✅ REFRESHER (clear selected rows)
+                    $livewire->deselectAllTableRecords();
+
+                    Notification::make()
+                        ->title('Announcements Restored')
+                        ->body('Selected announcements have been restored successfully.')
+                        ->success()
+                        ->send();
+                }),
+
+            Tables\Actions\BulkAction::make('bulk_delete')
+                ->label('Bulk Delete')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->requiresConfirmation()
+                ->modalHeading('Delete Selected Announcements')
+                ->modalDescription('This will permanently delete the selected announcements. This action cannot be undone.')
+                ->modalSubmitActionLabel('Delete All')
+                ->action(function (\Illuminate\Support\Collection $records, HasTable $livewire) {
+
+                    foreach ($records as $record) {
+                        $record->delete();
+                    }
+
+                    // ✅ REFRESHER (clear selected rows)
+                    $livewire->deselectAllTableRecords();
+
+                    Notification::make()
+                        ->title('Announcements Deleted')
+                        ->body('Selected announcements have been permanently deleted.')
+                        ->success()
+                        ->send();
+                }),
+
+        ]);
     }
 }

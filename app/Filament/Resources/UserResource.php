@@ -21,6 +21,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Mail;
 use Throwable;
+use Filament\Tables\Contracts\HasTable;
 
 class UserResource extends Resource
 {
@@ -324,7 +325,8 @@ class UserResource extends Resource
                             ->password()
                             ->required(),
                     ])
-                    ->action(function (Collection $records, array $data) {
+                    ->action(function (Collection $records, array $data, HasTable $livewire) {
+
                         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
                             Notification::make()
                                 ->title('Incorrect admin password')
@@ -341,6 +343,9 @@ class UserResource extends Resource
                                 auth()->logout();
                             }
                         }
+
+                        // ✅ CLEAR SELECTION
+                        $livewire->deselectAllTableRecords();
 
                         Notification::make()
                             ->title('Selected accounts deactivated successfully')

@@ -17,6 +17,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
 
 class LogoResource extends Resource
@@ -200,11 +201,15 @@ class LogoResource extends Resource
                     ->modalHeading('Archive Logo Sets')
                     ->modalDescription('Are you sure you want to archive the selected logo sets?')
                     ->modalSubmitActionLabel('Archive')
-                    ->action(function ($records) {
-                        $records->each->update([
-                            'is_archived' => true,
-                            'is_published' => false,
-                        ]);
+                    ->action(function ($records, HasTable $livewire) {
+
+                    $records->each->update([
+                        'is_archived' => true,
+                        'is_published' => false,
+                    ]);
+
+                    // ✅ CLEAR SELECTION
+                    $livewire->deselectAllTableRecords();
 
                         Notification::make()
                             ->title('Logo Sets Archived')

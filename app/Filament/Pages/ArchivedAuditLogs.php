@@ -163,7 +163,6 @@ class ArchivedAuditLogs extends Page implements HasTable
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->label('Delete Permanently')
                         ->icon('heroicon-o-trash')
@@ -173,7 +172,6 @@ class ArchivedAuditLogs extends Page implements HasTable
                         ->modalDescription('Are you sure you want to permanently delete the selected audit logs? This action cannot be undone.')
                         ->modalSubmitActionLabel('Delete')
                         ->successNotificationTitle('Selected audit logs have been permanently deleted.'),
-                ]),
             ])
             ->defaultSort('attempted_at', 'desc');
     }

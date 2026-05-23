@@ -235,7 +235,8 @@ class DeactivatedUsers extends Page implements HasTable
                             ->password()
                             ->required(),
                     ])
-                    ->action(function (Collection $records, array $data) {
+                    ->action(function (Collection $records, array $data, HasTable $livewire) {
+
                         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
                             Notification::make()
                                 ->title('Incorrect admin password')
@@ -248,6 +249,9 @@ class DeactivatedUsers extends Page implements HasTable
                             $record->update(['is_active' => true]);
                             UserResource::sendAccountRestoredEmail($record);
                         }
+
+                        // ✅ CLEAR SELECTION
+                        $livewire->deselectAllTableRecords();
 
                         Notification::make()
                             ->title('Selected accounts restored')
@@ -266,7 +270,8 @@ class DeactivatedUsers extends Page implements HasTable
                             ->password()
                             ->required(),
                     ])
-                    ->action(function (Collection $records, array $data) {
+                    ->action(function (Collection $records, array $data, HasTable $livewire) {
+
                         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
                             Notification::make()
                                 ->title('Incorrect admin password')
@@ -279,6 +284,9 @@ class DeactivatedUsers extends Page implements HasTable
                             UserResource::sendAccountDeletedEmail($record);
                             $record->delete();
                         }
+
+                        // ✅ CLEAR SELECTION
+                        $livewire->deselectAllTableRecords();
 
                         Notification::make()
                             ->title('Selected accounts deleted')
