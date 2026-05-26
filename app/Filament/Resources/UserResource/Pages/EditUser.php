@@ -56,7 +56,7 @@ class EditUser extends EditRecord
 
                     Notification::make()
                         ->title('Account Deactivated')
-                        ->body("{$this->record->name}'s account has been deactivated successfully.")
+                        ->body("{$this->record->name}'s account has been deactivated successfully. An email has been sent to notify the user.")
                         ->success()
                         ->send();
 
@@ -71,6 +71,7 @@ class EditUser extends EditRecord
         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
             Notification::make()
                 ->title('Incorrect admin password')
+                ->body('The admin password you entered is incorrect.')
                 ->danger()
                 ->send();
 
@@ -84,5 +85,13 @@ class EditUser extends EditRecord
     protected function afterSave(): void
     {
         UserResource::sendAccountEditedEmail($this->record);
+
+        // ✅ Success Notification
+        Notification::make()
+            ->title('Account Updated')
+            ->body("{$this->record->name}'s account has been updated successfully. An email has been sent to notify the user.")
+            ->success()
+            ->send();
+
     }
 }

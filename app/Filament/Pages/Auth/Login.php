@@ -56,12 +56,8 @@ class Login extends BaseLogin
                     ]);
                 }
 
-                // lock expired → go to challenge
+                // lock expired — allow the user to retry credentials.
                 session()->forget('login_lockout_until');
-
-                $this->redirect('/admin/login-challenge');
-
-                return null;
             }
 
             if ($loginRateLimiter->tooManyAttempts(request())) {
@@ -131,6 +127,24 @@ class Login extends BaseLogin
             }
 
             $user = Filament::auth()->user();
+            $challengeEmail = session('login_challenge_email');
+            $loginNeedsChallenge = session('login_needs_challenge');
+
+            if ($loginNeedsChallenge && $challengeEmail === $email) {
+                Filament::auth()->logout();
+
+                $this->redirect('/admin/login-challenge');
+
+                return null;
+            }
+
+            if ($loginNeedsChallenge && $challengeEmail !== null && $challengeEmail !== $email) {
+                session()->forget([
+                    'login_needs_challenge',
+                    'login_challenge_email',
+                    'login_lockout_until',
+                ]);
+            }
 
             if (
                 $user instanceof FilamentUser &&

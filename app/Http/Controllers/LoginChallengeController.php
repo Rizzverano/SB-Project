@@ -42,7 +42,7 @@ class LoginChallengeController extends Controller
             session([
                 'challenge_num1' => $num1,
                 'challenge_num2' => $num2,
-                'challenge_answer' => "x = $num1 . $num2",
+                'challenge_answer' => "x = " . $num1 . $num2,
             ]);
         }
 
@@ -91,9 +91,10 @@ class LoginChallengeController extends Controller
             ]);
         }
 
-        $expected = (int) session('challenge_answer');
+        $expected = (string) session('challenge_answer');
+        $answer = (string) $request->answer;
 
-        if ((int) $request->answer !== $expected) {
+        if (! $this->challengeAnswerMatches($answer, $expected)) {
             $failedAttempts = (int) session('login_challenge_failed_attempts', 0) + 1;
 
             session(['login_challenge_failed_attempts' => $failedAttempts]);
@@ -186,6 +187,13 @@ class LoginChallengeController extends Controller
         );
 
         return redirect('/admin/login');
+    }
+
+    protected function challengeAnswerMatches(string $answer, string $expected): bool
+    {
+        $normalize = static fn (string $value): string => strtolower(preg_replace('/\s+/', '', trim($value)));
+
+        return $normalize($answer) === $normalize($expected);
     }
 
     protected function triggerLoginLockout(Request $request): int

@@ -308,7 +308,7 @@ class UserResource extends Resource
 
                         Notification::make()
                             ->title('Account Deactivated')
-                            ->body("{$record->name}'s account has been deactivated successfully.")
+                            ->body("{$record->name}'s account has been deactivated successfully. An Email has been sent to notify the user.")
                             ->success()
                             ->send();
                     }),
@@ -349,6 +349,7 @@ class UserResource extends Resource
 
                         Notification::make()
                             ->title('Selected accounts deactivated successfully')
+                            ->body('An email has been sent to notify the affected users.')
                             ->success()
                             ->send();
                     }),

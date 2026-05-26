@@ -4,7 +4,6 @@
     $activeLogo = \App\Models\Logo::published()->latest()->first();
     $lockoutUntil = session('login_lockout_until');
     $initialLockoutSeconds = $lockoutUntil ? max(0, $lockoutUntil - now()->timestamp) : 0;
-    $shouldRedirectToChallenge = session('login_needs_challenge') && (! $lockoutUntil || now()->timestamp >= $lockoutUntil);
     $showLoginOtpModal = session()->has('login_otp_pending_user_id');
 @endphp
 
@@ -680,35 +679,6 @@
     @script
         <script>
             function initLoginPageScripts() {
-                let challengeRedirectTimer = null;
-                const challengeUrl = @js(route('login.challenge'));
-                const initialLockoutSeconds = @js($initialLockoutSeconds);
-                const shouldRedirectToChallenge = @js($shouldRedirectToChallenge);
-
-                function scheduleChallengeRedirect(seconds) {
-                    if (challengeRedirectTimer) {
-                        return;
-                    }
-
-                    if (!Number.isFinite(seconds)) {
-                        return;
-                    }
-
-                    challengeRedirectTimer = setTimeout(function() {
-                        window.location.href = challengeUrl;
-                    }, Math.max(seconds, 0) * 1000);
-                }
-
-                function scheduleChallengeRedirectFromText(text) {
-                    const match = text.match(/Account locked for\s+(\d+)\s+seconds/i);
-
-                    if (!match) {
-                        return;
-                    }
-
-                    scheduleChallengeRedirect(Number.parseInt(match[1], 10));
-                }
-
                 function clearPasswordField() {
                     const passwordInputs = document.querySelectorAll('input[type="password"]');
                     passwordInputs.forEach(input => {
@@ -733,7 +703,6 @@
                         if (mutation.type === 'characterData') {
                             const text = mutation.target.textContent || '';
                             clearPasswordField();
-                            scheduleChallengeRedirectFromText(text);
                         }
 
                         if (mutation.addedNodes.length > 0) {
@@ -747,37 +716,12 @@
                                         text.includes('lock')
                                     ) {
                                         clearPasswordField();
-                                        scheduleChallengeRedirectFromText(text);
-                                    }
-
-                                    if (
-                                        node.classList && (
-                                            node.classList.contains('text-danger') ||
-                                            node.classList.contains('fi-fo-field-wrp-error') ||
-                                            node.closest('[class*="error"]')
-                                        )
-                                    ) {
-                                        clearPasswordField();
                                     }
                                 }
                             });
                         }
                     });
                 });
-
-                window.addEventListener('login-lockout-triggered', function(event) {
-                    const seconds = Number.parseInt(event.detail?.seconds ?? 0, 10);
-
-                    scheduleChallengeRedirect(seconds);
-                });
-
-                if (shouldRedirectToChallenge) {
-                    scheduleChallengeRedirect(0);
-                } else if (initialLockoutSeconds > 0) {
-                    scheduleChallengeRedirect(initialLockoutSeconds);
-                }
-
-                scheduleChallengeRedirectFromText(document.body.textContent || '');
 
                 observer.observe(document.body, {
                     childList: true,

@@ -127,6 +127,75 @@ class ArchivedSbmembers extends Page implements HasTable
                             ->success()
                             ->send();
                     }),
+
+                Tables\Actions\Action::make('delete')
+                    ->label('Delete Permanently')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Delete SB Member Permanently')
+                    ->modalDescription('Are you sure you want to permanently delete this SB member? This action cannot be undone.')
+                    ->modalSubmitActionLabel('Delete')
+                    ->action(function (Sbmember $record) {
+                        $record->delete();
+
+                        Notification::make()
+                            ->title('SB Member Deleted')
+                            ->body('The SB member has been permanently deleted.')
+                            ->success()
+                            ->send();
+                    }),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkAction::make('restore')
+                    ->label('Restore Selected')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Restore Selected SB Members')
+                    ->modalDescription('Are you sure you want to restore the selected SB members?')
+                    ->modalSubmitActionLabel('Restore')
+                    ->action(function (\Illuminate\Support\Collection $records, HasTable $livewire) {
+
+                        foreach ($records as $record) {
+                            $record->update([
+                                'is_archived' => false,
+                            ]);
+                        }
+
+                        // ✅ REFRESHER
+                        $livewire->deselectAllTableRecords();
+
+                        Notification::make()
+                            ->title('SB Members Restored')
+                            ->body('Selected SB members have been restored successfully.')
+                            ->success()
+                            ->send();
+                    }),
+
+                Tables\Actions\BulkAction::make('delete')
+                    ->label('Delete Permanently')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Delete Selected SB Members')
+                    ->modalDescription('This will permanently delete the selected SB members. This action cannot be undone.')
+                    ->modalSubmitActionLabel('Delete')
+                    ->action(function (\Illuminate\Support\Collection $records, HasTable $livewire) {
+
+                        foreach ($records as $record) {
+                            $record->delete();
+                        }
+
+                        // ✅ REFRESHER
+                        $livewire->deselectAllTableRecords();
+
+                        Notification::make()
+                            ->title('SB Members Deleted')
+                            ->body('Selected SB members have been permanently deleted.')
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 }

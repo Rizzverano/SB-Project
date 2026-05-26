@@ -72,16 +72,13 @@
                         <div class="relative h-64 sm:h-80">
                             <img src="{{ asset('images/SB-Members.jpg') }}" class="w-full h-full object-cover"
                                 alt="SB Members">
-
                             <div class="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-900/40 to-transparent">
                             </div>
-
                             <div class="absolute bottom-0 p-6">
                                 <span
                                     class="bg-green-500/20 border border-green-400/40 text-green-300 text-[10px] uppercase px-3 py-1 rounded-full">
                                     SB Members
                                 </span>
-
                                 <h3 class="text-white text-xl font-bold mt-3"
                                     style="font-family: 'Playfair Display', serif;">
                                     Seventeenth Sangguniang Bayan of Hilongos
@@ -89,9 +86,9 @@
                             </div>
                         </div>
 
-                        <div class="p-6">
+                        <div class="p-6 flex flex-col gap-4">
 
-                            <div class="flex items-center gap-3 mb-3">
+                            <div class="flex items-center gap-3">
                                 <div class="w-1 h-8 bg-green-400 rounded-full"></div>
                                 <h4 class="text-blue-900 font-bold">WHO ARE WE?</h4>
                             </div>
@@ -101,18 +98,29 @@
                                 resolutions, and policies that support local governance and development.
                             </p>
 
-                            <div class="grid grid-cols-2 gap-2 mt-5">
-                                <div
-                                    class="bg-white rounded-2xl p-4 text-center shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-300">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
                                     <p class="text-2xl font-extrabold text-blue-800">{{ $membersCount }}</p>
                                     <p class="text-[10px] uppercase tracking-widest text-slate-400 mt-1">Councilors</p>
                                 </div>
-                                <div
-                                    class="bg-white rounded-2xl p-4 text-center shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-300">
+                                <div class="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
                                     <p class="text-sm font-extrabold text-blue-800 leading-tight">Every<br>Monday</p>
                                     <p class="text-[10px] uppercase tracking-widest text-slate-400 mt-1">Sessions</p>
                                 </div>
                             </div>
+
+                            <div class="pt-1 border-t border-slate-100">
+                                <a href="{{ route('sb.info') }}"
+                                    class="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-500 transition duration-200 rounded-lg">
+                                    Learn More
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                    </svg>
+                                </a>
+                            </div>
+
                         </div>
                     </div>
 
@@ -122,16 +130,13 @@
                         <div class="relative h-64 sm:h-80">
                             <img src="{{ asset('images/SB-Sec.jpg') }}" class="w-full h-full object-cover"
                                 alt="SB Secretary">
-
                             <div class="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-900/40 to-transparent">
                             </div>
-
                             <div class="absolute bottom-0 p-6">
                                 <span
                                     class="bg-green-500/20 border border-green-400/40 text-green-300 text-[10px] uppercase px-3 py-1 rounded-full">
                                     SB Secretary
                                 </span>
-
                                 <h3 class="text-white text-xl font-bold mt-3"
                                     style="font-family: 'Playfair Display', serif;">
                                     Legislative Support Office
@@ -139,9 +144,9 @@
                             </div>
                         </div>
 
-                        <div class="p-6">
+                        <div class="p-6 flex flex-col gap-4">
 
-                            <div class="flex items-center gap-3 mb-3">
+                            <div class="flex items-center gap-3">
                                 <div class="w-1 h-8 bg-green-400 rounded-full"></div>
                                 <h4 class="text-blue-900 font-bold">WHO ARE WE?</h4>
                             </div>
@@ -151,7 +156,7 @@
                                 efficient governance and documentation.
                             </p>
 
-                            <div class="flex flex-wrap gap-2 mt-5 pt-5 border-t border-slate-100">
+                            <div class="flex flex-wrap gap-2 pb-1">
                                 <span
                                     class="flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full">
                                     <i class="fa-solid fa-landmark text-[10px]"></i> Local Governance
@@ -164,6 +169,18 @@
                                     class="flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full">
                                     <i class="fa-solid fa-scale-balanced text-[10px]"></i> Legislative
                                 </span>
+                            </div>
+
+                            <div class="pt-1 border-t border-slate-100">
+                                <a href="{{ route('sb.sec') }}"
+                                    class="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-semibold text-white bg-green-600 hover:bg-green-500 transition duration-200 rounded-lg">
+                                    Learn More
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                    </svg>
+                                </a>
                             </div>
 
                         </div>

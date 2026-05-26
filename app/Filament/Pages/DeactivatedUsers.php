@@ -108,6 +108,7 @@ class DeactivatedUsers extends Page implements HasTable
 
                         Notification::make()
                             ->title('Account restored successfully')
+                            ->body("{$record->name}'s account has been restored successfully. An email has been sent to notify the user.")
                             ->success()
                             ->send();
                     }),
@@ -188,7 +189,7 @@ class DeactivatedUsers extends Page implements HasTable
 
                         Notification::make()
                             ->title('User Updated')
-                            ->body("{$record->name}'s account has been updated successfully.")
+                            ->body("{$record->name}'s account has been updated successfully. An email has been sent to notify the user of these changes.")
                             ->success()
                             ->send();
                     }),
@@ -218,6 +219,7 @@ class DeactivatedUsers extends Page implements HasTable
 
                         Notification::make()
                             ->title('User deleted successfully')
+                            ->body("{$record->name}'s account has been deleted successfully. An email has been sent to notify the user.")
                             ->danger()
                             ->send();
                     }),
@@ -255,6 +257,7 @@ class DeactivatedUsers extends Page implements HasTable
 
                         Notification::make()
                             ->title('Selected accounts restored')
+                            ->body('Selected accounts have been restored successfully. An email has been sent to notify the affected users.')
                             ->success()
                             ->send();
                     }),
@@ -290,6 +293,7 @@ class DeactivatedUsers extends Page implements HasTable
 
                         Notification::make()
                             ->title('Selected accounts deleted')
+                            ->body('Selected accounts have been deleted successfully. An email has been sent to notify the affected users.')
                             ->danger()
                             ->send();
                     }),

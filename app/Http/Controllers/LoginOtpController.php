@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\MessageBag;
@@ -40,6 +41,35 @@ class LoginOtpController extends Controller
         $request->validate([
             'otp' => ['required', 'digits:6'],
         ]);
+
+        $recaptchaToken = $request->input('token');
+
+        if (! $recaptchaToken) {
+            return back()->withErrors(new MessageBag([
+                'otp' => 'Security verification failed.',
+            ]));
+        }
+
+        $response = Http::asForm()->post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            [
+                'secret' => config('services.recaptcha.secret_key'),
+                'response' => $recaptchaToken,
+                'remoteip' => $request->ip(),
+            ]
+        )->json();
+
+        if (! ($response['success'] ?? false)) {
+            $this->recordLoginAttempt(
+                (string) session('login_otp_email', ''),
+                AuditLog::STATUS_FAILED,
+                $request,
+            );
+
+            return back()->withErrors(new MessageBag([
+                'otp' => 'Security verification failed.',
+            ]));
+        }
 
         $rateLimitKey = 'login-otp:'.$userId.'|'.$request->ip();
 

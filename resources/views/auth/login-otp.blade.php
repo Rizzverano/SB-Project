@@ -35,10 +35,16 @@
                     autofocus
                 >
 
+                <p class="otp-modal-copy" style="font-size:0.75rem; color:#94a3b8; margin-top:0.5rem;">
+                    Protected by reCAPTCHA — <a href="https://policies.google.com/privacy" class="underline">Privacy</a> &amp; <a href="https://policies.google.com/terms" class="underline">Terms</a>
+                </p>
+
                 @error('otp')
                     <p class="otp-modal-error">{{ $message }}</p>
                 @enderror
             </div>
+
+            <input type="hidden" name="token" id="recaptcha-token">
 
             <button type="submit">
                 Verify and Continue
@@ -54,5 +60,14 @@
         if (event.persisted) {
             window.location.reload();
         }
+    });
+</script>
+<script src="https://www.google.com/recaptcha/api.js?render={{ config('services.recaptcha.site_key') }}"></script>
+<script>
+    grecaptcha.ready(function () {
+        grecaptcha.execute("{{ config('services.recaptcha.site_key') }}", {action:'login'})
+            .then(function(token) {
+                document.getElementById('recaptcha-token').value = token;
+            });
     });
 </script>

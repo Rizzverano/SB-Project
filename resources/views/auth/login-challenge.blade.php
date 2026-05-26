@@ -100,11 +100,16 @@
 
         <div>
             <label class="block mb-2 label">
-                What is {{ $num1 }} + {{ $num2 }}?
+                Enter the challenge exactly as shown below:
             </label>
 
+            <div class="mb-3 px-4 py-3 rounded-xl bg-slate-900/70 text-slate-100 border border-slate-700">
+                <code class="font-mono">What is {{ $num1 }} + {{ $num2 }} ?</code>
+            </div>
+
             <input type="text" name="answer"
-                class="w-full px-4 py-2 input">
+                class="w-full px-4 py-2 input"
+                autocomplete="off">
 
             <p class="text-xs text-slate-500 mt-3 text-center">
                 Protected by reCAPTCHA &mdash;

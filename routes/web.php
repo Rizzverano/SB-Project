@@ -66,3 +66,9 @@ Route::get('/legislative-process', [DirectoryController::class, 'legislativeProc
 
 Route::get('/sb-members', [DirectoryController::class, 'sbmember'])
     ->name('sb.members');
+
+Route::get('/sb-info', [DirectoryController::class, 'sbinfo'])
+    ->name('sb.info');
+
+Route::get('/sb-sec', [DirectoryController::class, 'sbsec'])
+    ->name('sb.sec');

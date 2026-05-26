@@ -17,6 +17,7 @@ class CreateUser extends CreateRecord
         if (!Hash::check($data['admin_password'], auth()->user()->password)) {
             Notification::make()
                 ->title('Incorrect admin password')
+                ->body('The admin password you entered is incorrect.')
                 ->danger()
                 ->send();
 
@@ -30,5 +31,12 @@ class CreateUser extends CreateRecord
     protected function afterCreate(): void
     {
         UserResource::sendAccountCreatedEmail($this->record);
+
+        // ✅ Success Notification
+        Notification::make()
+            ->title('Account Created')
+            ->body("{$this->record->name}'s account has been created successfully. An email has been sent to notify the user.")
+            ->success()
+            ->send();
     }
 }

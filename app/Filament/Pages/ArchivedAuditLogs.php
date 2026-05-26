@@ -50,6 +50,26 @@ class ArchivedAuditLogs extends Page implements HasTable
                     ->label('Email')
                     ->searchable()
                     ->sortable(),
+
+                // ADD HERE
+                TextColumn::make('action')
+                    ->badge()
+                    ->sortable(),
+
+                TextColumn::make('module')
+                    ->badge()
+                    ->color('info'),
+
+                TextColumn::make('performed_by')
+                    ->label('Performed By')
+                    ->searchable(),
+
+                TextColumn::make('description')
+                    ->limit(50)
+                    ->tooltip(fn ($record) => $record->description),
+
+                // END ADD
+
                 TextColumn::make('ip_address')
                     ->label('IP Address')
                     ->searchable(),
@@ -163,6 +183,32 @@ class ArchivedAuditLogs extends Page implements HasTable
                     }),
             ])
             ->bulkActions([
+                    Tables\Actions\BulkAction::make('restore')
+                        ->label('Restore Selected')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Restore Audit Logs')
+                        ->modalDescription('Are you sure you want to restore the selected audit logs?')
+                        ->modalSubmitActionLabel('Restore')
+                        ->action(function (\Illuminate\Support\Collection $records, HasTable $livewire) {
+
+                            foreach ($records as $record) {
+                                $record->update([
+                                    'is_archived' => false,
+                                ]);
+                            }
+
+                            // ✅ REFRESHER (important)
+                            $livewire->deselectAllTableRecords();
+
+                            Notification::make()
+                                ->title('Audit Logs Restored')
+                                ->body('Selected audit logs have been restored successfully.')
+                                ->success()
+                                ->send();
+                        }),
+
                     Tables\Actions\DeleteBulkAction::make()
                         ->label('Delete Permanently')
                         ->icon('heroicon-o-trash')

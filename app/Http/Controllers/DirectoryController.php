@@ -121,4 +121,14 @@ class DirectoryController extends Controller
 
         return view('main.sb-members', compact('members', 'formerMembers'));
     }
+
+    public function sbinfo()
+    {
+        return view('main.sb-info');
+    }
+
+    public function sbsec()
+    {
+        return view('main.sb-sec');
+    }
 }

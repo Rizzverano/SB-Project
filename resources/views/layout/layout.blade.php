@@ -63,9 +63,9 @@
         <header class="relative overflow-hidden">
 
             <!-- Background -->
-            <img src="{{ asset('images/Hilongos-Lgu.jpg') }}" class="absolute inset-0 w-full h-full object-cover z-0">
+            <img src="{{ asset('images/legis-naming.jpg') }}" class="absolute inset-0 w-full h-full object-fit z-0">
 
-            <div class="absolute inset-0 bg-blue-900/80 z-0"></div>
+            <div class="absolute inset-0 bg-blue-900/80 z-10"></div>
 
             <div class="relative px-4 sm:px-6 lg:px-8 py-6 z-10">
 
@@ -191,11 +191,11 @@
                     </a>
                 </div>
 
-                <!-- Legislative -->
+                <!-- Transparency -->
                 <a href="{{ route('legislative_index') }}"
                     class="block px-4 py-2.5 text-xs font-semibold uppercase border-b border-white/10 transition-colors
         {{ request()->routeIs('legislative_index') ? 'bg-green-700 text-white' : 'text-white hover:bg-green-700' }}">
-                    Legislative Records
+                    Transparency Records
                 </a>
 
                 <!-- Legislative Process -->
@@ -282,7 +282,7 @@
                     <a href="{{ route('legislative_index') }}"
                         class="px-4 py-3 text-white text-xs font-semibold uppercase tracking-wide border-r border-white/10 whitespace-nowrap transition-colors
             {{ request()->routeIs('legislative_index') ? 'bg-green-700' : 'hover:bg-green-700' }}">
-                        Legislative Records
+                        Transparency Records
                     </a>
 
                     <a href="{{ route('legislative.process') }}"
@@ -303,21 +303,27 @@
         <!-- ══════════════════ HERO ══════════════════ -->
         <section class="relative flex items-center justify-center min-h-[340px] md:min-h-[420px] overflow-hidden">
 
-            <!-- Background Image -->
-            <img src="{{ asset('images/legis-building.jpg') }}"
-                class="absolute inset-0 w-full h-full object-cover z-0" alt="">
+            <!-- Background Images (crossfade slideshow) -->
+            <div class="absolute inset-0 z-0">
+                <img src="{{ asset('images/legis-building.png') }}"
+                    class="hero-bg-img absolute inset-0 w-full h-full object-fill"
+                    style="animation: heroCrossfade 6s infinite 0s;" alt="">
+                <img src="{{ asset('images/Hilongos-Lgu.jpg') }}"
+                    class="hero-bg-img absolute inset-0 w-full h-full object-fill"
+                    style="animation: heroCrossfade 6s infinite 3s;" alt="">
+            </div>
 
-            <!-- Optional dark overlay (for readability) -->
-            <div class="absolute inset-0 bg-blue-950/70 z-0"></div>
+            <!-- Dark overlay -->
+            <div class="absolute inset-0 bg-blue-950/70 z-10"></div>
 
             <!-- Decorative circles -->
-            <div class="absolute -top-40 -right-32 w-[500px] h-[500px] rounded-full bg-green-300 opacity-[0.07] z-0">
+            <div class="absolute -top-40 -right-32 w-[500px] h-[500px] rounded-full bg-green-300 opacity-[0.07] z-10">
             </div>
-            <div class="absolute -bottom-36 -left-24 w-[380px] h-[380px] rounded-full bg-blue-600 opacity-10 z-0">
+            <div class="absolute -bottom-36 -left-24 w-[380px] h-[380px] rounded-full bg-blue-600 opacity-10 z-10">
             </div>
 
             <!-- Content -->
-            <div class="relative z-10 text-center px-4 animate-fadeUp">
+            <div class="relative z-20 text-center px-4 animate-fadeUp">
                 <p class="text-green-300 text-xs tracking-[0.3em] uppercase mb-3">
                     Hilongos, Leyte • Local Government Unit
                 </p>
@@ -331,9 +337,32 @@
                     The legislative body of the Local Government of Hilongos — serving the people through principled
                     governance and transparent lawmaking.
                 </p>
-
             </div>
         </section>
+
+        <style>
+            @keyframes heroCrossfade {
+                0% {
+                    opacity: 1;
+                }
+
+                45% {
+                    opacity: 1;
+                }
+
+                50% {
+                    opacity: 0;
+                }
+
+                95% {
+                    opacity: 0;
+                }
+
+                100% {
+                    opacity: 1;
+                }
+            }
+        </style>
 
         <!-- ══════════════════ QUICK LINKS ══════════════════ -->
         <div class="bg-slate-100 border-b border-slate-100 flex items-stretch relative">
@@ -343,7 +372,7 @@
             <!-- CENTER QUICK LINKS -->
             <div class="flex justify-center flex-1 overflow-x-auto no-scrollbar">
 
-                <a href="{{ route('legislative_index') }}" title="Legislative Records"
+                <a href="{{ route('legislative_index') }}" title="Transparency Records"
                     class="flex flex-col items-center justify-center gap-1.5 px-3 sm:px-5 py-3 sm:py-4 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide border-r border-slate-100 transition group
             {{ request()->routeIs('legislative_index')
                 ? 'bg-blue-800 text-white'
@@ -352,7 +381,7 @@
                         class="fa-solid fa-file-lines text-xl transition-transform
                 {{ request()->routeIs('legislative_index') ? 'scale-110' : 'group-hover:scale-110' }}">
                     </i>
-                    <span class="hidden sm:inline">Legislative Records</span>
+                    <span class="hidden sm:inline">Transparency Records</span>
                 </a>
 
                 <a href="{{ route('sb.members') }}" title="SB Members"
@@ -393,21 +422,21 @@
 
             </div>
 
-        <div class="flex items-center justify-end pr-3 gap-2">
-            <a href="{{ route('filament.admin.auth.login') }}" title="Admin Portal"
-                class="hidden sm:flex w-10 h-10 items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
-                <i class="fa-solid fa-user-shield"></i>
-            </a>
-            @auth
-                @if (auth()->user()->isAdmin() || auth()->user()->isMember())
-                    <a href="{{ route('filament.admin.pages.dashboard') }}" title="Go Back"
-                        class="hidden sm:flex w-10 h-10 items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </a>
-                @endif
-            @endauth
+            <div class="flex items-center justify-end pr-3 gap-2">
+                <a href="{{ route('filament.admin.auth.login') }}" title="Admin Portal"
+                    class="hidden sm:flex w-10 h-10 items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
+                    <i class="fa-solid fa-user-shield"></i>
+                </a>
+                @auth
+                    @if (auth()->user()->isAdmin() || auth()->user()->isMember())
+                        <a href="{{ route('filament.admin.pages.dashboard') }}" title="Go Back"
+                            class="hidden sm:flex w-10 h-10 items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </a>
+                    @endif
+                @endauth
+            </div>
         </div>
-    </div>
     </div>
 
     <main class="flex-1 w-full">
@@ -498,7 +527,7 @@
    {{ request()->routeIs('legislative_index*')
        ? 'text-green-300 font-semibold border-l-2 border-green-400 pl-2'
        : 'text-white/60 hover:text-green-300' }}">
-                    Legislative Records
+                    Transparency Records
                 </a>
 
 

@@ -17,8 +17,8 @@ class ForceLoginChallenge
                 Filament::auth()->logout();
             }
 
-            // block all admin access except challenge page
-            if (! $request->is('admin/login-challenge')) {
+            // allow login and challenge page while the account is in challenge state
+            if (! $request->is('admin/login-challenge') && ! $request->is('admin/login')) {
                 return redirect('/admin/login-challenge');
             }
         }
