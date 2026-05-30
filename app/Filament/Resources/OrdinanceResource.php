@@ -54,7 +54,7 @@ class OrdinanceResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            TextInput::make('title')->required()->maxLength(150)->columnSpanFull()->placeholder('e.g. Strict Curfew-001, etc.'),
+            TextInput::make('title')->required()->maxLength(255)->columnSpanFull()->placeholder('e.g. Strict Curfew-001, etc.'),
 
             MarkdownEditor::make('description')->columnSpanFull()->required()->placeholder('e.g. Strict Curfew for minors 10:00 P.M. Onwards, etc.'),
 

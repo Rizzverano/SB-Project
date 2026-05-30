@@ -38,7 +38,7 @@
                             Search Session / Title
                         </label>
                         <input type="text" name="session" value="{{ request('session') }}"
-                            placeholder="e.g. Regular Session 01"
+                            placeholder="e.g. First Regular Session / TASK FORCE - ORD NO. 11"
                             class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm
                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                    placeholder:text-slate-300 transition">
@@ -218,17 +218,18 @@
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Publish Through</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Date</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">N/A</th>
+                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">View</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
-                                @foreach ($ordinances as $ordinance)
+                                @foreach ($ordinances as $index => $ordinance)
                                     <tr class="hover:bg-blue-50/50 transition-colors duration-150 {{ $loop->even ? 'bg-slate-50/50' : 'bg-white' }}">
 
                                         <td class="px-5 py-4 font-semibold text-blue-900 text-xs max-w-[200px]">
                                             {{ $ordinance->title }}
                                         </td>
 
-                                        <td class="px-5 py-4 text-slate-500 text-xs max-w-[220px]">
+                                        <td class="px-5 py-4 text-dark text-xs max-w-[220px] whitespace-pre-wrap break-words">
                                             {{ $ordinance->description ?? '—' }}
                                         </td>
 
@@ -262,6 +263,14 @@
                                                     did not set as N/A
                                                 </span>
                                             @endif
+                                        </td>
+
+                                        <td class="px-5 py-4 text-center">
+                                            <button type="button"
+                                                class="view-ordinance-btn inline-flex items-center justify-center px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-white bg-blue-800 rounded-xl hover:bg-blue-700 transition-all duration-200"
+                                                data-index="{{ $index }}">
+                                                View
+                                            </button>
                                         </td>
 
                                     </tr>
@@ -393,6 +402,52 @@
     </div>
 </div>
 
+{{-- ══════════════════ ORDINANCE MODAL ══════════════════ --}}
+<div id="ordinanceModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
+
+        <div class="relative bg-blue-900 px-6 py-5 flex-shrink-0">
+            <button id="ordinance-modal-close"
+                class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+
+            <div class="text-center">
+                <p class="text-white/50 text-[10px] tracking-[0.3em] uppercase mb-1">
+                    Republic of the Philippines • Province of Leyte • Municipality of Hilongos
+                </p>
+                <h5 class="text-white font-bold text-base" style="font-family: 'Playfair Display', serif;">
+                    Ordinance Details
+                </h5>
+                <p class="text-green-300 text-xs mt-1.5">
+                    <strong id="ordinance-modal-title"></strong>
+                    <span class="text-white/30 mx-2">•</span>
+                    <span id="ordinance-modal-date" class="text-white/60"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="overflow-auto flex-1">
+            <table class="w-full text-sm text-gray-700">
+                <thead class="sticky top-0 bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Title</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Description</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Sponsor</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Action</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Publish Through</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">N/A</th>
+                    </tr>
+                </thead>
+                <tbody id="ordinance-modal-body" class="divide-y divide-slate-100 bg-white"></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -444,6 +499,20 @@
         const modalTitle = document.getElementById('modal-session-title');
         const modalDate = document.getElementById('modal-session-date');
 
+        const formattedDescription = (desc) => {
+            if (!desc) return '';
+            return desc
+                .replace(/\r\n/g, '\n')
+                .replace(/\r/g, '\n')
+                .replace(/(^|\n)(\s*[-*•]|\s*\d+\.)\s*/g, '$1  $2 ');
+        };
+
+        const ordinanceData = @json($ordinances->items());
+        const ordinanceModal = document.getElementById('ordinanceModal');
+        const ordinanceTbody = document.getElementById('ordinance-modal-body');
+        const ordinanceModalTitle = document.getElementById('ordinance-modal-title');
+        const ordinanceModalDate = document.getElementById('ordinance-modal-date');
+
         document.querySelectorAll('.session-card').forEach(card => {
             card.addEventListener('click', function () {
                 const sessionKey = this.dataset.session;
@@ -452,14 +521,6 @@
                 modalTitle.textContent = group.session_label;
                 modalDate.textContent  = new Date(group.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
                 tbody.innerHTML = '';
-
-                const formattedDescription = (desc) => {
-                    if (!desc) return '';
-                    return desc
-                        .replace(/\r\n/g, '\n')
-                        .replace(/\r/g, '\n')
-                        .replace(/(^|\n)(\s*[-*•]|\s*\d+\.)\s*/g, '$1  $2 ');
-                };
 
                 group.records.forEach((row, i) => {
                     const descriptionText = formattedDescription(row.description || '');
@@ -482,6 +543,37 @@
             });
         });
 
+        document.querySelectorAll('.view-ordinance-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const index = Number(this.dataset.index);
+                const record = ordinanceData[index] || {};
+
+                const descriptionText = formattedDescription(record.description || '');
+                const publishThrough = record.publish_through || '—';
+                const actionText = record.action || '—';
+                const sponsorText = record.sponsor || '—';
+                const naText = record.not_applicable ? 'N/A' : 'No';
+
+                ordinanceModalTitle.textContent = record.title || 'Ordinance';
+                ordinanceModalDate.textContent = record.date
+                    ? new Date(record.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                    : '—';
+
+                ordinanceTbody.innerHTML = `
+                    <tr class="bg-white">
+                        <td class="px-5 py-3 text-xs text-slate-600 align-top">${record.title || '—'}</td>
+                        <td class="px-5 py-3 text-left text-dark text-xs whitespace-pre-wrap break-words">${descriptionText || '—'}</td>
+                        <td class="px-5 py-3 text-left text-slate-600 text-xs">${sponsorText}</td>
+                        <td class="px-5 py-3 text-left text-slate-600 text-xs">${actionText}</td>
+                        <td class="px-5 py-3 text-left text-slate-600 text-xs">${publishThrough}</td>
+                        <td class="px-5 py-3 text-left text-slate-600 text-xs">${naText}</td>
+                    </tr>`;
+
+                ordinanceModal.classList.remove('hidden');
+                ordinanceModal.classList.add('flex');
+            });
+        });
+
         document.getElementById('modal-close').onclick = () => {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -491,6 +583,18 @@
             if (e.target === modal) {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
+            }
+        });
+
+        document.getElementById('ordinance-modal-close').onclick = () => {
+            ordinanceModal.classList.add('hidden');
+            ordinanceModal.classList.remove('flex');
+        };
+
+        ordinanceModal.addEventListener('click', function (e) {
+            if (e.target === ordinanceModal) {
+                ordinanceModal.classList.add('hidden');
+                ordinanceModal.classList.remove('flex');
             }
         });
 
