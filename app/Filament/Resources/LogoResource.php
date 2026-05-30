@@ -25,7 +25,7 @@ class LogoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
 
-    protected static ?string $navigationGroup = 'Gov Logos';
+    protected static ?string $navigationGroup = 'Website Content';
 
     protected static ?string $navigationLabel = 'Logo Sets';
 

@@ -22,7 +22,6 @@ class AuditLog extends Model
         'failure_reason',
         'is_locked',
         'has_challenge',
-        'is_archived',
 
         'action',
         'module',
@@ -35,6 +34,5 @@ class AuditLog extends Model
         'attempted_at' => 'datetime',
         'is_locked' => 'boolean',
         'has_challenge' => 'boolean',
-        'is_archived' => 'boolean',
     ];
 }

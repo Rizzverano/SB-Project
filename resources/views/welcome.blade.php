@@ -192,7 +192,7 @@
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-1 h-8 bg-green-400 rounded-full"></div>
                             <h4 class="text-blue-900 font-bold">
-                                Types of Information and Records
+                                Main Information and Records
                             </h4>
                         </div>
 

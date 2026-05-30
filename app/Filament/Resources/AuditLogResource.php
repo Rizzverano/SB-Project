@@ -5,17 +5,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AuditLogResource\Pages;
 use App\Models\AuditLog;
 use App\Models\User;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Contracts\HasTable;
 
 class AuditLogResource extends Resource
 {
@@ -25,11 +23,11 @@ class AuditLogResource extends Resource
 
     protected static ?string $navigationGroup = 'Admin Activities';
 
-    protected static ?string $navigationLabel = 'Audit Logs';
+    protected static ?string $navigationLabel = 'Audit Log Monitoring';
 
     protected static ?string $modelLabel = 'Audit Log';
 
-    protected static ?int $navigationSort = 16;
+    protected static ?int $navigationSort = 14;
 
     public static function canViewAny(): bool
     {
@@ -69,7 +67,6 @@ class AuditLogResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                // ADD HERE
                 TextColumn::make('action')
                     ->badge()
                     ->sortable(),
@@ -86,7 +83,6 @@ class AuditLogResource extends Resource
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->description),
 
-                // END ADD
                 TextColumn::make('ip_address')
                     ->label('IP Address')
                     ->searchable(),
@@ -200,56 +196,24 @@ class AuditLogResource extends Resource
                             ]),
                     ]),
 
-                Action::make('archive')
-                    ->label('Archive')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->modalHeading('Archive Audit Log')
-                    ->modalDescription('Are you sure you want to archive this audit log?')
-                    ->modalSubmitActionLabel('Archive')
-                    ->action(function (AuditLog $record) {
-                        $record->update([
-                            'is_archived' => true,
-                        ]);
-
-                        Notification::make()
-                            ->title('Audit Log Archived')
-                            ->body('The audit log has been archived successfully.')
-                            ->success()
-                            ->send();
-                    }),
+                DeleteAction::make()
+                    ->label('Delete')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
-                    BulkAction::make('archive')
-                        ->label('Archive Selected')
-                        ->icon('heroicon-o-archive-box')
-                        ->color('warning')
-                        ->requiresConfirmation()
-                        ->modalHeading('Archive Audit Logs')
-                        ->modalDescription('Are you sure you want to archive the selected audit logs?')
-                        ->modalSubmitActionLabel('Archive')
-                        ->action(function ($records, HasTable $livewire) {
-
-                            $records->each->update([
-                                'is_archived' => true,
-                            ]);
-
-                            $livewire->deselectAllTableRecords();
-
-                            Notification::make()
-                                ->title('Audit Logs Archived')
-                                ->body('Selected audit logs have been archived successfully.')
-                                ->success()
-                                ->send();
-                        }),
+                DeleteBulkAction::make()
+                    ->label('Delete Selected')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ]);
     }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('is_archived', false)
             ->latest('attempted_at');
     }
 

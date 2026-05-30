@@ -6,6 +6,8 @@ $activeLogo = \App\Models\Logo::where('is_published', true)
 $announcements = \App\Models\Announcement::where('published', true)
     ->latest()
     ->get();
+$header = \App\Models\Header::published()->first();
+$hero = \App\Models\Hero::published()->first();
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -66,8 +68,13 @@ $announcements = \App\Models\Announcement::where('published', true)
         <!-- ══════════════════ HEADER ══════════════════ -->
         <header class="relative overflow-hidden">
 
-            <!-- Background -->
-            <img src="{{ asset('images/legis-naming.jpg') }}" class="absolute inset-0 w-full h-full object-fit z-0">
+        <!-- Background -->
+        <img
+            src="{{ $header
+                ? asset('storage/' . $header->image)
+                : asset('images/legis-naming.jpg')
+            }}"
+            class="absolute inset-0 w-full h-full object-cover z-0">
 
             <div class="absolute inset-0 bg-blue-900/80 z-10"></div>
 
@@ -309,12 +316,23 @@ $announcements = \App\Models\Announcement::where('published', true)
 
             <!-- Background Images (crossfade slideshow) -->
             <div class="absolute inset-0 z-0">
-                <img src="{{ asset('images/legis-building.png') }}"
+                <img
+                    src="{{ $hero && $hero->image1
+                        ? asset('storage/' . $hero->image1)
+                        : asset('images/legis-building.png')
+                    }}"
                     class="hero-bg-img absolute inset-0 w-full h-full object-fill"
-                    style="animation: heroCrossfade 6s infinite 0s;" alt="">
-                <img src="{{ asset('images/Hilongos-Lgu.jpg') }}"
+                    style="animation: heroCrossfade 6s infinite 0s;"
+                    alt="">
+
+                <img
+                    src="{{ $hero && $hero->image2
+                        ? asset('storage/' . $hero->image2)
+                        : asset('images/Hilongos-Lgu.jpg')
+                    }}"
                     class="hero-bg-img absolute inset-0 w-full h-full object-fill"
-                    style="animation: heroCrossfade 6s infinite 3s;" alt="">
+                    style="animation: heroCrossfade 6s infinite 3s;"
+                    alt="">
             </div>
 
             <!-- Dark overlay -->

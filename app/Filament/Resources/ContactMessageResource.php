@@ -31,7 +31,7 @@ class ContactMessageResource extends Resource
 
     protected static ?string $navigationGroup = 'Admin Activities';
 
-    protected static ?int $navigationSort = 14;
+    protected static ?int $navigationSort = 15;
 
     public static function canViewAny(): bool
     {
