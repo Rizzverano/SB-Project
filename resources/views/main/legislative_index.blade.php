@@ -13,7 +13,7 @@
             Hilongos, Leyte • LGU
         </span>
         <h1 class="text-white text-4xl sm:text-5xl font-bold leading-tight mb-4" style="font-family: 'Playfair Display', serif;">
-            Legislative Records
+            Transparency Records
         </h1>
         <p class="text-white/50 text-sm leading-relaxed max-w-md mx-auto">
             Browse all ordinances, resolutions, and official session records of the Sangguniang Bayan.
@@ -103,21 +103,21 @@
         <div id="orbusTab" class="tab-panel {{ $activeTab === 'orbus' ? '' : 'hidden' }}">
             @if ($records->count() > 0)
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    @foreach ($records as $session => $items)
+                    @foreach ($records as $group)
                         <div class="group bg-white border border-slate-200 rounded-2xl p-6 shadow-sm
                                     hover:border-blue-400 hover:shadow-lg hover:-translate-y-1
                                     cursor-pointer transition-all duration-300 session-card text-center"
-                            data-session="{{ $session }}">
+                            data-session="{{ $group['session_key'] }}">
 
                             <div class="w-12 h-12 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto mb-4
                                         group-hover:bg-blue-800 group-hover:border-blue-800 transition-colors duration-300">
                                 <i class="fa-solid fa-file-lines text-blue-700 group-hover:text-white text-sm transition-colors duration-300"></i>
                             </div>
 
-                            <h6 class="font-bold text-blue-900 text-sm mb-1 leading-tight">{{ $session }}</h6>
+                            <h6 class="font-bold text-blue-900 text-sm mb-1 leading-tight">{{ $group['session_label'] }}</h6>
 
                             <p class="text-slate-400 text-xs">
-                                {{ \Carbon\Carbon::parse($items[0]['date'])->format('F d, Y') }}
+                                {{ \Carbon\Carbon::parse($group['date'])->format('F d, Y') }}
                             </p>
 
                             <div class="mt-4 pt-4 border-t border-slate-100">
@@ -381,7 +381,7 @@
                     <tr>
                         <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Session</th>
                         <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
-                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Legislative Record</th>
+                        <th class="px-5 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Legislative Records</th>
                         <th class="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Sponsor</th>
                         <th class="px-5 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Action Taken</th>
                     </tr>
@@ -434,25 +434,43 @@
         });
 
         // Modal — only pass current page's items to JS
-        const sessionData = @json($records->items());
+        const rawSessionData = @json($records->items());
+        const sessionData = {};
+        rawSessionData.forEach(group => {
+            sessionData[group.session_key] = group;
+        });
         const modal = document.getElementById('legislativeModal');
         const tbody = document.getElementById('modal-table-body');
+        const modalTitle = document.getElementById('modal-session-title');
+        const modalDate = document.getElementById('modal-session-date');
 
         document.querySelectorAll('.session-card').forEach(card => {
             card.addEventListener('click', function () {
-                const session = this.dataset.session;
-                const rows    = sessionData[session] || [];
+                const sessionKey = this.dataset.session;
+                const group      = sessionData[sessionKey] || { records: [], session_label: '', date: '' };
 
+                modalTitle.textContent = group.session_label;
+                modalDate.textContent  = new Date(group.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
                 tbody.innerHTML = '';
 
-                rows.forEach((row, i) => {
+                const formattedDescription = (desc) => {
+                    if (!desc) return '';
+                    return desc
+                        .replace(/\r\n/g, '\n')
+                        .replace(/\r/g, '\n')
+                        .replace(/(^|\n)(\s*[-*•]|\s*\d+\.)\s*/g, '$1  $2 ');
+                };
+
+                group.records.forEach((row, i) => {
+                    const descriptionText = formattedDescription(row.description || '');
+
                     tbody.innerHTML += `
                         <tr class="hover:bg-blue-50/40 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}">
                             <td class="px-5 py-3 text-xs text-slate-600">${row.session}</td>
-                            <td class="px-5 py-3 text-xs text-slate-500 whitespace-nowrap">${new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                            <td class="px-5 py-3 text-left">
+                            <td class="px-5 py-3 text-xs text-slate-600 whitespace-nowrap">${new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                            <td class="px-5 py-3 text-left align-top">
                                 <p class="font-semibold text-blue-900 text-xs">${row.title}</p>
-                                <p class="text-slate-400 text-xs mt-0.5">${row.description ?? ''}</p>
+                                <p class="text-dark text-xs mt-0.5 whitespace-pre-wrap break-words">${descriptionText}</p>
                             </td>
                             <td class="px-5 py-3 text-center text-xs text-slate-600">${row.sponsor || '—'}</td>
                             <td class="px-5 py-3 text-center text-xs text-slate-600">${row.action_taken || '—'}</td>

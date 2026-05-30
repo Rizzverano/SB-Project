@@ -31,21 +31,49 @@ class LegislativeController extends Controller
             ]);
         }
 
-        // Group all results first, then paginate the groups
+        // Keep only the seven official agenda titles and group by session + date
+        $agendaTitles = [
+            'LOCAL CHIEF EXECUTIVE HOUR',
+            'READING AND REFERRAL OF THE PROPOSED MEASURES',
+            'COMMITTEE REPORT',
+            'UNFINISHED BUSINESS',
+            'BUSINESS FOR THE DAY',
+            'UNASSIGNED BUSINESS',
+            'OTHER MATTERS',
+        ];
+
         $allGroups = $orbusQuery
             ->orderBy('date', 'asc')
             ->get()
-            ->groupBy(fn ($r) => trim($r->session))
-            ->map(function ($group) {
-                return $group->map(fn ($record) => [
-                    'session'     => trim($record->session),
-                    'date'        => Carbon::parse($record->date)->format('Y-m-d'),
-                    'title'       => $record->title,
-                    'description' => $record->description,
-                    'sponsor'     => $record->sponsor,
-                    'action_taken'=> $record->action_taken,
-                ])->values()->toArray();
-            });
+            ->filter(function ($record) use ($agendaTitles) {
+                return in_array(strtoupper(trim($record->title)), $agendaTitles, true);
+            })
+            ->groupBy(function ($record) {
+                return trim($record->session) . '|' . Carbon::parse($record->date)->format('Y-m-d');
+            })
+            ->map(function ($group, $groupKey) use ($agendaTitles) {
+                [$session, $date] = explode('|', $groupKey);
+
+                $sorted = $group->sortBy(function ($record) use ($agendaTitles) {
+                    return array_search(strtoupper(trim($record->title)), $agendaTitles, true);
+                })->map(function ($record) use ($session, $date) {
+                    return [
+                        'session'     => trim($session),
+                        'date'        => Carbon::parse($date)->format('Y-m-d'),
+                        'title'       => strtoupper(trim($record->title)),
+                        'description' => $record->description,
+                        'sponsor'     => $record->sponsor,
+                        'action_taken'=> $record->action_taken,
+                    ];
+                })->values()->toArray();
+
+                return [
+                    'session_key'   => $groupKey,
+                    'session_label' => trim($session),
+                    'date'          => Carbon::parse($date)->format('Y-m-d'),
+                    'records'       => $sorted,
+                ];
+            })->values();
 
         $orbusPage    = $request->get('orbus_page', 1);
         $orbusPerPage = 8;

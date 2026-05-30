@@ -179,7 +179,7 @@
             {{ request()->routeIs('sb.members*')
                 ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400 pl-3'
                 : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
-                        Members
+                        SB Members
                     </a>
 
                     <a href="{{ route('gallery') }}"
@@ -266,7 +266,7 @@
                     {{ request()->routeIs('sb.members*')
                         ? 'bg-blue-700 text-green-300 font-semibold border-l-4 border-green-400'
                         : 'text-white hover:bg-blue-700 hover:text-green-300' }}">
-                                Members
+                                SB Members
                             </a>
 
                             <a href="{{ route('gallery') }}"

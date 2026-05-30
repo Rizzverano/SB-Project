@@ -20,8 +20,6 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        LegislativeRecord::factory()->count(40)->create();
-
         $this->call([
             AdminUserSeeder::class,
             MemberUserSeeder::class,
