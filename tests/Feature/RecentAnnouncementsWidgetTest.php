@@ -18,7 +18,6 @@ class RecentAnnouncementsWidgetTest extends TestCase
             'title' => 'Public Hearing Schedule',
             'description' => 'The committee hearing will be held on Friday at 9:00 AM.',
             'published' => true,
-            'is_archived' => false,
         ]);
 
         Livewire::test(RecentAnnouncements::class)

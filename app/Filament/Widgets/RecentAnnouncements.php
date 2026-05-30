@@ -18,7 +18,6 @@ class RecentAnnouncements extends BaseWidget
         return $table
             ->query(
                 Announcement::query()
-                    ->where('is_archived', false)
                     ->where('published', true)
                     ->latest()
                     ->limit(5)
