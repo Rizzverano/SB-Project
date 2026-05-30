@@ -33,7 +33,7 @@ class UserResource extends Resource
 
     protected static ?string $navigationGroup = 'Users';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 7;
 
     protected static function hasPermission(Permission $permission): bool
     {

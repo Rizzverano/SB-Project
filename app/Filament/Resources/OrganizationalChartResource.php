@@ -9,7 +9,6 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\ImageColumn;
@@ -21,7 +20,6 @@ use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
-use Filament\Tables\Contracts\HasTable;
 
 class OrganizationalChartResource extends Resource
 {
@@ -30,7 +28,7 @@ class OrganizationalChartResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Documents';
     protected static ?string $navigationLabel = 'Organizational Chart';
-    protected static ?int $navigationSort = 15;
+    protected static ?int $navigationSort = 13;
 
     public static function form(Form $form): Form
     {
@@ -71,7 +69,7 @@ class OrganizationalChartResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(static::getEloquentQuery()->where('is_archived', false))
+            ->query(static::getEloquentQuery())
             ->columns([
                 TextColumn::make('title')
                     ->label('Title')
@@ -146,46 +144,18 @@ class OrganizationalChartResource extends Resource
 
                 Tables\Actions\EditAction::make(),
 
-                Tables\Actions\Action::make('archive')
-                    ->label('Archive')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->modalHeading('Archive Organizational Chart')
-                    ->modalDescription('Are you sure you want to archive this organizational chart?')
-                    ->action(function ($record) {
-                        $record->update([
-                            'is_archived' => true,
-                        ]);
-
-                        Notification::make()
-                            ->title('Organizational Chart Archived')
-                            ->body('Organizational chart has been successfully archived.')
-                            ->success()
-                            ->send();
-                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Delete')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkAction::make('archive')
-                    ->label('Archive Selected')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->action(function ($records, HasTable $livewire) {
-
-                    $records->each->update([
-                        'is_archived' => true
-                    ]);
-
-                    // ✅ CLEAR SELECTION (IMPORTANT)
-                    $livewire->deselectAllTableRecords();
-
-                        Notification::make()
-                            ->title('Organizational Charts Archived')
-                            ->body('Selected organizational charts have been successfully archived.')
-                            ->success()
-                            ->send();
-                    }),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->label('Delete Selected')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ])
             ->defaultSort('created_at', 'desc');
     }

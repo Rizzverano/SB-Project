@@ -22,7 +22,9 @@ class DirectoryController extends Controller
 
     public function about()
     {
-        $orgCharts = OrganizationalChart::where('is_publish', true)->where('is_archived', false)->latest()->get();
+        $orgCharts = OrganizationalChart::where('is_publish', true)
+            ->latest()
+            ->get();
 
         return view('main.about', compact('orgCharts'));
     }
@@ -108,7 +110,9 @@ class DirectoryController extends Controller
 
     public function legislativeProcess()
     {
-        $charters = CitizensCharter::where('is_publish', true)->where('is_archived', false)->latest()->get(); // get ALL published
+        $charters = CitizensCharter::where('is_publish', true)
+            ->latest()
+            ->get();
 
         return view('main.legislative-process', compact('charters'));
     }

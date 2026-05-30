@@ -39,7 +39,7 @@ class SbmemberResource extends Resource
 
     protected static ?string $pluralModelLabel = 'SB Members';
 
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 10;
 
     public static function form(Form $form): Form
     {

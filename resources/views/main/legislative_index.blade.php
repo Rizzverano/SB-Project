@@ -230,7 +230,7 @@
                                         </td>
 
                                         <td class="px-5 py-4 text-dark text-xs max-w-[220px] whitespace-pre-wrap break-words">
-                                            {{ $ordinance->description ?? '—' }}
+                                            {{ preg_replace('/^[ \t]+/m', '', $ordinance->description) ?? '—' }}
                                         </td>
 
                                         <td class="px-5 py-4 text-center text-xs text-slate-600">
@@ -504,7 +504,9 @@
             return desc
                 .replace(/\r\n/g, '\n')
                 .replace(/\r/g, '\n')
-                .replace(/(^|\n)(\s*[-*•]|\s*\d+\.)\s*/g, '$1  $2 ');
+                .replace(/^\s+/, '')
+                .replace(/(^|\n)\s+/g, '$1')
+                .replace(/(^|\n)([-*•]|\d+\.)\s*/g, '$1  $2 ');
         };
 
         const ordinanceData = @json($ordinances->items());

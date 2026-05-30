@@ -17,7 +17,6 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
 
 class LogoResource extends Resource
@@ -30,7 +29,7 @@ class LogoResource extends Resource
 
     protected static ?string $navigationLabel = 'Logo Sets';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 9;
 
     protected static function hasPermission(Permission $permission): bool
     {
@@ -91,7 +90,6 @@ class LogoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->modifyQueryUsing(fn (Builder $query) => $query
-            ->where('is_archived', false)
             ->latest())
             ->columns([
                 TextColumn::make('id')
@@ -171,52 +169,18 @@ class LogoResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\Action::make('archive')
-                    ->label('Archive')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->modalHeading('Archive Logo Set')
-                    ->modalDescription('Are you sure you want to archive this logo set?')
-                    ->modalSubmitActionLabel('Archive')
-                    ->action(function (Logo $record) {
-                        $record->update([
-                            'is_archived' => true,
-                            'is_published' => false,
-                        ]);
-
-                        Notification::make()
-                            ->title('Logo Set Archived')
-                            ->body('The logo set has been archived successfully.')
-                            ->success()
-                            ->send();
-                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Delete')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkAction::make('archive')
-                    ->label('Archive Selected')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->modalHeading('Archive Logo Sets')
-                    ->modalDescription('Are you sure you want to archive the selected logo sets?')
-                    ->modalSubmitActionLabel('Archive')
-                    ->action(function ($records, HasTable $livewire) {
-
-                    $records->each->update([
-                        'is_archived' => true,
-                        'is_published' => false,
-                    ]);
-
-                    // ✅ CLEAR SELECTION
-                    $livewire->deselectAllTableRecords();
-
-                        Notification::make()
-                            ->title('Logo Sets Archived')
-                            ->body('Selected logo sets have been archived successfully.')
-                            ->success()
-                            ->send();
-                    }),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->label('Delete Selected')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ]);
     }
 

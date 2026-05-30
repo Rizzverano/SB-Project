@@ -8,12 +8,10 @@ use App\Filament\Resources\AnnouncementResource\Pages;
 use App\Models\Announcement;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Table;
-use Filament\Tables\Contracts\HasTable;
 
 class AnnouncementResource extends Resource
 {
@@ -75,7 +73,7 @@ class AnnouncementResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(static::getEloquentQuery()->where('is_archived', false))
+            ->query(static::getEloquentQuery())
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
@@ -131,46 +129,18 @@ class AnnouncementResource extends Resource
                     ]),
 
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('archive')
-                    ->label('Archive')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->modalHeading('Archive Announcement')
-                    ->modalDescription('Are you sure you want to archive this announcement?')
-                    ->action(function ($record) {
-                        $record->update([
-                            'is_archived' => true,
-                        ]);
-
-                        Notification::make()
-                            ->title('Announcement Archived')
-                            ->body('Announcement have been successfully archived.')
-                            ->success()
-                            ->send();
-                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Delete')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkAction::make('archive')
-                    ->label('Archive Selected')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->action(function ($records, HasTable $livewire) {
-
-                    $records->each->update([
-                        'is_archived' => true
-                    ]);
-
-                    // ✅ CLEAR SELECTION (IMPORTANT)
-                    $livewire->deselectAllTableRecords();
-
-                        Notification::make()
-                            ->title('Announcements Archived')
-                            ->body('Selected announcements have been successfully archived.')
-                            ->success()
-                            ->send();
-                    }),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->label('Delete Selected')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ]);
     }
 

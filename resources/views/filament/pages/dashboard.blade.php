@@ -24,7 +24,7 @@
                 <div>
                     <p class="text-sm text-gray-500">Announcements</p>
                     <p class="text-2xl font-bold">
-                        {{ \App\Models\Announcement::query()->where('is_archived', false)->where('published', true)->count() }}
+                        {{ \App\Models\Announcement::query()->where('published', true)->count() }}
                     </p>
                 </div>
 

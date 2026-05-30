@@ -6,11 +6,9 @@ use App\Filament\Resources\CitizensCharterResource\Pages;
 use App\Models\CitizensCharter;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Columns\CheckboxColumn;
 
 class CitizensCharterResource extends Resource
@@ -20,7 +18,7 @@ class CitizensCharterResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Documents';
     protected static ?string $navigationLabel = 'Citizens Charter';
-    protected static ?int $navigationSort = 14;
+    protected static ?int $navigationSort = 12;
 
     public static function form(Form $form): Form
     {
@@ -64,7 +62,7 @@ class CitizensCharterResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(static::getEloquentQuery()->where('is_archived', false))
+            ->query(static::getEloquentQuery())
             ->columns([
 
                 Tables\Columns\TextColumn::make('title')
@@ -99,46 +97,18 @@ class CitizensCharterResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('archive')
-                    ->label('Archive')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->modalHeading('Archive Citizens Charter')
-                    ->modalDescription('Are you sure you want to archive this citizens charter?')
-                    ->action(function ($record) {
-                        $record->update([
-                            'is_archived' => true,
-                        ]);
-
-                        Notification::make()
-                            ->title('Citizens Charter Archived')
-                            ->body('Citizens charter has been successfully archived.')
-                            ->success()
-                            ->send();
-                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Delete')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkAction::make('archive')
-                    ->label('Archive Selected')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                        ->action(function ($records, HasTable $livewire) {
-
-                        $records->each->update([
-                            'is_archived' => true
-                        ]);
-
-                        // ✅ CLEAR SELECTION (IMPORTANT)
-                        $livewire->deselectAllTableRecords();
-
-                        Notification::make()
-                            ->title('Citizens Charters Archived')
-                            ->body('Selected citizens charters have been successfully archived.')
-                            ->success()
-                            ->send();
-                    }),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->label('Delete Selected')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ])
             ->defaultSort('created_at', 'desc');
     }

@@ -1,7 +1,11 @@
 @php
-    $activeLogo = \App\Models\Logo::where('is_published', true)->where('is_archived', false)->latest()->first();
+$activeLogo = \App\Models\Logo::where('is_published', true)
+    ->latest()
+    ->first();
 
-    $announcements = \App\Models\Announcement::where('published', true)->where('is_archived', false)->latest()->get();
+$announcements = \App\Models\Announcement::where('published', true)
+    ->latest()
+    ->get();
 @endphp
 <!DOCTYPE html>
 <html lang="en">

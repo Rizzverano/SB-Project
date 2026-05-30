@@ -26,7 +26,7 @@ class ArchivedAuditLogs extends Page implements HasTable
 
     protected static ?string $navigationLabel = 'Archived Audit Logs';
 
-    protected static ?int $navigationSort = 19;
+    protected static ?int $navigationSort = 17;
 
     public static function canAccess(): bool
     {

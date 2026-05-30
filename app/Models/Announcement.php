@@ -13,7 +13,6 @@ class Announcement extends Model
         'title',
         'description',
         'published',
-        'is_archived',
     ];
 
     protected $casts = [

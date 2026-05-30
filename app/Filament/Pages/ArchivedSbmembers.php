@@ -26,7 +26,7 @@ class ArchivedSbmembers extends Page implements HasTable
     protected static string $view = 'filament.pages.archived-sbmembers';
     protected static ?string $navigationGroup = 'Officials';
     protected static ?string $navigationLabel = 'Former SB Members';
-    protected static ?int $navigationSort = 13;
+    protected static ?int $navigationSort = 11;
 
     public function getTitle(): string
     {

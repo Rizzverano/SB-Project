@@ -3,8 +3,7 @@
 namespace App\Filament\Resources\OrganizationalChartResource\Pages;
 
 use App\Filament\Resources\OrganizationalChartResource;
-use Filament\Actions\Action;
-use Filament\Notifications\Notification;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditOrganizationalChart extends EditRecord
@@ -14,23 +13,11 @@ class EditOrganizationalChart extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('archive')
-                ->label('Archive')
-                ->icon('heroicon-o-archive-box')
-                ->color('warning')
-                ->requiresConfirmation()
-                ->modalHeading('Archive Organizational Chart')
-                ->modalDescription('Are you sure you want to archive this organizational chart?')
-                ->action(function ($record) {
-                    $record->update([
-                        'is_archived' => true,
-                    ]);
-
-                    Notification::make()
-                        ->title('Organizational Chart Archived')
-                        ->success()
-                        ->send();
-                }),
+            Actions\DeleteAction::make()
+                ->label('Delete')
+                ->icon('heroicon-o-trash')
+                ->color('danger')
+                ->requiresConfirmation(),
         ];
     }
 }
