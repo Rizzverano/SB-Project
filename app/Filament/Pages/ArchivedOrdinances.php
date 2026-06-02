@@ -8,6 +8,7 @@ use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
 
@@ -89,6 +90,11 @@ class ArchivedOrdinances extends Page implements HasTable
                     })
                     ->sortable(),
 
+                CheckboxColumn::make('not_applicable')
+                    ->label('Not Applicable')
+                    ->sortable()
+                    ->toggleable(),
+
                 TextColumn::make('file')
                     ->label('PDF')
                     ->formatStateUsing(fn ($state) => $state ? '📄 View PDF' : 'No File')
@@ -96,6 +102,11 @@ class ArchivedOrdinances extends Page implements HasTable
                         $record->file ? asset('storage/' . $record->file) : null
                     )
                     ->openUrlInNewTab(),
+
+                CheckboxColumn::make('published')
+                    ->label('Published')
+                    ->sortable()
+                    ->toggleable(),
             ])
             ->striped()
             ->paginated([10, 25, 50])

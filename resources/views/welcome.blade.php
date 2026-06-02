@@ -198,13 +198,6 @@
 
                         <div class="flex flex-wrap gap-3 pt-5 border-t border-slate-200">
 
-                            {{-- ORBOS --}}
-                            <span
-                                class="flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm">
-                                <i class="fa-solid fa-list-ol text-[11px]"></i>
-                                ORBOS
-                            </span>
-
                             {{-- Ordinance --}}
                             <span
                                 class="flex items-center gap-2 bg-green-50 text-green-700 text-xs font-semibold px-4 py-2 rounded-full shadow-sm">

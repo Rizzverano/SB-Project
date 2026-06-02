@@ -121,7 +121,7 @@ class DirectoryController extends Controller
     {
         $members = Sbmember::where('is_publish', true)->where('is_archived', false)->latest()->get();
 
-        $formerMembers = Sbmember::where('is_archived', true)->where('is_publish', true)->latest()->get();
+        $formerMembers = Sbmember::where('is_archived', true)->latest()->get();
 
         return view('main.sb-members', compact('members', 'formerMembers'));
     }

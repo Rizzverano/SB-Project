@@ -70,9 +70,11 @@
                                 {{-- Image --}}
                                 <div class="relative w-full aspect-[3/4] overflow-hidden">
                                     <img src="{{ $member->image ? asset('storage/' . $member->image) : asset('images/default.jpg') }}"
-                                        class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent"></div>
-                                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                                        class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 cursor-zoom-in"
+                                        onclick='openMemberLightbox(this.src, @json($member->name))'
+                                        title="Click to enlarge">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent pointer-events-none"></div>
+                                    <div class="absolute bottom-0 left-0 right-0 p-4 pointer-events-none">
                                         <h3 class="text-white font-bold text-sm leading-tight">{{ $member->name }}</h3>
                                     </div>
                                 </div>
@@ -128,9 +130,11 @@
                                 {{-- Image with grayscale effect for former members --}}
                                 <div class="relative w-full aspect-[3/4] overflow-hidden">
                                     <img src="{{ $member->image ? asset('storage/' . $member->image) : asset('images/default.jpg') }}"
-                                        class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
-                                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                                        class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 cursor-zoom-in"
+                                        onclick='openMemberLightbox(this.src, @json($member->name))'
+                                        title="Click to enlarge">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent pointer-events-none"></div>
+                                    <div class="absolute bottom-0 left-0 right-0 p-4 pointer-events-none">
                                         <h3 class="text-white font-bold text-sm leading-tight">{{ $member->name }}</h3>
                                     </div>
                                 </div>
@@ -165,10 +169,70 @@
         </div>
     </div>
 
+    {{-- ══════════════════════════════════════════
+         MEMBER IMAGE LIGHTBOX
+    ══════════════════════════════════════════ --}}
+    <div id="memberLightbox"
+     class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+     onclick="if(event.target === this) closeMemberLightbox()">
+
+        {{-- Close button --}}
+        <button type="button" onclick="closeMemberLightbox()"
+                class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20
+                       flex items-center justify-center text-white transition-colors z-20">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+
+        {{-- Image container --}}
+        <div class="relative max-w-6xl w-full h-[85vh] flex items-center justify-center overflow-hidden"
+             id="lightboxContainer"
+             onclick="event.stopPropagation();">
+            <img id="memberLightboxImg" src="" alt="Member image"
+                 class="max-h-full max-w-full object-contain rounded-2xl shadow-2xl border border-white/20 transition-transform duration-200"
+                 style="cursor: default;">
+        </div>
+
+        {{-- Caption --}}
+        <p id="memberLightboxCaption"
+           class="absolute bottom-4 left-4 right-4 text-center text-white/70 text-sm font-semibold uppercase tracking-wide"></p>
+    </div>
+
 @endsection
 
 @push('scripts')
 <script>
+    // Member Lightbox functionality - defined globally OUTSIDE DOMContentLoaded
+    window.openMemberLightbox = function(src, title) {
+        const lb = document.getElementById('memberLightbox');
+        if (!lb) {
+            console.error('Lightbox element not found');
+            return;
+        }
+        document.getElementById('memberLightboxImg').src = src;
+        document.getElementById('memberLightboxCaption').textContent = title;
+        lb.style.display = 'flex';
+        lb.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeMemberLightbox = function() {
+        const lb = document.getElementById('memberLightbox');
+        if (!lb) return;
+        lb.style.display = 'none';
+        lb.classList.add('hidden');
+        document.body.style.overflow = '';
+    };
+
+    // Keyboard controls for lightbox
+    document.addEventListener('keydown', e => {
+        const lb = document.getElementById('memberLightbox');
+        if (lb && !lb.classList.contains('hidden')) {
+            if (e.key === 'Escape') {
+                window.closeMemberLightbox();
+            }
+        }
+    });
+
     document.addEventListener("DOMContentLoaded", () => {
 
         function initSlider(containerId, prevId, nextId, indicatorId) {
@@ -240,6 +304,9 @@
             panelCurrent.classList.add("hidden");
             tabFormer.className = "relative px-8 py-4 text-xs font-bold uppercase tracking-widest transition-all duration-300 text-blue-900 border-b-2 border-blue-800";
             tabCurrent.className = "relative px-8 py-4 text-xs font-bold uppercase tracking-widest transition-all duration-300 text-slate-400 border-b-2 border-transparent hover:text-slate-600";
+
+            // Re-trigger slider update now that the panel is visible
+            window.dispatchEvent(new Event('resize'));
         });
 
     });

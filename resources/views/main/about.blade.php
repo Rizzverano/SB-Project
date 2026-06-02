@@ -565,14 +565,14 @@
      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 backdrop-blur-sm p-4"
      onclick="closeLightbox()">
 
-    <div class="relative max-w-6xl w-full" onclick="event.stopPropagation()">
-        {{-- Close button --}}
-        <button onclick="closeLightbox()"
-                class="absolute -top-12 right-0 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20
-                       flex items-center justify-center text-white transition-colors">
-            <i class="fa-solid fa-xmark text-sm"></i>
-        </button>
+    {{-- Close button --}}
+    <button onclick="closeLightbox()"
+            class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20
+                   flex items-center justify-center text-white transition-colors z-10">
+        <i class="fa-solid fa-xmark text-sm"></i>
+    </button>
 
+    <div class="relative max-w-6xl w-full" onclick="event.stopPropagation()">
         {{-- Image --}}
         <img id="lightbox-img" src="" alt=""
              class="w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/10">

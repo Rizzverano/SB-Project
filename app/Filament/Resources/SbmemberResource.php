@@ -178,7 +178,7 @@ class SbmemberResource extends Resource
 
                     $records->each->update([
                         'is_archived' => true,
-                        'is_published' => false,
+                        'is_publish' => false,
                     ]);
 
                     // ✅ CLEAR SELECTION

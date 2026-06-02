@@ -524,7 +524,7 @@ $hero = \App\Models\Hero::published()->first();
     </main>
 
 
-    @stack('scripts')
+
 
     <!-- ══════════════════ Divider Line ══════════════════ -->
     <section class="bg-gradient-to-r from-blue-900 to-blue-800 h-2 w-full"></section>
@@ -614,6 +614,7 @@ $hero = \App\Models\Hero::published()->first();
     <script src="{{ asset('js/filament/announcement.js') }}"></script>
     <script src="{{ asset('js/filament/hamburger.js') }}"></script>
     <script src="{{ asset('js/filament/activities.js') }}"></script>
+    @stack('scripts')
 </body>
 
 </html>

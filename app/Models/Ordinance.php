@@ -14,6 +14,7 @@ class Ordinance extends Model
         'title',
         'file',
         'is_archived',
+        'published',
         'description',
         'sponsor',
         'action',
@@ -25,7 +26,13 @@ class Ordinance extends Model
     protected $casts = [
         'is_archived' => 'boolean',
         'not_applicable' => 'boolean',
+        'published' => 'boolean',
     ];
+
+    public function scopePublished($query)
+    {
+        return $query->where('published', true);
+    }
 
     protected static function booted()
     {

@@ -21,6 +21,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Forms;
 
 class OrdinanceResource extends Resource
 {
@@ -95,7 +96,15 @@ class OrdinanceResource extends Resource
                 ->acceptedFileTypes(['application/pdf'])
                 ->maxSize(307200)->columnSpanFull(),
 
-            ])
+            ]),
+
+            Section::make('Visibility')
+            ->schema([
+                Toggle::make('published')
+                    ->label('Publish Ordinance')
+                    ->helperText('Enable to make this visible to users.')
+                    ->default(false),
+            ]),
         ]);
     }
 
@@ -151,6 +160,11 @@ class OrdinanceResource extends Resource
                         $record->file ? asset('storage/' . $record->file) : null
                     )
                     ->openUrlInNewTab(),
+
+                CheckboxColumn::make('published')
+                    ->label('Published')
+                    ->sortable()
+                    ->toggleable(),
             ])
             ->striped()
             ->paginated([10, 25, 50])
