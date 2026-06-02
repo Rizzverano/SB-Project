@@ -42,6 +42,8 @@ class AuditHelper
             'record_id' => $recordId,
             'performed_by' => auth()->user()?->name ?? 'System',
             'description' => $description,
+
+            'is_archived' => false,
         ]);
     }
 }

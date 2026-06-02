@@ -29,16 +29,16 @@
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6">
             <form method="GET" action="{{ route('legislative_index') }}">
                 @csrf
-                <input type="hidden" name="tab" id="activeTab" value="{{ request('tab', 'orbus') }}">
+                <input type="hidden" name="tab" id="activeTab" value="{{ $activeTab }}">
 
                 <div class="flex flex-wrap gap-3 items-end">
 
                     <div class="flex-1 min-w-[180px]">
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
-                            Search Session / Title
+                            @auth Search Session / @endauth Title
                         </label>
                         <input type="text" name="session" value="{{ request('session') }}"
-                            placeholder="e.g. First Regular Session / TASK FORCE - ORD NO. 11"
+                            placeholder="e.g. @auth First Regular Session / @endauth TASK FORCE - ORD NO. 11"
                             class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm
                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                    placeholder:text-slate-300 transition">
@@ -46,7 +46,8 @@
 
                     <div class="min-w-[160px]">
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
-                            Filter by Date
+                            @auth Filter by Date @endauth
+                            @guest Filter by Date Published @endguest
                         </label>
                         <input type="date" name="date" value="{{ request('date') }}"
                             class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm
@@ -78,19 +79,27 @@
         <div class="flex justify-center mb-8">
             <div class="inline-flex bg-white border border-slate-200 rounded-2xl p-1.5 shadow-sm gap-1 relative">
 
-                <button class="tab-btn relative z-10 flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300
-                               {{ $activeTab === 'orbus' ? 'text-white' : 'text-slate-400 hover:text-blue-700' }}"
-                    data-target="orbusTab" data-tab="orbus">
-                    <i class="fa-solid fa-layer-group text-xs"></i>
-                    ORBOS
-                </button>
-
-                <button class="tab-btn relative z-10 flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300
-                               {{ $activeTab === 'ordinance' ? 'text-white' : 'text-slate-400 hover:text-blue-700' }}"
+                <button type="button" class="tab-btn relative z-10 flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300
+                               {{ $activeTab === 'ordinance'
+                                        ? 'bg-blue-800 text-white shadow-md'
+                                        : 'text-slate-400 hover:text-blue-700'
+                                    }}"
                     data-target="ordinanceTab" data-tab="ordinance">
                     <i class="fa-solid fa-scale-balanced text-xs"></i>
                     Ordinance
                 </button>
+
+                @auth
+                <button type="button" class="tab-btn relative z-10 flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300
+                               {{ $activeTab === 'orbus'
+                                        ? 'bg-blue-800 text-white shadow-md'
+                                        : 'text-slate-400 hover:text-blue-700'
+                                    }}"
+                    data-target="orbusTab" data-tab="orbus">
+                    <i class="fa-solid fa-layer-group text-xs"></i>
+                    ORBOS
+                </button>
+                @endauth
 
                 <span id="tabIndicator"
                     class="absolute top-1.5 left-1.5 h-[calc(100%-0.75rem)] bg-blue-800 rounded-xl shadow-md transition-all duration-300 ease-in-out">
@@ -99,6 +108,7 @@
             </div>
         </div>
 
+        @auth
         {{-- ══ ORBOS TAB ══ --}}
         <div id="orbusTab" class="tab-panel {{ $activeTab === 'orbus' ? '' : 'hidden' }}">
             @if ($records->count() > 0)
@@ -203,6 +213,8 @@
             @endif
         </div>
 
+        @endauth
+
         {{-- ══ ORDINANCE TAB ══ --}}
         <div id="ordinanceTab" class="tab-panel {{ $activeTab === 'ordinance' ? '' : 'hidden' }}">
             @if ($ordinances->count() > 0)
@@ -216,7 +228,7 @@
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Sponsor</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Action</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Publish Through</th>
-                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Date</th>
+                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Date Published</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">N/A</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">View</th>
                                 </tr>
@@ -462,13 +474,24 @@
             indicator.style.left  = el.offsetLeft  + 'px';
         }
 
-        tabBtns.forEach(btn => {
-            if (btn.dataset.tab === tabInput.value) {
-                btn.classList.add('text-white');
-                btn.classList.remove('text-slate-400');
-                setTimeout(() => moveIndicator(btn), 50);
-            }
-        });
+        const activeBtn = Array.from(tabBtns).find(btn => btn.dataset.tab === tabInput.value) || tabBtns[0];
+
+        if (activeBtn) {
+            tabBtns.forEach(btn => {
+                if (btn === activeBtn) {
+                    btn.classList.remove('text-slate-400');
+                    btn.classList.add('bg-blue-800', 'text-white', 'shadow-md');
+                } else {
+                            btn.classList.add('text-slate-400');
+                }
+            });
+
+            tabPanels.forEach(p => p.classList.add('hidden'));
+            document.getElementById(activeBtn.dataset.target)?.classList.remove('hidden');
+
+            setTimeout(() => moveIndicator(activeBtn), 50);
+            tabInput.value = activeBtn.dataset.tab;
+        }
 
         tabBtns.forEach(btn => {
             btn.addEventListener('click', function () {
@@ -478,12 +501,12 @@
                 document.getElementById(this.dataset.target).classList.remove('hidden');
 
                 tabBtns.forEach(b => {
-                    b.classList.remove('text-white');
+                    b.classList.remove('bg-blue-800', 'text-white', 'shadow-md');
                     b.classList.add('text-slate-400');
                 });
 
                 this.classList.remove('text-slate-400');
-                this.classList.add('text-white');
+                this.classList.add('bg-blue-800', 'text-white', 'shadow-md');
                 moveIndicator(this);
             });
         });

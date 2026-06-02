@@ -12,7 +12,7 @@ class LegislativeController extends Controller
 {
     public function index(Request $request)
     {
-        $activeTab = $request->get('tab', 'orbus');
+        $activeTab = $request->get('tab', 'ordinance');
 
         /* =======================
             ORBUS QUERY

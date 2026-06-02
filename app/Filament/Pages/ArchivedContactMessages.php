@@ -23,7 +23,7 @@ class ArchivedContactMessages extends Page implements HasTable
     protected static string $view = 'filament.pages.archived-contact-messages';
     protected static ?string $navigationGroup = 'Admin Activities';
     protected static ?string $navigationLabel = 'Archived Contact Messages';
-    protected static ?int $navigationSort = 16;
+    protected static ?int $navigationSort = 17;
 
     public static function canAccess(): bool
     {

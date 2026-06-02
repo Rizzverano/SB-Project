@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AuditLogResource\Pages;
+use App\Filament\Resources\ArchivedAuditLogResource\Pages;
 use App\Models\AuditLog;
 use App\Models\User;
 use Filament\Resources\Resource;
@@ -17,19 +17,19 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class AuditLogResource extends Resource
+class ArchivedAuditLogResource extends Resource
 {
     protected static ?string $model = AuditLog::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
     protected static ?string $navigationGroup = 'Admin Activities';
 
-    protected static ?string $navigationLabel = 'Audit Log Monitoring';
+    protected static ?string $navigationLabel = 'Archived Audit Logs';
 
-    protected static ?string $modelLabel = 'Audit Log';
+    protected static ?string $modelLabel = 'Archived Audit Log';
 
-    protected static ?int $navigationSort = 14;
+    protected static ?int $navigationSort = 15;
 
     public static function canViewAny(): bool
     {
@@ -69,7 +69,7 @@ class AuditLogResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                // Add
+                    // Add
                 TextColumn::make('action')
                     ->badge()
                     ->sortable(),
@@ -86,7 +86,7 @@ class AuditLogResource extends Resource
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->description),
 
-                // End
+                    // End
 
                 TextColumn::make('ip_address')
                     ->label('IP Address')
@@ -149,7 +149,7 @@ class AuditLogResource extends Resource
                         ->map(fn ($date) => \Carbon\Carbon::parse($date)->toDateString())
                         ->unique()
                         ->mapWithKeys(fn ($date) => [
-                            $date => \Carbon\Carbon::parse($date)->toFormattedDateString()
+                            $date => \Carbon\Carbon::parse($date)->toFormattedDateString(),
                         ])
                         ->all())
                     ->searchable()
@@ -224,50 +224,62 @@ class AuditLogResource extends Resource
                             ]),
                     ]),
 
-                Tables\Actions\Action::make('archive')
-                    ->label('Archive')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
+                Action::make('restore')
+                    ->label('Restore')
+                    ->icon('heroicon-o-arrow-left-on-rectangle')
+                    ->color('success')
                     ->requiresConfirmation()
-                    ->modalHeading('Archive Audit Log')
-                    ->modalDescription('Are you sure you want to archive this audit log entry?')
-                    ->modalSubmitActionLabel('Archive')
+                    ->modalHeading('Restore Archived Audit Log')
+                    ->modalDescription('Are you sure you want to restore this audit log entry?')
+                    ->modalSubmitActionLabel('Restore')
                     ->action(function (AuditLog $record) {
                         $record->update([
-                            'is_archived' => true,
+                            'is_archived' => false,
                         ]);
                     }),
+
+                DeleteAction::make()
+                    ->label('Delete Permanently')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
-                BulkAction::make('archive')
-                    ->label('Archive Selected')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
+                BulkAction::make('restore')
+                    ->label('Restore Selected')
+                    ->icon('heroicon-o-arrow-left-on-rectangle')
+                    ->color('success')
                     ->requiresConfirmation()
-                    ->modalHeading('Archive Selected Audit Logs')
-                    ->modalDescription('Are you sure you want to archive the selected audit log entries?')
-                    ->modalSubmitActionLabel('Archive')
+                    ->modalHeading('Restore Selected Audit Logs')
+                    ->modalDescription('Are you sure you want to restore the selected archived audit log entries?')
+                    ->modalSubmitActionLabel('Restore')
                     ->action(function ($records, $livewire) {
                         $records->each->update([
-                            'is_archived' => true,
+                            'is_archived' => false,
                         ]);
 
                         $livewire->deselectAllTableRecords();
                     }),
+
+                DeleteBulkAction::make()
+                    ->label('Delete Permanently Selected')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation(),
             ]);
     }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('is_archived', false)
+            ->where('is_archived', true)
             ->latest('attempted_at');
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAuditLogs::route('/'),
+            'index' => Pages\ListArchivedAuditLogs::route('/'),
         ];
     }
 }

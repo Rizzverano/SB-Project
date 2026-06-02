@@ -55,9 +55,9 @@
         {{-- ══════════════════ IMAGE CARDS MACRO ══════════════════ --}}
         @php
             $publicImages = [
-                ['src' => 'images/public1.jpg', 'title' => 'Public Hearing Session',         'desc' => 'Community members gathered to discuss local ordinances and public concerns.'],
-                ['src' => 'images/public2.jpg', 'title' => 'Open Forum',                     'desc' => 'Citizens voice their concerns directly to the Sangguniang Bayan members.'],
-                ['src' => 'images/public3.jpg', 'title' => 'Community Consultation',         'desc' => 'Barangay representatives participate in a scheduled public consultation.'],
+                ['src' => 'images/Hearings/hearing1.jpg', 'title' => 'Public Hearing Session',         'desc' => 'Community members gathered to discuss local ordinances and public concerns.'],
+                ['src' => 'images/Hearings/hearing2.jpg', 'title' => 'Open Forum',                     'desc' => 'Citizens voice their concerns directly to the Sangguniang Bayan members.'],
+                ['src' => 'images/Hearings/hearing3.jpg', 'title' => 'Community Consultation',         'desc' => 'Barangay representatives participate in a scheduled public consultation.'],
             ];
 
             $regularImages = [
