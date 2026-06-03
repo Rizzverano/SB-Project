@@ -40,7 +40,8 @@ Route::get('/contact', [DirectoryController::class, 'contact'])
 
 Route::post('/contact', [DirectoryController::class, 'storeContact'])
     ->name('contact.store')
-    ->middleware('throttle:5,1'); // 5 requests per minute
+    ->middleware('throttle:5,1')
+    ->middleware('block.spam'); // 5 requests per minute
 
 Route::get('/gallery', [DirectoryController::class, 'gallery'])
     ->name('gallery');

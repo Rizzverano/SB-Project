@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ContactMessage;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use App\Models\Sbmember;
 use App\Models\CitizensCharter;
 use App\Models\OrganizationalChart;
@@ -79,9 +80,16 @@ class DirectoryController extends Controller
         }
 
         // ✅ SAVE MESSAGE
-        $contactMessage = ContactMessage::create($request->only(['name', 'email', 'phone', 'message']));
+        $contactMessage = ContactMessage::create(array_merge(
+            $request->only(['name', 'phone', 'message']),
+            [
+                'email' => Str::lower(trim($request->input('email'))),
+                'ip_address' => $request->ip(),
+            ]
+        ));
 
         // ✅ NOTIFY ADMINS
+        if (! $contactMessage->is_spam) {
         $admins = \App\Models\User::where('role', \App\Models\User::ADMIN)->where('is_active', true)->get();
 
         $url = route('filament.admin.resources.contact-messages.index', ['record' => $contactMessage]);
@@ -98,6 +106,7 @@ class DirectoryController extends Controller
                 ])
                 ->actions([Action::make('view')->label('View message')->url($url)->markAsRead()])
                 ->sendToDatabase($admin, isEventDispatched: true);
+        }
         }
 
         return back()->with('success', 'Your message has been sent successfully!');

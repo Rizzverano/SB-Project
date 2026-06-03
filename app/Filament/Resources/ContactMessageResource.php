@@ -81,6 +81,7 @@ class ContactMessageResource extends Resource
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query
                 ->where('is_archived', false)
+                ->where('is_spam', false)
                 ->latest())
             ->columns([
                 TextColumn::make('name')->searchable(),

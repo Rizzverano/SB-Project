@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
         'force.challenge' => \App\Http\Middleware\ForceLoginChallenge::class,
         'login.otp' => \App\Http\Middleware\EnsureLoginOtpIsVerified::class,
         'nocache' => \App\Http\Middleware\NoCache::class,
+        'block.spam' => \App\Http\Middleware\BlockSpam::class,
     ];
 }
