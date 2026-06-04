@@ -80,6 +80,17 @@ class LoginOtpController extends Controller
         }
 
         if (now()->timestamp > (int) session('login_otp_expires_at')) {
+            $user = User::find($userId);
+
+            if ($user) {
+                // Try to automatically resend a fresh OTP when the previous one expired.
+                $sent = self::beginChallenge($user, (bool) session('login_otp_remember', false));
+
+                if ($sent) {
+                    return back()->with('status', 'Your OTP has expired. A new code has been sent to your email.');
+                }
+            }
+
             $this->forgetOtpSession();
 
             return redirect('/admin/login')->withErrors(new MessageBag([
@@ -151,6 +162,58 @@ class LoginOtpController extends Controller
         ]);
 
         return true;
+    }
+
+    public function resend(Request $request)
+    {
+        $userId = session('login_otp_pending_user_id');
+
+        if (! $userId) {
+            return redirect('/admin/login');
+        }
+
+        $rateLimitKey = 'login-otp-resend:'.$userId.'|'.$request->ip();
+        $maxResends = 5;
+
+        if (RateLimiter::tooManyAttempts($rateLimitKey, $maxResends)) {
+            $message = 'Too many resend requests. Please wait before trying again.';
+
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 429);
+            }
+
+            return back()->withErrors(new MessageBag(['otp' => $message]));
+        }
+
+        $user = User::find($userId);
+
+        if (! $user) {
+            $this->forgetOtpSession();
+
+            return redirect('/admin/login');
+        }
+
+        RateLimiter::hit($rateLimitKey, 3600);
+
+        $sent = self::beginChallenge($user, (bool) session('login_otp_remember', false));
+
+        if (! $sent) {
+            $message = 'Unable to send OTP right now. Please try again later.';
+
+            if ($request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $message], 500);
+            }
+
+            return back()->withErrors(new MessageBag(['otp' => $message]));
+        }
+
+        $message = 'A new OTP has been sent to your email.';
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $message, 'expires_at' => session('login_otp_expires_at')]);
+        }
+
+        return back()->with('status', $message);
     }
 
     protected function forgetOtpSession(): void

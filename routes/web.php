@@ -60,6 +60,9 @@ Route::middleware('nocache')->group(function () {
 
     Route::post('/admin/login-otp', [LoginOtpController::class, 'verify'])
         ->name('login.otp.verify');
+
+    Route::post('/admin/login-otp/resend', [LoginOtpController::class, 'resend'])
+        ->name('login.otp.resend');
 });
 
 Route::get('/legislative-process', [DirectoryController::class, 'legislativeProcess'])

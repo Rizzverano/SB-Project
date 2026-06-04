@@ -184,6 +184,26 @@ class ContactMessageResource extends Resource
                         }
                     }),
 
+                Tables\Actions\Action::make('markSpam')
+                    ->label('Mark as Spam')
+                    ->icon('heroicon-o-shield-exclamation')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Mark as Spam')
+                    ->modalDescription('Are you sure you want to move this message to spam?')
+                    ->modalSubmitActionLabel('Yes, mark as spam')
+                    ->action(function (ContactMessage $record) {
+                        $record->update([
+                            'is_spam' => true,
+                        ]);
+
+                        Notification::make()
+                            ->title('Marked as Spam')
+                            ->body('The message has been moved to spam successfully.')
+                            ->success()
+                            ->send();
+                    }),
+
                 Tables\Actions\Action::make('archive')
                     ->label('Archive')
                     ->icon('heroicon-o-archive-box')

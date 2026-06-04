@@ -12,7 +12,7 @@ class NotifyAdminsOfUserLogin
 {
     public function handle(Login $event): void
     {
-        if (! $event->user instanceof User || $event->user->isAdmin()) {
+        if (! $event->user instanceof User) {
             return;
         }
 
@@ -22,6 +22,13 @@ class NotifyAdminsOfUserLogin
             ->get();
 
         if ($admins->isEmpty()) {
+            return;
+        }
+
+        // Don't notify the user about their own login
+        $recipients = $admins->filter(fn ($a) => $a->id !== $event->user->id)->values();
+
+        if ($recipients->isEmpty()) {
             return;
         }
 
@@ -42,6 +49,6 @@ class NotifyAdminsOfUserLogin
                     ->url($url)
                     ->markAsRead(),
             ])
-            ->sendToDatabase($admins, isEventDispatched: true);
+            ->sendToDatabase($recipients, isEventDispatched: true);
     }
 }
