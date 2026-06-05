@@ -14,6 +14,7 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
+use Illuminate\Database\Eloquent\Model;
 
 class ArchivedContactMessages extends Page implements HasTable
 {
@@ -41,7 +42,9 @@ class ArchivedContactMessages extends Page implements HasTable
     {
         return $table
             ->query(ContactMessage::query()->where('is_archived', true)->latest())
-            ->columns([TextColumn::make('name')->searchable(), TextColumn::make('email')->searchable(), TextColumn::make('phone'), TextColumn::make('message')->limit(50)->tooltip(fn($state) => strlen($state) > 50 ? $state : null)->searchable(), TextColumn::make('is_read')->label('Status')->formatStateUsing(fn($state) => $state ? 'Read' : 'Unread')->badge()->color(fn($state) => $state ? 'success' : 'danger'), TextColumn::make('created_at')->label('Received At')->dateTime()->sortable()])
+            ->columns([TextColumn::make('name')->searchable(), TextColumn::make('email')->searchable(), TextColumn::make('phone'), TextColumn::make('message')->limit(50)->tooltip(fn($state) => strlen($state) > 50 ? $state : null)->searchable(), TextColumn::make('is_read')->label('Status')->formatStateUsing(fn($state) => $state ? 'Read' : 'Unread')->badge()->color(fn($state) => $state ? 'success' : 'danger'), TextColumn::make('created_at')->label('Received At')->dateTime()->sortable(), TextColumn::make('note')
+    ->label('')
+    ->getStateUsing(fn () => 'Spam messages cannot be restored')])
             ->striped()
             ->paginated([10, 25, 50])
             ->actions([
@@ -61,6 +64,7 @@ class ArchivedContactMessages extends Page implements HasTable
                     ->label('Restore')
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('success')
+                    ->visible(fn (ContactMessage $record) => ! $record->is_spam)
                     ->requiresConfirmation()
                     ->modalHeading('Restore Contact Message')
                     ->modalDescription('Are you sure you would like to restore this contact message?')
@@ -71,6 +75,28 @@ class ArchivedContactMessages extends Page implements HasTable
                         ]);
 
                         Notification::make()->title('Contact Message Restored')->body('The contact message has been restored successfully.')->success()->send();
+                    }),
+
+                Tables\Actions\Action::make('markSpam')
+                    ->label('Restore to Spam')
+                    ->icon('heroicon-o-shield-exclamation')
+                    ->color('danger') // match your resource
+                    ->requiresConfirmation()
+                    ->modalHeading('Restore to Spam')
+                    ->modalDescription('Are you sure you want to move this message back to spam?')
+                    ->modalSubmitActionLabel('Yes, move to spam')
+                    ->action(function (ContactMessage $record) {
+
+                        $record->update([
+                            'is_spam' => true,
+                            'is_archived' => false,
+                        ]);
+
+                        Notification::make()
+                            ->title('Restored to Spam')
+                            ->body('The message has been moved to spam successfully.')
+                            ->success()
+                            ->send();
                     }),
 
                 Tables\Actions\Action::make('delete')
@@ -87,26 +113,32 @@ class ArchivedContactMessages extends Page implements HasTable
                         Notification::make()->title('Contact Message Deleted')->body('The contact message has been permanently deleted.')->success()->send();
                     }),
             ])
+            ->checkIfRecordIsSelectableUsing(
+            fn (Model $record): bool => ! $record->is_spam,
+            )
             ->bulkActions([
                     Tables\Actions\BulkAction::make('restore')
-                        ->label('Restore Selected')
-                        ->icon('heroicon-o-arrow-uturn-left')
-                        ->color('success')
-                        ->requiresConfirmation()
-                        ->modalHeading('Restore Selected Messages')
-                        ->modalDescription('Are you sure you want to restore the selected contact messages?')
-                        ->modalSubmitActionLabel('Restore')
-                        ->action(function (\Illuminate\Support\Collection $records, HasTable $livewire) {
+                    ->label('Restore Selected')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Restore Selected Messages')
+                    ->modalDescription('Are you sure you want to restore the selected contact messages?')
+                    ->modalSubmitActionLabel('Restore')
+                    ->action(function ($records, HasTable $livewire) {
 
                         foreach ($records as $record) {
                             $record->update(['is_archived' => false]);
                         }
 
-                        // ✅ REFRESHER (THIS IS WHAT YOU NEED)
                         $livewire->deselectAllTableRecords();
 
-                            Notification::make()->title('Contact Messages Restored')->body('Selected contact messages have been restored successfully.')->success()->send();
-                        }),
+                        Notification::make()
+                            ->title('Contact Messages Restored')
+                            ->body('Selected contact messages have been restored successfully.')
+                            ->success()
+                            ->send();
+                    }),
 
                     Tables\Actions\BulkAction::make('delete')
                         ->label('Delete Permanently')

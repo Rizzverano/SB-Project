@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\BlockedEmail;
+use App\Models\BlockedIp;
 use App\Models\ContactMessage;
 use Filament\Pages\Page;
 use Filament\Tables;
@@ -45,6 +47,7 @@ class SpamContactMessages extends Page implements HasTable
             ->query(
                 ContactMessage::query()
                     ->where('is_spam', true)
+                    ->where('is_archived', false)
                     ->latest()
             )
             ->columns([
@@ -120,12 +123,12 @@ class SpamContactMessages extends Page implements HasTable
                     ->modalDescription('Block email and device permanently?')
                     ->action(function (ContactMessage $record) {
 
-                        \App\Models\BlockedEmail::firstOrCreate([
+                        BlockedEmail::firstOrCreate([
                             'email' => $record->email,
                         ]);
 
                         if (! empty($record->ip_address)) {
-                            \App\Models\BlockedIp::firstOrCreate([
+                            BlockedIp::firstOrCreate([
                                 'ip_address' => $record->ip_address,
                             ]);
                         }
@@ -160,20 +163,22 @@ class SpamContactMessages extends Page implements HasTable
                             ->send();
                     }),
 
-                // 🗑 DELETE
-                Tables\Actions\Action::make('delete')
-                    ->label('Delete')
-                    ->icon('heroicon-o-trash')
-                    ->color('danger')
+                Tables\Actions\Action::make('archive')
+                    ->label('Archive')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
                     ->requiresConfirmation()
-                    ->modalHeading('Delete Message')
-                    ->modalDescription('This action cannot be undone.')
+                    ->modalHeading('Archive Message')
+                    ->modalDescription('Move this message to archive?')
                     ->action(function (ContactMessage $record) {
-                        $record->delete();
+
+                        $record->update([
+                            'is_archived' => true,
+                        ]);
 
                         Notification::make()
-                            ->title('Deleted')
-                            ->body('The message has been permanently deleted.')
+                            ->title('Archived')
+                            ->body('The message has been archived.')
                             ->success()
                             ->send();
                     }),
@@ -204,26 +209,26 @@ class SpamContactMessages extends Page implements HasTable
                             ->send();
                     }),
 
-                BulkAction::make('deleteSelected')
-                    ->label('Delete Selected')
-                    ->icon('heroicon-o-trash')
-                    ->color('danger')
+                Tables\Actions\BulkAction::make('archive')
+                    ->label('Archive Selected')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
                     ->requiresConfirmation()
-                    ->modalHeading('Delete Selected Messages')
-                    ->modalDescription('Are you sure you want to permanently delete the selected messages? This action cannot be undone.')
-                    ->modalSubmitActionLabel('Delete Permanently')
-                    ->action(function (\Illuminate\Support\Collection $records, $livewire) {
+                    ->modalHeading('Archive Selected Messages')
+                    ->modalDescription('Are you sure you want to archive the selected messages?')
+                    ->modalSubmitActionLabel('Archive')
+                        ->action(function ($records, HasTable $livewire) {
 
-                        foreach ($records as $record) {
-                            $record->delete();
-                        }
+                        $records->each->update([
+                            'is_archived' => true
+                        ]);
 
-                        // ✅ Clear selection after action
+                        // ✅ CLEAR SELECTION (IMPORTANT)
                         $livewire->deselectAllTableRecords();
 
                         Notification::make()
-                            ->title('Messages Deleted')
-                            ->body('Selected messages have been permanently deleted.')
+                            ->title('Contact Messages Archived')
+                            ->body('Selected contact messages have been archived successfully.')
                             ->success()
                             ->send();
                     }),
