@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Filament\Resources\OfficialsImageResource\Pages;
+
+use App\Filament\Resources\OfficialsImageResource;
+use Filament\Actions;
+use Filament\Resources\Pages\EditRecord;
+
+class EditOfficialsImage extends EditRecord
+{
+    protected static string $resource = OfficialsImageResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\DeleteAction::make(),
+        ];
+    }
+}

@@ -43,6 +43,9 @@ class SpamHelper
             'yawa','pistingyawa','pestengyawa','pistengyawa',
             'animalka',
             'otin','oten','bilat','belat','bisong','besong','alimbarok',
+
+            // emoji
+            '🤬', '🖕'
         ];
 
         // ✅ keyword check

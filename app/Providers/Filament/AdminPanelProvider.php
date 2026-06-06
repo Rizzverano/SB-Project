@@ -36,6 +36,11 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-home')
                     ->group('Public View')
                     ->sort(5),
+                NavigationItem::make('Transparency Page')
+                    ->url(fn () => route('legislative_index'))
+                    ->icon('heroicon-o-folder-open')
+                    ->group('Public View')
+                    ->sort(5),
             ])
             ->default()
             ->id('admin')
