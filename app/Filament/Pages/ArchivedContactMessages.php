@@ -43,8 +43,10 @@ class ArchivedContactMessages extends Page implements HasTable
         return $table
             ->query(ContactMessage::query()->where('is_archived', true)->latest())
             ->columns([TextColumn::make('name')->searchable(), TextColumn::make('email')->searchable(), TextColumn::make('phone'), TextColumn::make('message')->limit(50)->tooltip(fn($state) => strlen($state) > 50 ? $state : null)->searchable(), TextColumn::make('is_read')->label('Status')->formatStateUsing(fn($state) => $state ? 'Read' : 'Unread')->badge()->color(fn($state) => $state ? 'success' : 'danger'), TextColumn::make('created_at')->label('Received At')->dateTime()->sortable(), TextColumn::make('note')
-    ->label('')
-    ->getStateUsing(fn () => 'Spam messages cannot be restored')])
+                ->label('')
+                ->getStateUsing(fn ($record) =>
+                    $record?->is_spam ? 'Spam messages cannot be selected' : null
+                )])
             ->striped()
             ->paginated([10, 25, 50])
             ->actions([
@@ -85,6 +87,7 @@ class ArchivedContactMessages extends Page implements HasTable
                     ->modalHeading('Restore to Spam')
                     ->modalDescription('Are you sure you want to move this message back to spam?')
                     ->modalSubmitActionLabel('Yes, move to spam')
+                    ->visible(fn (ContactMessage $record) => $record->is_spam)
                     ->action(function (ContactMessage $record) {
 
                         $record->update([

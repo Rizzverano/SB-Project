@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Helpers\SpamHelper;
 use Illuminate\Support\Str;
 use Filament\Notifications\Notification;
-use Filament\Notifications\Actions\Action;
 use App\Models\User;
-use App\Filament\Pages\SpamContactMessages;
+
 
 class ContactMessage extends Model
 {
@@ -55,8 +54,6 @@ class ContactMessage extends Model
 
                     $snippet = Str::limit(strip_tags($message->message), 120);
 
-                    $url = SpamContactMessages::getUrl();
-
                     Notification::make()
                         ->title('Spam Contact Message')
                         ->body("{$message->name} sent a message flagged as spam: \"{$snippet}\"")
@@ -64,13 +61,6 @@ class ContactMessage extends Model
                         ->iconColor('danger')
                         ->viewData([
                             'module' => 'Contact Message',
-                        ])
-                        ->actions([
-                            Action::make('open')
-                                ->label('Open Spam Messages')
-                                ->url($url)
-                                ->openUrlInNewTab(false) // ✅ FIXED
-                                ->markAsRead(),
                         ])
                         ->sendToDatabase($admins, isEventDispatched: true);
                 }

@@ -47,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Indigo,
                 'gray' => Color::Slate,
             ])
-            ->brandName('Legislative Tracking')
+            ->brandName('Sangguniang Bayan')
             ->brandLogo(fn () => view('filament.brand'))
             ->favicon(asset('images/Logo.png'))
             ->databaseNotifications()
