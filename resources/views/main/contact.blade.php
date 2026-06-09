@@ -33,7 +33,7 @@
                     <div class="space-y-6 text-sm text-white/90">
                         <div>
                             <p class="text-green-300 font-semibold">Email</p>
-                            <p>sblegis@gmail.com</p>
+                            <p>hilongossb@gmail.com</p>
                         </div>
                         <div>
                             <p class="text-green-300 font-semibold">Phone</p>

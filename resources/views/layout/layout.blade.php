@@ -225,23 +225,35 @@ $hero = \App\Models\Hero::published()->first();
                 </a>
 
                 <!-- Admin Links (mobile only) -->
-                <div class="sm:hidden border-t border-white/10 px-4 py-2.5 flex items-center gap-3">
-                    <a href="{{ route('filament.admin.auth.login') }}" title="Admin Portal"
+                <div class="sm:hidden border-t border-white/10 px-4 py-3 flex flex-col gap-3">
+
+                    {{-- Admin Portal --}}
+                    <a href="{{ route('filament.admin.auth.login') }}"
+                        title="Admin Portal"
                         class="flex items-center gap-2 text-xs font-semibold uppercase text-blue-300 hover:text-white transition-colors">
+
                         <i class="fa-solid fa-user-shield"></i>
                         <span>Admin Portal</span>
+
                     </a>
 
+                    {{-- Divider --}}
+                    <div class="border-t border-white/10"></div>
 
+                    {{-- Dashboard --}}
                     @auth
                         @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator())
-                            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('filament.admin.pages.dashboard') }}" title="Go Back to Dashboard"
+                            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('filament.admin.pages.dashboard') }}"
+                                title="Go Back to Dashboard"
                                 class="flex items-center gap-2 text-xs font-semibold uppercase text-blue-300 hover:text-white transition-colors">
+
                                 <i class="fa-solid fa-arrow-left"></i>
                                 <span>Dashboard</span>
+
                             </a>
                         @endif
                     @endauth
+
                 </div>
 
             </div>
