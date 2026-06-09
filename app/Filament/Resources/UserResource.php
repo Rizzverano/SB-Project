@@ -54,11 +54,7 @@ class UserResource extends Resource
 
     public static function getRoleLabel(int|string|null $role): string
     {
-        return match ((int) $role) {
-            UserModel::ADMIN => 'Admin',
-            UserModel::MEMBER => 'Member',
-            default => 'User',
-        };
+        return UserModel::roleLabel($role);
     }
 
     public static function sendAccountCreatedEmail(UserModel $user): void
@@ -149,6 +145,7 @@ class UserResource extends Resource
             TextInput::make('email')
                 ->label('Email')
                 ->email()
+                ->rule('email:rfc,dns')
                 ->required()
                 ->maxLength(255)
                 ->regex('/^\S*$/')
@@ -200,10 +197,7 @@ class UserResource extends Resource
             Select::make('role')
                 ->label('Role')
                 ->required()
-                ->options([
-                    0 => 'Admin',
-                    1 => 'Member',
-                ])
+                ->options(UserModel::roleOptions())
                 ->validationMessages([
                     'required' => 'Role is required.',
                 ]),
@@ -229,15 +223,9 @@ class UserResource extends Resource
                 TextColumn::make('email')->label('Email')->searchable(),
                 TextColumn::make('role')
                     ->label('Role')
-                    ->formatStateUsing(fn($state) => match ($state) {
-                        0 => 'Admin',
-                        1 => 'Member',
-                    })
+                    ->formatStateUsing(fn($state) => UserModel::roleLabel($state))
                     ->badge()
-                    ->color(fn($state) => match ($state) {
-                        0 => 'danger',
-                        1 => 'success',
-                    }),
+                    ->color(fn($state) => UserModel::roleColor($state)),
                 TextColumn::make('created_at')->dateTime()->label('Created'),
             ])
             ->striped()
@@ -257,14 +245,8 @@ class UserResource extends Resource
                         \Filament\Infolists\Components\TextEntry::make('role')
                             ->label('Role')
                             ->badge()
-                            ->formatStateUsing(fn($state) => match ($state) {
-                                0 => 'Admin',
-                                1 => 'Member',
-                            })
-                            ->color(fn($state) => match ($state) {
-                                0 => 'danger',
-                                1 => 'success',
-                            }),
+                            ->formatStateUsing(fn($state) => UserModel::roleLabel($state))
+                            ->color(fn($state) => UserModel::roleColor($state)),
                         \Filament\Infolists\Components\TextEntry::make('created_at')
                             ->label('Created')
                             ->dateTime(),

@@ -81,7 +81,7 @@
 
                                 {{-- Description --}}
                                 <div class="p-4 border-t-2 border-green-400">
-                                    <p class="text-slate-500 text-xs leading-relaxed">{{ $member->description }}</p>
+                                    <p class="text-slate-500 text-xs font-bold leading-relaxed">{{ $member->description }}</p>
                                 </div>
 
                             </div>
@@ -141,7 +141,7 @@
 
                                 {{-- Description --}}
                                 <div class="p-4 border-t-2 border-slate-300">
-                                    <p class="text-slate-500 text-xs leading-relaxed">{{ $member->description }}</p>
+                                    <p class="text-slate-500 text-xs font-bold leading-relaxed">{{ $member->description }}</p>
                                 </div>
 
                             </div>

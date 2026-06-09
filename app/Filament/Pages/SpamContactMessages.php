@@ -25,7 +25,7 @@ class SpamContactMessages extends Page implements HasTable
     protected static ?string $navigationLabel = 'Spam Messages';
     protected static ?string $navigationGroup = 'Admin Activities';
     protected static ?string $navigationIcon = 'heroicon-o-shield-exclamation';
-    protected static ?int $navigationSort = 17;
+    protected static ?int $navigationSort = 27;
 
     protected static string $view = 'filament.pages.spam-contact-messages';
 

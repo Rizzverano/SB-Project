@@ -59,6 +59,7 @@ class Profile extends Page implements HasForms
                 TextInput::make('email')
                     ->label('Email Address')
                     ->email()
+                    ->rule('email:rfc,dns')
                     ->required()
                     ->minLength(5)
                     ->maxLength(255)

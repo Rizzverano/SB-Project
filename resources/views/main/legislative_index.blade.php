@@ -493,7 +493,7 @@
                                         </td>
 
                                         <td class="px-5 py-4 text-dark text-xs max-w-[220px] whitespace-pre-wrap break-words">
-                                            {{ preg_replace('/^[ \t]+/m', '', $ordinance->description) ?? '—' }}
+                                            {{ preg_replace("/\s+/", " ", trim($ordinance->description)) ?: '—' }}
                                         </td>
 
                                         <td class="px-5 py-4 text-center text-xs text-slate-600">
@@ -811,7 +811,7 @@
                             <td class="px-5 py-3 text-xs text-slate-600 whitespace-nowrap">${new Date(row.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
                             <td class="px-5 py-3 text-left align-top">
                                 <p class="font-semibold text-blue-900 text-xs">${row.title}</p>
-                                <p class="text-dark text-xs mt-0.5 whitespace-pre-wrap break-words">${descriptionText}</p>
+                                <p class="text-dark text-xs font-bold mt-0.5 whitespace-pre-wrap break-words">${descriptionText}</p>
                             </td>
                             <td class="px-5 py-3 text-center text-xs text-slate-600">${row.sponsor || '—'}</td>
                             <td class="px-5 py-3 text-center text-xs text-slate-600">${row.action_taken || '—'}</td>

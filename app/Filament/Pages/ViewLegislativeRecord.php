@@ -43,15 +43,7 @@ class ViewLegislativeRecord extends Page implements HasInfolists
             return false;
         }
 
-        $permissions = match ($user->role) {
-            User::ADMIN => Permission::adminPermissions(),
-            User::MEMBER => Permission::memberPermissions(),
-            default => [],
-        };
-
-        $permissionValues = array_map(fn ($permission) => $permission->value, $permissions);
-
-        return in_array(Permission::DASHBOARD->value, $permissionValues, true);
+        return $user->hasPermission(Permission::DASHBOARD);
     }
 
     public function infolist(Infolist $infolist): Infolist

@@ -62,6 +62,7 @@ $hero = \App\Models\Hero::published()->first();
 </head>
 
 <body class="bg-slate-50 font-sans text-gray-600 overflow-x-hidden">
+    <x-loader />
     <div class="w-full max-w-[100vw] overflow-x-hidden">
 
 
@@ -231,9 +232,10 @@ $hero = \App\Models\Hero::published()->first();
                         <span>Admin Portal</span>
                     </a>
 
+
                     @auth
-                        @if (auth()->user()->isAdmin() || auth()->user()->isMember())
-                            <a href="{{ route('filament.admin.pages.dashboard') }}" title="Go Back to Dashboard"
+                        @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator())
+                            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('filament.admin.pages.dashboard') }}" title="Go Back to Dashboard"
                                 class="flex items-center gap-2 text-xs font-semibold uppercase text-blue-300 hover:text-white transition-colors">
                                 <i class="fa-solid fa-arrow-left"></i>
                                 <span>Dashboard</span>
@@ -450,8 +452,8 @@ $hero = \App\Models\Hero::published()->first();
                     <i class="fa-solid fa-user-shield"></i>
                 </a>
                 @auth
-                    @if (auth()->user()->isAdmin() || auth()->user()->isMember())
-                        <a href="{{ route('filament.admin.pages.dashboard') }}" title="Go Back"
+                    @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator())
+                        <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('filament.admin.pages.dashboard') }}" title="Go Back"
                             class="hidden sm:flex w-10 h-10 items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
                             <i class="fa-solid fa-arrow-left"></i>
                         </a>

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\RequiresStaffAccess;
 use Filament\Pages\Page;
 use App\Models\Ordinance;
 use Filament\Tables;
@@ -14,6 +15,7 @@ use Filament\Notifications\Notification;
 
 class ArchivedOrdinances extends Page implements HasTable
 {
+    use RequiresStaffAccess;
     use InteractsWithTable;
 
     public bool $accessGranted = false;
@@ -107,6 +109,11 @@ class ArchivedOrdinances extends Page implements HasTable
                     ->label('Published')
                     ->sortable()
                     ->toggleable(),
+
+                TextColumn::make('updated_at')
+                    ->label('Archived Date')
+                    ->dateTime('F d, Y h:i A')
+                    ->sortable(),
             ])
             ->striped()
             ->paginated([10, 25, 50])

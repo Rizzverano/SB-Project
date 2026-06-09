@@ -44,6 +44,17 @@ enum Permission: string
         ];
     }
 
+    /**
+     * Get permissions for Spectator role
+     * Dashboard only
+     */
+    public static function spectatorPermissions(): array
+    {
+        return [
+            self::DASHBOARD,
+        ];
+    }
+
 
     /**
      * Get permissions for a specific role
@@ -53,6 +64,7 @@ enum Permission: string
         return match ($role) {
             \App\Models\User::ADMIN => self::adminPermissions(),
             \App\Models\User::MEMBER => self::memberPermissions(),
+            \App\Models\User::SPECTATOR => self::spectatorPermissions(),
             default => [],
         };
     }

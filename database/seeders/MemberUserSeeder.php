@@ -11,7 +11,7 @@ class MemberUserSeeder extends Seeder
     public function run(): void
     {
         User::firstOrCreate(
-            ['email' => 'member@example.com'],
+            ['email' => 'divinazamora347@gmail.com'],
             [
                 'name' => 'Member User',
                 'password' => Hash::make('password123'),

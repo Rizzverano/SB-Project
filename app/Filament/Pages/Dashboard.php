@@ -22,13 +22,7 @@ class Dashboard extends Page
     {
         $user = auth()->user();
         if (!$user) return false;
-        $permissions = match ($user->role) {
-            \App\Models\User::ADMIN => \App\Enums\Permission::adminPermissions(),
-            \App\Models\User::MEMBER => \App\Enums\Permission::memberPermissions(),
-            default => [],
-        };
-        $permissionValues = array_map(fn($p) => $p->value, $permissions);
-        return in_array(\App\Enums\Permission::DASHBOARD->value, $permissionValues, true);
+        return $user->hasPermission(\App\Enums\Permission::DASHBOARD);
     }
 
     // ✅ THIS is the correct method for custom pages

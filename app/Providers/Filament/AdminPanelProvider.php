@@ -23,6 +23,7 @@ use App\Http\Middleware\EnsureUserIsActive;
 use \App\Http\Middleware\HideNotificationsForMembers;
 use App\Http\Middleware\NoCache;
 use Filament\Navigation\MenuItem;
+use Filament\View\PanelsRenderHook;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -35,11 +36,13 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn () => route('home'))
                     ->icon('heroicon-o-home')
                     ->group('Public View')
+                    ->visible(fn () => auth()->user()?->isStaff() || auth()->user()?->isSpectator())
                     ->sort(5),
                 NavigationItem::make('Transparency Page')
                     ->url(fn () => route('legislative_index'))
                     ->icon('heroicon-o-folder-open')
                     ->group('Public View')
+                    ->visible(fn () => auth()->user()?->isSpectator())
                     ->sort(5),
             ])
             ->default()
@@ -77,6 +80,10 @@ class AdminPanelProvider extends PanelProvider
                 HideNotificationsForMembers::class,
                 NoCache::class,
             ])
+            ->renderHook(
+                PanelsRenderHook::BODY_START,
+                fn () => view('components.loader')
+            )
             ->userMenuItems([
                 MenuItem::make()
                 ->label('Profile')

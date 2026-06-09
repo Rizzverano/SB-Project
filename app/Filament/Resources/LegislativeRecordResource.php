@@ -173,6 +173,11 @@ class LegislativeRecordResource extends Resource
                         },
                     )
                     ->searchable(),
+
+                TextColumn::make('created_at')
+                    ->label('Created Date')
+                    ->dateTime('F d, Y h:i A')
+                    ->sortable(),
             ])
             ->defaultSort('date', 'desc')
             ->striped()

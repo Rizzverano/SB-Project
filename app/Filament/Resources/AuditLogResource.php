@@ -29,7 +29,7 @@ class AuditLogResource extends Resource
 
     protected static ?string $modelLabel = 'Audit Log';
 
-    protected static ?int $navigationSort = 14;
+    protected static ?int $navigationSort = 24;
 
     public static function canViewAny(): bool
     {

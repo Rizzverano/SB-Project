@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\LegislativeRecord;
 
 class DatabaseSeeder extends Seeder
 {
@@ -23,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             MemberUserSeeder::class,
+            SpectatorSeeder::class,
         ]);
     }
 }

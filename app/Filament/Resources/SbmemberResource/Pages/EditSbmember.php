@@ -15,6 +15,11 @@ class EditSbmember extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\ViewAction::make()
+                ->label('View')
+                ->icon('heroicon-o-eye')
+                ->color('info'),
+
             Actions\Action::make('archive')
                 ->label('Mark as Former')
                 ->icon('heroicon-o-user-group')

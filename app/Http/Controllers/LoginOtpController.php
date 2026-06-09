@@ -18,6 +18,7 @@ class LoginOtpController extends Controller
 {
     private const MAX_ATTEMPTS = 5;
     private const OTP_TTL_MINUTES = 10;
+
     public function show()
     {
         if (! session('login_otp_pending_user_id')) {
@@ -42,24 +43,7 @@ class LoginOtpController extends Controller
             'otp' => ['required', 'digits:6'],
         ]);
 
-        $recaptchaToken = $request->input('token');
-
-        if (! $recaptchaToken) {
-            return back()->withErrors(new MessageBag([
-                'otp' => 'Security verification failed.',
-            ]));
-        }
-
-        $response = Http::asForm()->post(
-            'https://www.google.com/recaptcha/api/siteverify',
-            [
-                'secret' => config('services.recaptcha.secret_key'),
-                'response' => $recaptchaToken,
-                'remoteip' => $request->ip(),
-            ]
-        )->json();
-
-        if (! ($response['success'] ?? false)) {
+        if (! $this->passesRecaptcha($request)) {
             $this->recordLoginAttempt(
                 (string) session('login_otp_email', ''),
                 AuditLog::STATUS_FAILED,
@@ -81,15 +65,6 @@ class LoginOtpController extends Controller
 
         if (now()->timestamp > (int) session('login_otp_expires_at')) {
             $user = User::find($userId);
-
-            if ($user) {
-                // Try to automatically resend a fresh OTP when the previous one expired.
-                $sent = self::beginChallenge($user, (bool) session('login_otp_remember', false));
-
-                if ($sent) {
-                    return back()->with('status', 'Your OTP has expired. A new code has been sent to your email.');
-                }
-            }
 
             $this->forgetOtpSession();
 
@@ -137,8 +112,19 @@ class LoginOtpController extends Controller
         return $user->login_otp_verified_at === null;
     }
 
-    public static function beginChallenge(User $user, bool $remember = false): bool
+    public static function beginChallenge(User $user, bool $remember = false, bool $forceNewCode = false): bool
     {
+        if (
+            ! $forceNewCode &&
+            (int) session('login_otp_pending_user_id') === $user->id &&
+            session('login_otp_hash') &&
+            now()->timestamp <= (int) session('login_otp_expires_at')
+        ) {
+            session(['login_otp_remember' => $remember]);
+
+            return true;
+        }
+
         $otp = (string) random_int(100000, 999999);
 
         try {
@@ -195,7 +181,7 @@ class LoginOtpController extends Controller
 
         RateLimiter::hit($rateLimitKey, 3600);
 
-        $sent = self::beginChallenge($user, (bool) session('login_otp_remember', false));
+        $sent = self::beginChallenge($user, (bool) session('login_otp_remember', false), true);
 
         if (! $sent) {
             $message = 'Unable to send OTP right now. Please try again later.';
@@ -225,6 +211,38 @@ class LoginOtpController extends Controller
             'login_otp_expires_at',
             'login_otp_remember',
         ]);
+    }
+
+    protected function passesRecaptcha(Request $request): bool
+    {
+        $secretKey = config('services.recaptcha.secret_key');
+
+        if (! $secretKey) {
+            return true;
+        }
+
+        $recaptchaToken = $request->input('token');
+
+        if (! $recaptchaToken) {
+            return false;
+        }
+
+        try {
+            $response = Http::asForm()->post(
+                'https://www.google.com/recaptcha/api/siteverify',
+                [
+                    'secret' => $secretKey,
+                    'response' => $recaptchaToken,
+                    'remoteip' => $request->ip(),
+                ]
+            )->json();
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return false;
+        }
+
+        return (bool) ($response['success'] ?? false);
     }
 
     protected function recordLoginAttempt(string $email, string $status, Request $request): void

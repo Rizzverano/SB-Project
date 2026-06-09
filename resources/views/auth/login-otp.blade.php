@@ -1,6 +1,24 @@
 @php
     $email ??= session('login_otp_email');
+    $recaptchaSiteKey = config('services.recaptcha.site_key');
 @endphp
+
+<style>
+    #resend-otp-button {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-info, #185fa5);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: inherit;
+    text-decoration: none;
+    }
+</style>
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -22,7 +40,7 @@
             Enter the 6-digit code sent to {{ $email }}.
         </p>
 
-        <form method="POST" action="{{ route('login.otp.verify') }}" class="otp-modal-form">
+        <form method="POST" action="{{ route('login.otp.verify') }}" class="otp-modal-form" id="login-otp-form">
             @csrf
 
             <div>
@@ -37,9 +55,11 @@
                     autofocus
                 >
 
-                <p class="otp-modal-copy" style="font-size:0.75rem; color:#94a3b8; margin-top:0.5rem;">
-                    Protected by reCAPTCHA — <a href="https://policies.google.com/privacy" class="underline">Privacy</a> &amp; <a href="https://policies.google.com/terms" class="underline">Terms</a>
-                </p>
+                @if($recaptchaSiteKey)
+                    <p class="otp-modal-copy" style="font-size:0.75rem; color:#94a3b8; margin-top:0.5rem;">
+                        Protected by reCAPTCHA - <a href="https://policies.google.com/privacy" class="underline">Privacy</a> &amp; <a href="https://policies.google.com/terms" class="underline">Terms</a>
+                    </p>
+                @endif
 
                 @error('otp')
                     <p class="otp-modal-error">{{ $message }}</p>
@@ -53,16 +73,13 @@
             @endif
 
             <div style="margin-top:0.5rem; display:flex; gap:0.5rem; align-items:center;">
-                <form method="POST" action="{{ route('login.otp.resend') }}" id="resend-otp-form">
-                    @csrf
-                    <button type="submit" id="resend-otp-button">Resend code</button>
-                </form>
+                <a href="#" id="resend-otp-button">Resend code</a>
                 <div id="resend-countdown" style="color:#94a3b8; font-size:0.9rem;"></div>
             </div>
 
             <input type="hidden" name="token" id="recaptcha-token">
 
-            <button type="submit">
+            <button type="submit" id="verify-otp-button">
                 Verify and Continue
             </button>
         </form>
@@ -78,60 +95,59 @@
         }
     });
 </script>
-<script src="https://www.google.com/recaptcha/api.js?render={{ config('services.recaptcha.site_key') }}"></script>
-<script>
-    grecaptcha.ready(function () {
-        grecaptcha.execute("{{ config('services.recaptcha.site_key') }}", {action:'login'})
-            .then(function(token) {
-                document.getElementById('recaptcha-token').value = token;
-            });
-    });
-</script>
+
+@if($recaptchaSiteKey)
+    <script src="https://www.google.com/recaptcha/api.js?render={{ $recaptchaSiteKey }}"></script>
+@endif
+
 <script>
     (function () {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const otpForm = document.getElementById('login-otp-form');
+        const otpInput = document.getElementById('login-otp-code');
+        const verifyButton = document.getElementById('verify-otp-button');
+        const recaptchaToken = document.getElementById('recaptcha-token');
         const resendButton = document.getElementById('resend-otp-button');
-        const resendForm = document.getElementById('resend-otp-form');
         const countdownEl = document.getElementById('resend-countdown');
         const statusEl = document.getElementById('otp-status');
+        const recaptchaSiteKey = @json($recaptchaSiteKey);
 
         let expiresAt = @json(session('login_otp_expires_at')) || null;
         if (expiresAt) {
-            expiresAt = parseInt(expiresAt, 10) * 1000; // convert seconds -> ms
+            expiresAt = parseInt(expiresAt, 10) * 1000;
         }
 
-        let autoResent = false;
         let manualCooldown = false;
+        let isSubmitting = false;
 
-        function formatTime(s) {
-            if (s <= 0) return '00s';
-            return s + 's';
-        }
-
-        function updateCountdown() {
-            if (!expiresAt) {
-                countdownEl.textContent = '';
-                return;
-            }
-
-            const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
-
-            if (remaining > 0) {
-                countdownEl.textContent = 'Resend in ' + formatTime(remaining);
-            } else {
-                countdownEl.textContent = 'Code expired — requesting a new one...';
-
-                if (!autoResent) {
-                    autoResent = true;
-                    sendResend();
-                }
-            }
+        function formatTime(seconds) {
+            if (seconds <= 0) return '00s';
+            return seconds + 's';
         }
 
         function setStatus(message) {
             if (!statusEl) return;
             statusEl.textContent = message;
             statusEl.style.display = 'block';
+        }
+
+        function updateCountdown() {
+            if (!countdownEl || !expiresAt) {
+                if (countdownEl) countdownEl.textContent = '';
+                return;
+            }
+
+            const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
+            countdownEl.textContent = remaining > 0
+                ? 'Resend in ' + formatTime(remaining)
+                : 'Code expired. Please resend.';
+        }
+
+        function unlockResendAfterDelay() {
+            setTimeout(function () {
+                manualCooldown = false;
+                resendButton.disabled = false;
+            }, 30000);
         }
 
         function sendResend() {
@@ -160,31 +176,69 @@
                     setStatus(json.message || 'Unable to resend OTP.');
                 }
 
-                // re-enable after 30s
-                setTimeout(function () {
-                    manualCooldown = false;
-                    resendButton.disabled = false;
-                }, 30000);
+                unlockResendAfterDelay();
             }).catch(function () {
                 setStatus('Unable to resend OTP.');
-                setTimeout(function () {
-                    manualCooldown = false;
-                    resendButton.disabled = false;
-                }, 30000);
+                unlockResendAfterDelay();
             });
         }
 
-        // intercept manual form submit to use AJAX
-        if (resendForm) {
-            resendForm.addEventListener('submit', function (e) {
-                e.preventDefault();
-                if (manualCooldown) return;
-                autoResent = true; // avoid duplicate auto
+        function submitOtpForm() {
+            if (!recaptchaSiteKey) {
+                otpForm.submit();
+                return;
+            }
+
+            if (!window.grecaptcha) {
+                setStatus('Security verification is still loading. Please try again.');
+                verifyButton.disabled = false;
+                isSubmitting = false;
+                return;
+            }
+
+            grecaptcha.ready(function () {
+                grecaptcha.execute(recaptchaSiteKey, { action: 'login_otp_verify' })
+                    .then(function (token) {
+                        recaptchaToken.value = token;
+                        otpForm.submit();
+                    })
+                    .catch(function () {
+                        setStatus('Security verification failed. Please try again.');
+                        verifyButton.disabled = false;
+                        isSubmitting = false;
+                    });
+            });
+        }
+
+        if (otpForm) {
+            otpForm.addEventListener('submit', function (event) {
+                if (isSubmitting) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                const otp = (otpInput.value || '').trim();
+
+                if (!/^\d{6}$/.test(otp)) {
+                    setStatus('Please enter the 6-digit OTP code.');
+                    otpInput.focus();
+                    return;
+                }
+
+                isSubmitting = true;
+                verifyButton.disabled = true;
+                submitOtpForm();
+            });
+        }
+
+        if (resendButton) {
+            resendButton.addEventListener('click', function (event) {
+                event.preventDefault();
                 sendResend();
             });
         }
 
-        // start countdown timer
         setInterval(updateCountdown, 1000);
         updateCountdown();
     })();

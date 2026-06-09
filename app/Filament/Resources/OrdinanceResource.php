@@ -165,11 +165,16 @@ class OrdinanceResource extends Resource
                     ->label('Published')
                     ->sortable()
                     ->toggleable(),
+
+                TextColumn::make('created_at')
+                    ->label('Created Date')
+                    ->dateTime('F d, Y h:i A')
+                    ->sortable(),
             ])
             ->striped()
             ->paginated([10, 25, 50])
             ->filters([
-                        Tables\Filters\SelectFilter::make('sponsor')
+                Tables\Filters\SelectFilter::make('sponsor')
                 ->label('Filter by Sponsor')
                 ->options(
                     \App\Models\Ordinance::where('is_archived', false)

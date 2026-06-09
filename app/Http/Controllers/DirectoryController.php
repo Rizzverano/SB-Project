@@ -9,6 +9,14 @@ use Illuminate\Support\Str;
 use App\Models\Sbmember;
 use App\Models\CitizensCharter;
 use App\Models\OrganizationalChart;
+use App\Models\Accomplishment;
+use App\Models\Recognition;
+use App\Models\SbTarget;
+use App\Models\SbOutlook;
+use App\Models\OfficialsImage;
+use App\Models\SbsecImage;
+use App\Models\SbsecTarget;
+use App\Models\SbsecOutlook;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
 
@@ -16,9 +24,23 @@ class DirectoryController extends Controller
 {
     public function welcome()
     {
-        $membersCount = Sbmember::where('is_publish', true)->where('is_archived', false)->count();
+        $membersCount = Sbmember::where('is_publish', true)
+            ->where('is_archived', false)
+            ->count();
 
-        return view('welcome', compact('membersCount'));
+        $officialsImage = OfficialsImage::where('published', true)
+            ->latest()
+            ->first();
+
+        $sbsecImage = SbsecImage::where('published', true)
+            ->latest()
+            ->first();
+
+        return view('welcome', compact(
+            'membersCount',
+            'officialsImage',
+            'sbsecImage'
+        ));
     }
 
     public function about()
@@ -137,11 +159,56 @@ class DirectoryController extends Controller
 
     public function sbinfo()
     {
-        return view('main.sb-info');
+        $officialsImage = OfficialsImage::where('published', true)
+            ->latest()
+            ->first();
+
+        $accomplishments = Accomplishment::where('published', true)
+            ->orderBy('committee_name')
+            ->get()
+            ->groupBy('committee_name');
+
+        $recognitions = Recognition::where('published', true)
+            ->latest()
+            ->get();
+
+        $targets = SbTarget::where('published', true)
+            ->orderBy('title')
+            ->get()
+            ->groupBy('title');
+
+        $outlooks = SbOutlook::where('published', true)
+            ->get()
+            ->groupBy('type');
+
+        return view('main.sb-info', compact(
+            'officialsImage',
+            'accomplishments',
+            'recognitions',
+            'targets',
+            'outlooks'
+        ));
     }
 
     public function sbsec()
     {
-        return view('main.sb-sec');
+        $sbsecImage = SbsecImage::where('published', true)
+            ->latest()
+            ->first();
+
+        $targets = SbsecTarget::where('published', true)
+            ->orderBy('title')
+            ->get()
+            ->groupBy('title');
+
+        $outlooks = SbsecOutlook::where('published', true)
+            ->get()
+            ->groupBy('type');
+
+        return view('main.sb-sec', compact(
+            'sbsecImage',
+            'targets',
+            'outlooks'
+        ));
     }
 }

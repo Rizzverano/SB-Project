@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RequiresStaffAccess;
 use App\Filament\Resources\SbmemberResource\Pages;
 use App\Models\Sbmember;
 use Filament\Forms;
@@ -27,6 +28,8 @@ use Filament\Infolists\Components\Grid;
 
 class SbmemberResource extends Resource
 {
+    use RequiresStaffAccess;
+
     protected static ?string $model = Sbmember::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
@@ -39,7 +42,7 @@ class SbmemberResource extends Resource
 
     protected static ?string $pluralModelLabel = 'SB Members';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 20;
 
     public static function form(Form $form): Form
     {
@@ -92,6 +95,11 @@ class SbmemberResource extends Resource
                     ->label('Published')
                     ->sortable()
                     ->toggleable(),
+
+                TextColumn::make('created_at')
+                    ->label('Uploaded Date')
+                    ->dateTime('F d, Y h:i A')
+                    ->sortable(),
             ])
             ->striped()
             ->paginated([10, 25, 50])

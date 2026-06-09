@@ -41,8 +41,10 @@ class SpamHelper
             'putangina','putangina',
             'pucha','punyeta','bwisit','leche',
             'yawa','pistingyawa','pestengyawa','pistengyawa',
+            'pestingyawa',
             'animalka',
             'otin','oten','bilat','belat','bisong','besong','alimbarok',
+            'peste', 'kolera', 'kulera',
 
             // emoji
             '🤬', '🖕'

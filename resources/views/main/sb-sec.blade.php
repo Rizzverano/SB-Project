@@ -31,9 +31,11 @@
 
             {{-- Right: Image --}}
             <div class="flex-1 w-full">
-                <img src="{{ asset('images/sb-sec.jpg') }}"
-                    class="w-full h-auto object-contain block"
-                    alt="Office of the Secretary to the Sanggunian">
+                <img src="{{ optional($sbsecImage)->image
+                    ? asset('storage/' . $sbsecImage->image)
+                    : asset('images/sb-sec.jpg') }}"
+                class="w-full h-auto object-contain block"
+                alt="Office of the Secretary to the Sanggunian">
             </div>
 
         </div>
@@ -110,53 +112,42 @@
             </p>
         </div>
 
-        @php
-            $targets = [
-                [
-                    'title' => 'Full Digitalization of Legislative Records and Archives',
-                    'items' => [
-                        'Establish a digital records management system for ordinances, resolutions and minutes with supporting documents',
-                        'Create an online database accessible to the public for transparency and easy search',
-                        'Secure back-up systems for disaster recovery and data security',
-                    ],
-                ],
-                [
-                    'title' => 'Legislation Portal or Kiosk Installation',
-                    'items' => [
-                        'Set up a self-service kiosk at the Legislative Building for easy access to enacted ordinances and resolutions',
-                    ],
-                ],
-                [
-                    'title' => 'Capacity Support for Barangay Legislative Secretaries',
-                    'items' => [
-                        'Conduct training or quarterly workshops for Barangay Secretaries on legislative documentation, formatting of resolutions and proper archiving',
-                    ],
-                ],
-                [
-                    'title' => 'Assistance in the Establishment of Barangay Reading Centers',
-                    'items' => [
-                        'Facilitation in the accreditation of fifty-one (51) Barangay Reading Centers',
-                    ],
-                ],
-            ];
-        @endphp
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @foreach ($targets as $target)
-            <div class="border border-white/10 bg-white/5 p-5">
-                <h4 class="text-green-300 text-[10px] tracking-[0.25em] uppercase font-bold mb-3 pb-2 border-b border-white/10">
-                    {{ $target['title'] }}
-                </h4>
-                <ul class="space-y-2">
-                    @foreach ($target['items'] as $item)
-                    <li class="flex items-start gap-2">
-                        <span class="text-green-400 flex-shrink-0 mt-0.5 font-bold text-xs">▸</span>
-                        <span class="text-white/65 text-xs leading-snug">{{ $item }}</span>
-                    </li>
-                    @endforeach
-                </ul>
-            </div>
-            @endforeach
+            @forelse ($targets as $title => $items)
+
+                <div class="border border-white/10 bg-white/5 p-5">
+
+                    <h4 class="text-green-300 text-[10px] tracking-[0.25em] uppercase font-bold mb-3 pb-2 border-b border-white/10">
+                        {{ $title }}
+                    </h4>
+
+                    <ul class="space-y-2">
+
+                        @foreach ($items as $target)
+
+                            <li class="flex items-start gap-2">
+                                <span class="text-green-400 flex-shrink-0 mt-0.5 font-bold text-xs">
+                                    ▸
+                                </span>
+
+                                <span class="text-white/65 text-xs leading-snug">
+                                    {{ $target->description }}
+                                </span>
+                            </li>
+
+                        @endforeach
+
+                    </ul>
+
+                </div>
+
+            @empty
+
+                <div class="col-span-full text-center py-10 text-white/40">
+                    No targets available.
+                </div>
+
+            @endforelse
         </div>
 
     </div>
@@ -189,37 +180,33 @@
                 </div>
 
                 <div class="space-y-4">
-                    <div class="border-l-2 border-red-400/60 pl-4">
-                        <p class="text-blue-950 text-sm font-semibold mb-1">Funding Constraints / Insufficient Budget Allocation</p>
-                        <ul class="space-y-1 mt-2">
-                            @foreach ([
-                                'Digitization projects require initial investment in hardware, software, storage as well as maintenance costs for licenses, upgrades and equipment replacement',
-                                'Most barangays operate with small budgets and barangay reading centers are not usually prioritized in Annual / Supplemental Budgets',
-                            ] as $item)
-                            <li class="flex items-start gap-2 text-slate-500 text-xs leading-snug">
-                                <span class="text-red-400 flex-shrink-0 mt-0.5">▸</span>
-                                <span>{{ $item }}</span>
-                            </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    <div class="border-l-2 border-red-400/60 pl-4">
-                        <p class="text-blue-950 text-sm font-semibold mb-1">Risk Mitigation</p>
-                        <ul class="space-y-1 mt-2">
-                            @foreach ([
-                                'Low digital literacy among staff',
-                                'Lack of in-house IT personnel to design, deploy and maintain the portal or kiosk system',
-                                'Poor equipment and infrastructure at the Barangay level',
-                                'Data security / cyber security risks',
-                                'Connectivity and accessibility issues',
-                            ] as $item)
-                            <li class="flex items-start gap-2 text-slate-500 text-xs leading-snug">
-                                <span class="text-red-400 flex-shrink-0 mt-0.5">▸</span>
-                                <span>{{ $item }}</span>
-                            </li>
-                            @endforeach
-                        </ul>
-                    </div>
+                    @foreach (($outlooks['Challenges'] ?? collect())->groupBy('title') as $title => $items)
+
+                        <div class="border-l-2 border-red-400/60 pl-4">
+
+                            @if($title)
+                                <p class="text-blue-950 text-sm font-semibold mb-1">
+                                    {{ $title }}
+                                </p>
+                            @endif
+
+                            <ul class="space-y-1 mt-2">
+                                @foreach($items as $item)
+                                    <li class="flex items-start gap-2 text-slate-500 text-xs leading-snug">
+                                        <span class="text-red-400 flex-shrink-0 mt-0.5">
+                                            ▸
+                                        </span>
+
+                                        <span>
+                                            {{ $item->description }}
+                                        </span>
+                                    </li>
+                                @endforeach
+                            </ul>
+
+                        </div>
+
+                    @endforeach
                 </div>
             </div>
 
@@ -234,41 +221,42 @@
                     <h4 class="font-playfair text-blue-950 text-lg font-bold">Suggested Actions</h4>
                 </div>
 
-                @php
-                    $actions = [
-                        [
-                            'group' => 'Secure Policy Support',
-                            'items' => [
-                                'An ordinance for the creation of Local Legislative Staff Officer III',
-                            ],
-                        ],
-                        [
-                            'group' => 'Digital Governance',
-                            'items' => [
-                                'Procurement and installation of Legislation Portal or Kiosk',
-                                'Procurement of additional desktop computers',
-                                'Establishment of legislative website',
-                            ],
-                        ],
-                    ];
-                @endphp
-
                 <div class="space-y-4">
-                    @foreach ($actions as $i => $action)
-                    <div class="border-l-2 border-green-400/60 pl-4">
-                        <p class="text-blue-950 text-sm font-semibold mb-2">{{ $action['group'] }}</p>
-                        <ul class="space-y-1">
-                            @foreach ($action['items'] as $j => $item)
-                            <li class="flex items-start gap-2">
-                                <span class="flex-shrink-0 w-4 h-4 bg-green-50 border border-green-200 text-green-600 text-[9px] font-bold flex items-center justify-center mt-0.5">
-                                    {{ $j + 1 }}
-                                </span>
-                                <span class="text-slate-600 text-xs leading-snug">{{ $item }}</span>
-                            </li>
-                            @endforeach
-                        </ul>
-                    </div>
+
+                    @foreach (($outlooks['Suggestions'] ?? collect())->groupBy('title') as $title => $items)
+
+                        <div class="border-l-2 border-green-400/60 pl-4">
+
+                            @if($title)
+                                <p class="text-blue-950 text-sm font-semibold mb-2">
+                                    {{ $title }}
+                                </p>
+                            @endif
+
+                            <ul class="space-y-1">
+
+                                @foreach($items as $index => $item)
+
+                                    <li class="flex items-start gap-2">
+
+                                        <span class="flex-shrink-0 w-4 h-4 bg-green-50 border border-green-200 text-green-600 text-[9px] font-bold flex items-center justify-center mt-0.5">
+                                            {{ $index + 1 }}
+                                        </span>
+
+                                        <span class="text-slate-600 text-xs leading-snug">
+                                            {{ $item->description }}
+                                        </span>
+
+                                    </li>
+
+                                @endforeach
+
+                            </ul>
+
+                        </div>
+
                     @endforeach
+
                 </div>
             </div>
 

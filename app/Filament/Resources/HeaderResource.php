@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RequiresStaffAccess;
 use App\Filament\Resources\HeaderResource\Pages;
 use App\Models\Header;
 use Filament\Forms;
@@ -20,6 +21,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class HeaderResource extends Resource
 {
+    use RequiresStaffAccess;
+
     protected static ?string $model = Header::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';

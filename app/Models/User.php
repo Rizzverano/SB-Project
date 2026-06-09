@@ -16,6 +16,7 @@ class User extends Authenticatable implements FilamentUser
 
     const ADMIN = 0;
     const MEMBER = 1;
+    const SPECTATOR = 2;
 
     /**
      * The attributes that are mass assignable.
@@ -49,6 +50,7 @@ class User extends Authenticatable implements FilamentUser
     protected $casts = [
         'email_verified_at' => 'datetime',
         'login_otp_verified_at' => 'datetime',
+        'role' => 'integer',
         'password' => 'hashed',
     ];
 
@@ -80,6 +82,48 @@ class User extends Authenticatable implements FilamentUser
     public function isMember()
     {
         return $this->role === self::MEMBER;
+    }
+
+    public function isSpectator()
+    {
+        return $this->role === self::SPECTATOR;
+    }
+
+    public function isStaff()
+    {
+        return in_array($this->role, [self::ADMIN, self::MEMBER], true);
+    }
+
+    public static function roleOptions(): array
+    {
+        return [
+            self::ADMIN => 'Admin',
+            self::MEMBER => 'Member',
+            self::SPECTATOR => 'Spectator',
+        ];
+    }
+
+    public static function roleLabel(int|string|null $role): string
+    {
+        if ($role === null || $role === '') {
+            return 'User';
+        }
+
+        return self::roleOptions()[(int) $role] ?? 'User';
+    }
+
+    public static function roleColor(int|string|null $role): string
+    {
+        if ($role === null || $role === '') {
+            return 'gray';
+        }
+
+        return match ((int) $role) {
+            self::ADMIN => 'danger',
+            self::MEMBER => 'success',
+            self::SPECTATOR => 'info',
+            default => 'gray',
+        };
     }
 
 

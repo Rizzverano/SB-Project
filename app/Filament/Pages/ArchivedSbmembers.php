@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\RequiresStaffAccess;
 use App\Models\Sbmember;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -20,13 +21,14 @@ use Filament\Infolists\Components\Grid;
 
 class ArchivedSbmembers extends Page implements HasTable
 {
+    use RequiresStaffAccess;
     use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static string $view = 'filament.pages.archived-sbmembers';
     protected static ?string $navigationGroup = 'Officials';
     protected static ?string $navigationLabel = 'Former SB Members';
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 21;
 
     public function getTitle(): string
     {
@@ -61,6 +63,10 @@ class ArchivedSbmembers extends Page implements HasTable
                     ->label('Published')
                     ->sortable()
                     ->toggleable(),
+                TextColumn::make('updated_at')
+                    ->label('Marked Date')
+                    ->dateTime('F d, Y h:i A')
+                    ->sortable(),
             ])
             ->striped()
             ->paginated([10, 25, 50])

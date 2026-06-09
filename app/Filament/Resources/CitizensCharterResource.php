@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RequiresStaffAccess;
 use App\Filament\Resources\CitizensCharterResource\Pages;
 use App\Models\CitizensCharter;
 use Filament\Forms;
@@ -13,12 +14,14 @@ use Filament\Tables\Columns\CheckboxColumn;
 
 class CitizensCharterResource extends Resource
 {
+    use RequiresStaffAccess;
+
     protected static ?string $model = CitizensCharter::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Documents';
     protected static ?string $navigationLabel = 'Citizens Charter';
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 22;
 
     public static function form(Form $form): Form
     {

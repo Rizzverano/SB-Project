@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\RequiresStaffAccess;
 use Filament\Pages\Page;
 use App\Models\LegislativeRecord;
 use Filament\Tables\Contracts\HasTable;
@@ -22,6 +23,7 @@ use Illuminate\Support\Collection;
 
 class ArchivedLegislativeRecords extends Page implements HasTable
 {
+    use RequiresStaffAccess;
     use InteractsWithTable;
 
     public bool $accessGranted = false;
@@ -109,6 +111,10 @@ class ArchivedLegislativeRecords extends Page implements HasTable
                     ->label('Action Taken')
                     ->badge()
                     ->color('warning'),
+                TextColumn::make('updated_at')
+                    ->label('Archived Date')
+                    ->dateTime('F d, Y h:i A')
+                    ->sortable(),
             ])
             ->striped()
             ->paginated([10, 25, 50])

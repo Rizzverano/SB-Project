@@ -70,7 +70,10 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
 
                         <div class="relative h-64 sm:h-80">
-                            <img src="{{ asset('images/SB-Members.jpg') }}" class="w-full h-full object-cover"
+                            <img src="{{ $officialsImage && $officialsImage->image
+                                    ? asset('storage/' . $officialsImage->image)
+                                    : asset('images/SB-Members.jpg') }}"
+                                class="w-full h-full object-cover"
                                 alt="SB Members">
                             <div class="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-900/40 to-transparent">
                             </div>
@@ -128,7 +131,10 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
 
                         <div class="relative h-64 sm:h-80">
-                            <img src="{{ asset('images/SB-Sec.jpg') }}" class="w-full h-full object-cover"
+                            <img src="{{ $sbsecImage && $sbsecImage->image
+                                    ? asset('storage/' . $sbsecImage->image)
+                                    : asset('images/SB-Sec.jpg') }}"
+                                class="w-full h-full object-cover"
                                 alt="SB Secretary">
                             <div class="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-900/40 to-transparent">
                             </div>

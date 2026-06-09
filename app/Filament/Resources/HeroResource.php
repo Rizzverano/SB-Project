@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RequiresStaffAccess;
 use App\Filament\Resources\HeroResource\Pages;
 use App\Models\Hero;
 use Filament\Forms;
@@ -20,6 +21,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class HeroResource extends Resource
 {
+    use RequiresStaffAccess;
+
     protected static ?string $model = Hero::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';

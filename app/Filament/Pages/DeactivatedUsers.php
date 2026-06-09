@@ -63,15 +63,9 @@ class DeactivatedUsers extends Page implements HasTable
 
                 TextColumn::make('role')
                     ->label('Role')
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        0 => 'Admin',
-                        1 => 'Member',
-                    })
+                    ->formatStateUsing(fn ($state) => User::roleLabel($state))
                     ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        0 => 'danger',
-                        1 => 'success',
-                    }),
+                    ->color(fn ($state) => User::roleColor($state)),
 
                 TextColumn::make('updated_at')
                     ->label('Deactivated At')
@@ -136,10 +130,7 @@ class DeactivatedUsers extends Page implements HasTable
                                     ->helperText('Leave blank to keep current password.'),
 
                                 Select::make('role')
-                                    ->options([
-                                        0 => 'Admin',
-                                        1 => 'Member',
-                                    ])
+                                    ->options(User::roleOptions())
                                     ->required(),
                             ]),
 

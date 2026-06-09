@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RequiresStaffAccess;
 use App\Filament\Resources\OrganizationalChartResource\Pages;
 use App\Models\OrganizationalChart;
 use Filament\Resources\Resource;
@@ -23,12 +24,14 @@ use Filament\Infolists\Components\Grid;
 
 class OrganizationalChartResource extends Resource
 {
+    use RequiresStaffAccess;
+
     protected static ?string $model = OrganizationalChart::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Documents';
     protected static ?string $navigationLabel = 'Organizational Chart';
-    protected static ?int $navigationSort = 13;
+    protected static ?int $navigationSort = 23;
 
     public static function form(Form $form): Form
     {

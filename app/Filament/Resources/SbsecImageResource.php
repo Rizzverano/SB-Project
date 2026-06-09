@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\RequiresStaffAccess;
 use App\Filament\Resources\SbsecImageResource\Pages;
 use App\Models\SbsecImage;
 use Filament\Forms;
@@ -21,12 +22,14 @@ use Filament\Tables\Columns\ImageColumn;
 
 class SbsecImageResource extends Resource
 {
+    use RequiresStaffAccess;
+
     protected static ?string $model = SbsecImage::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';
-    protected static ?string $navigationGroup = 'SB Secretary Office Details';
+    protected static ?string $navigationGroup = 'SB Secretariat Details';
     protected static ?string $navigationLabel = 'SB Secretary Office Image';
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 17;
 
     public static function form(Form $form): Form
     {
@@ -35,6 +38,7 @@ class SbsecImageResource extends Resource
                 FileUpload::make('image')
                     ->image()
                     ->directory('sbsec-images')
+                    ->columnSpanFull()
                     ->required(),
 
                 Section::make('Visibility')
@@ -62,15 +66,39 @@ class SbsecImageResource extends Resource
                     ->sortable()
                     ->toggleable(),
             ])
-            ->filters([
-                Tables\Filters\TernaryFilter::make('published')
-                    ->label('Published Status'),
-            ])
+            ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->paginated([10, 25, 50])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label('View')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->modal()
+                    ->infolist([
+                        \Filament\Infolists\Components\Section::make('SB Secretary Office Preview')
+                            ->schema([
+                                \Filament\Infolists\Components\ImageEntry::make('image')
+                                    ->disk('public')
+                                    ->height(250),
+
+                                \Filament\Infolists\Components\IconEntry::make('published')
+                                    ->label('Published')
+                                    ->boolean(),
+
+                                \Filament\Infolists\Components\TextEntry::make('created_at')
+                                    ->label('Created')
+                                    ->dateTime('F d, Y h:i A'),
+                            ]),
+                    ]),
+
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->requiresConfirmation(),
             ]);
     }
 
