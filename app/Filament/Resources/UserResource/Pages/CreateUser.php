@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Hash;
 use Filament\Notifications\Notification;
@@ -10,6 +11,17 @@ use Filament\Notifications\Notification;
 class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('back')
+                ->label('Back to List')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(UserResource::getUrl('index')),
+        ];
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

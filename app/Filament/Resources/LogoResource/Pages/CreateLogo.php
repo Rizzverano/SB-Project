@@ -11,6 +11,18 @@ class CreateLogo extends CreateRecord
 {
     protected static string $resource = LogoResource::class;
 
+    protected function getHeaderActions(): array
+    {
+        return
+            [
+                Actions\Action::make('back')
+                    ->label('Back to List')
+                    ->icon('heroicon-o-arrow-left')
+                    ->color('gray')
+                    ->url(LogoResource::getUrl('index')),
+            ];
+    }
+
     protected function afterCreate(): void
     {
         /** @var Logo $record */

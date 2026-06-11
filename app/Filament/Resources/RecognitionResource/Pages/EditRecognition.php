@@ -13,6 +13,12 @@ class EditRecognition extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('back')
+                ->label('Back to List')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(RecognitionResource::getUrl('index')),
+
             Actions\ViewAction::make()
                 ->label('View')
                 ->icon('heroicon-o-eye')

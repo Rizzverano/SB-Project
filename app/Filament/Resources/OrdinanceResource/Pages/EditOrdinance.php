@@ -14,6 +14,12 @@ class EditOrdinance extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('back')
+                ->label('Back to List')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(OrdinanceResource::getUrl('index')),
+
             Actions\Action::make('archive')
                 ->label('Archive')
                 ->icon('heroicon-o-archive-box')

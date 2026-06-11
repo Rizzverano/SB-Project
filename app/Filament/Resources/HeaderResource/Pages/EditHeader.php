@@ -14,6 +14,12 @@ class EditHeader extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('back')
+                ->label('Back to List')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(HeaderResource::getUrl('index')),
+
             Actions\ViewAction::make()
                 ->label('View')
                 ->icon('heroicon-o-eye')

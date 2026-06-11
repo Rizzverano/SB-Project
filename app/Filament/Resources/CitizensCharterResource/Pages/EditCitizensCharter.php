@@ -13,6 +13,12 @@ class EditCitizensCharter extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('back')
+                ->label('Back to List')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(CitizensCharterResource::getUrl('index')),
+
             Actions\DeleteAction::make()
                 ->label('Delete')
                 ->icon('heroicon-o-trash')

@@ -14,7 +14,7 @@
 </head>
 
 <body class="min-h-screen bg-slate-50 font-sans flex flex-col text-gray-600">
-
+    <x-loader />
     {{-- Header --}}
     <header class="bg-blue-900 px-6 py-4 flex items-center justify-center gap-3 shadow-md">
         <img
@@ -34,7 +34,7 @@
     </header>
 
     {{-- Main --}}
-    <main class="flex-1 flex items-center justify-center px-4 py-16">
+    <main class="flex-1 flex items-center justify-center px-4 py-12">
 
         <div class="max-w-3xl w-full">
 

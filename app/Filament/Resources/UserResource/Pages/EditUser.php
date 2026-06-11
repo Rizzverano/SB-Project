@@ -17,6 +17,12 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('back')
+                ->label('Back to List')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(UserResource::getUrl('index')),
+
             Action::make('deactivate')
                 ->label('Deactivate User')
                 ->icon('heroicon-o-user-minus')
