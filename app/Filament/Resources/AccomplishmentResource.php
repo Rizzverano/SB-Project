@@ -18,7 +18,7 @@ class AccomplishmentResource extends Resource
 
     protected static ?string $model = Accomplishment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?string $navigationGroup = 'SB Members Details';
     protected static ?string $navigationLabel = 'Major Accomplishments';
     protected static ?int $navigationSort = 13;

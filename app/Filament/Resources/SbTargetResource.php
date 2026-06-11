@@ -18,7 +18,7 @@ class SbTargetResource extends Resource
 
     protected static ?string $model = SbTarget::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-flag';
+    protected static ?string $navigationIcon = 'heroicon-o-arrow-trending-up';
     protected static ?string $navigationGroup = 'SB Members Details';
     protected static ?string $navigationLabel = 'SB Targets';
     protected static ?int $navigationSort = 15;

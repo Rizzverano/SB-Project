@@ -18,7 +18,7 @@ class SbsecTargetResource extends Resource
 
     protected static ?string $model = SbsecTarget::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-flag';
+    protected static ?string $navigationIcon = 'heroicon-o-arrow-trending-up';
     protected static ?string $navigationGroup = 'SB Secretariat Details';
     protected static ?string $navigationLabel = 'SBSEC Targets';
     protected static ?int $navigationSort = 18;
