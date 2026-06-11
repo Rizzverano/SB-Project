@@ -243,12 +243,14 @@ $hero = \App\Models\Hero::published()->first();
                     {{-- Dashboard --}}
                     @auth
                         @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator())
-                            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('filament.admin.pages.dashboard') }}"
+                            <a href="{{ str_starts_with(url()->previous(), url('/admin'))
+                                    ? url()->previous()
+                                    : route('filament.admin.pages.dashboard') }}"
                                 title="Go Back to Dashboard"
                                 class="flex items-center gap-2 text-xs font-semibold uppercase text-blue-300 hover:text-white transition-colors">
 
                                 <i class="fa-solid fa-arrow-left"></i>
-                                <span>Dashboard</span>
+                                <span>Go Back</span>
 
                             </a>
                         @endif
@@ -465,7 +467,9 @@ $hero = \App\Models\Hero::published()->first();
                 </a>
                 @auth
                     @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator())
-                        <a href="{{ url()->previous() !== url()->current() ? url()->previous() : route('filament.admin.pages.dashboard') }}" title="Go Back"
+                        <a href="{{ str_starts_with(url()->previous(), url('/admin'))
+                                    ? url()->previous()
+                                    : route('filament.admin.pages.dashboard') }}" title="Go Back"
                             class="hidden sm:flex w-10 h-10 items-center justify-center text-blue-500 shadow-md hover:bg-blue-800 hover:text-white">
                             <i class="fa-solid fa-arrow-left"></i>
                         </a>
