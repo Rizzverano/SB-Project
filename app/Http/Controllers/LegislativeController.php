@@ -40,6 +40,7 @@ class LegislativeController extends Controller
             'BUSINESS FOR THE DAY',
             'UNASSIGNED BUSINESS',
             'OTHER MATTERS',
+            'NO QUORUM'
         ];
 
         $allGroups = $orbusQuery

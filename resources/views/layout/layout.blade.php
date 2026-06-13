@@ -611,7 +611,8 @@ $hero = \App\Models\Hero::published()->first();
                     Contact Information</h4>
                 <p class="text-xs sm:text-sm leading-6 sm:leading-8 text-white/60">Address: Western Barangay Hilongos,
                     Leyte</p>
-                <p class="text-xs sm:text-sm leading-6 sm:leading-8 text-white/60">Phone: (+63) 954 305 6206 </p>
+                <p class="text-xs sm:text-sm leading-6 sm:leading-8 text-white/60">Tel Phone (Sangguniang Bayan): 567 - 9703 </p>
+                <p class="text-xs sm:text-sm leading-6 sm:leading-8 text-white/60">Tel Phone (SB Secretary): 567 - 9704 </p>
                 <p class="text-xs sm:text-sm leading-6 sm:leading-8 text-white/60">Opening Hours: Monday to Friday</p>
                 <p class="text-xs sm:text-sm leading-6 sm:leading-8 text-white/60">8:00 AM – 5:00 PM (no noon break)
                 </p>

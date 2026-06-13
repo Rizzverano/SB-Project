@@ -36,8 +36,12 @@
                             <p>hilongossb@gmail.com</p>
                         </div>
                         <div>
-                            <p class="text-green-300 font-semibold">Phone</p>
-                            <p>+63 987 654 3210</p>
+                            <p class="text-green-300 font-semibold">Tel Phone (Sangguniang Bayan)</p>
+                            <p>567 - 9703</p>
+                        </div>
+                        <div>
+                            <p class="text-green-300 font-semibold">Tel Phone (SB Secretary)</p>
+                            <p>567 - 9704</p>
                         </div>
                         <div>
                             <p class="text-green-300 font-semibold">Address</p>

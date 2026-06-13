@@ -130,6 +130,7 @@ class LegislativeRecordResource extends Resource
                     'BUSINESS FOR THE DAY' => 'BUSINESS FOR THE DAY',
                     'UNASSIGNED BUSINESS' => 'UNASSIGNED BUSINESS',
                     'OTHER MATTERS' => 'OTHER MATTERS',
+                    'NO QUORUM' => 'NO QUORUM',
                 ])
                 ->searchable()
                 ->required()
