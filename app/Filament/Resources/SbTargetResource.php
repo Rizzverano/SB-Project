@@ -28,11 +28,13 @@ class SbTargetResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('title')
                 ->required()
+                ->placeholder('e.g; SOCIAL PROTECTION')
                 ->columnSpanFull()
                 ->maxLength(255),
 
             Forms\Components\Textarea::make('description')
                 ->required()
+                ->placeholder('e.g; Ordinance Revising / Amending the Gender and Development Code of 2019')
                 ->rows(5)
                 ->columnSpanFull(),
 
@@ -74,6 +76,7 @@ class SbTargetResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->color('info')
+                    ->icon('heroicon-o-eye')
                     ->modal()
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('SB Target Overview')

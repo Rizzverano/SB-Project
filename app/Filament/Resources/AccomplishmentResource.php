@@ -28,14 +28,17 @@ class AccomplishmentResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('committee_name')
                 ->required()
+                ->placeholder('e.g; HEALTH NUTRITION AND SANITATION')
                 ->maxLength(255),
 
             Forms\Components\TextInput::make('ord_no')
                 ->required()
+                ->placeholder('e.g; 2022-13')
                 ->maxLength(255),
 
             Forms\Components\TextInput::make('ord_title')
                 ->required()
+                ->placeholder('e.g; Health and Sanitation Code of Hilongos')
                 ->columnSpanFull()
                 ->maxLength(255),
 
@@ -79,6 +82,7 @@ class AccomplishmentResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->color('info')
+                    ->icon('heroicon-o-eye')
                     ->modal()
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('Accomplishment Overview')

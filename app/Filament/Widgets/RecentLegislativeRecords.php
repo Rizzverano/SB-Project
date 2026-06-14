@@ -54,7 +54,7 @@ class RecentLegislativeRecords extends BaseWidget
                 Tables\Actions\ViewAction::make()
                     ->url(fn (LegislativeRecord $record): string => ViewLegislativeRecord::getUrl([
                         'record' => $record,
-                    ]))->color('info'),
+                    ]))->color('info')->icon('heroicon-o-eye'),
             ])
             ->heading('Recent Legislative Records');
     }

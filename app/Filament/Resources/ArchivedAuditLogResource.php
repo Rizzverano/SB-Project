@@ -163,6 +163,7 @@ class ArchivedAuditLogResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->color('info')
+                    ->icon('heroicon-o-eye')
                     ->modal()
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('Audit Details') // renamed for clarity

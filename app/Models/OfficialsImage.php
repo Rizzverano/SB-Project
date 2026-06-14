@@ -11,6 +11,7 @@ class OfficialsImage extends Model
 
     protected $fillable = [
         'image',
+        'welcome_image',
         'published',
     ];
 

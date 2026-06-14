@@ -27,6 +27,8 @@ class SbOutlookResource extends Resource
     {
         return $form->schema([
             Forms\Components\Select::make('type')
+                ->label('Outlook Types')
+                ->placeholder('Either choose Challenges or Suggestions')
                 ->options([
                     'Challenges' => 'Challenges',
                     'Suggestions' => 'Suggestions',
@@ -35,9 +37,11 @@ class SbOutlookResource extends Resource
                 ->native(false),
 
             Forms\Components\TextInput::make('title')
+                ->placeholder('e.g; Funding Constraints or leave this field empty')
                 ->maxLength(255),
 
             Forms\Components\Textarea::make('description')
+                ->placeholder('Challenges e.g; Lack of Funding / Suggestions e.g; Codification of General Ordinances')
                 ->required()
                 ->rows(5)
                 ->columnSpanFull(),
@@ -57,6 +61,7 @@ class SbOutlookResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\BadgeColumn::make('type')
+                    ->label('Outlook Type')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('title')
@@ -83,6 +88,7 @@ class SbOutlookResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->color('info')
+                    ->icon('heroicon-o-eye')
                     ->modal()
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('SB Outlook Overview')

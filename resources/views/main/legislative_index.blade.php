@@ -35,10 +35,10 @@
 
                     <div class="flex-1 min-w-[180px]">
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
-                            @auth Search Session / @endauth Title
+                            @auth @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator()) Search Session / @endif @endauth Title
                         </label>
                         <input type="text" name="session" value="{{ request('session') }}"
-                            placeholder="e.g. @auth First Regular Session / @endauth TASK FORCE - ORD NO. 11"
+                            placeholder="e.g. @auth @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator()) First Regular Session / @endif @endauth TASK FORCE - ORD NO. 11"
                             class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm
                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                                    placeholder:text-slate-300 transition">
@@ -46,7 +46,7 @@
 
                     <div class="min-w-[160px]">
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">
-                            @auth Filter by Date @endauth
+                            @auth @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator()) Filter by Date @endif @endauth
                             @guest Filter by Date Published @endguest
                         </label>
                         <input type="date" name="date" value="{{ request('date') }}"
@@ -101,6 +101,7 @@
                 </button>
 
                 @auth
+                @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator())
                 <button type="button" class="tab-btn relative z-10 flex items-center gap-2 px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300
                                {{ $activeTab === 'orbus'
                                         ? 'bg-blue-800 text-white shadow-md'
@@ -120,6 +121,7 @@
                     <i class="fa-solid fa-box-archive text-xs"></i>
                     Old ORBOS
                 </button>
+                @endif
                 @endauth
 
                 <span id="tabIndicator"
@@ -130,6 +132,7 @@
         </div>
 
         @auth
+        @if (auth()->user()->isAdmin() || auth()->user()->isMember() || auth()->user()->isSpectator())
         {{-- ══ ORBOS TAB ══ --}}
         <div id="orbusTab" class="tab-panel {{ $activeTab === 'orbus' ? '' : 'hidden' }}">
             @if ($records->count() > 0)
@@ -333,6 +336,7 @@
                 </div>
             @endif
         </div>
+        @endif
         @endauth
 
         {{-- ══ OLD ORDINANCE TAB ══ --}}
@@ -349,7 +353,7 @@
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Action</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Publish Through</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Date Published</th>
-                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">N/A</th>
+                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">N/A Date Published</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">View</th>
                                 </tr>
                             </thead>
@@ -480,7 +484,7 @@
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Action</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Publish Through</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">Date Published</th>
-                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">N/A</th>
+                                    <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">N/A Date Published</th>
                                     <th class="px-5 py-4 text-xs font-bold uppercase tracking-wider">View</th>
                                 </tr>
                             </thead>

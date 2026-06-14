@@ -122,6 +122,7 @@ class LogoResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->color('info')
+                    ->icon('heroicon-o-eye')
                     ->modal()
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('Logo set overview')

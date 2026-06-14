@@ -28,6 +28,7 @@ class SbsecOutlookResource extends Resource
         return $form->schema([
             Forms\Components\Select::make('type')
                 ->label('Outlook Type')
+                ->placeholder('Either choose Challenges or Suggestions')
                 ->options([
                     'Challenges' => 'Challenges',
                     'Suggestions' => 'Suggestions',
@@ -37,10 +38,12 @@ class SbsecOutlookResource extends Resource
 
             Forms\Components\TextInput::make('title')
                 ->maxLength(255)
+                ->placeholder('e.g; RISK MITIGATION or leave this field empty')
                 ->nullable(),
 
             Forms\Components\Textarea::make('description')
                 ->required()
+                ->placeholder('Challenges e.g; Low digital literacy among staff / Suggestions e.g; Procurement of additional desktop computers')
                 ->rows(5)
                 ->columnSpanFull(),
 
@@ -59,6 +62,7 @@ class SbsecOutlookResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\BadgeColumn::make('type')
+                    ->label('Outlook Type')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('title')
@@ -85,6 +89,7 @@ class SbsecOutlookResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->color('info')
+                    ->icon('heroicon-o-eye')
                     ->modal()
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('SBSEC Outlook Overview')

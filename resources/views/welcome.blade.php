@@ -70,11 +70,11 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
 
                         <div class="relative h-64 sm:h-80">
-                            <img src="{{ $officialsImage && $officialsImage->image
-                                    ? asset('storage/' . $officialsImage->image)
-                                    : asset('images/SB-Members.jpg') }}"
-                                class="w-full h-full object-cover"
-                                alt="SB Members">
+                            <img src="{{ $officialsImage && $officialsImage->welcome_image
+                                        ? asset('storage/' . $officialsImage->welcome_image)
+                                        : asset('images/SB-Members.jpg') }}"
+                                        class="w-full h-full object-cover"
+                                        alt="SB Members">
                             <div class="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-blue-900/40 to-transparent">
                             </div>
                             <div class="absolute bottom-0 p-6">

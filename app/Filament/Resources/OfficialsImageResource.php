@@ -33,10 +33,17 @@ class OfficialsImageResource extends Resource
         return $form
             ->schema([
                 FileUpload::make('image')
+                    ->label('Officials Image')
                     ->image()
                     ->directory('officials-images')
                     ->columnSpanFull()
                     ->required(),
+
+                FileUpload::make('welcome_image')
+                    ->label('Modified Officials Image')
+                    ->image()
+                    ->directory('officials-images')
+                    ->columnSpanFull(),
 
                 Section::make('Visibility')
                     ->schema([
@@ -54,6 +61,12 @@ class OfficialsImageResource extends Resource
             ->columns([
                 ImageColumn::make('image')
                     ->label('Officials')
+                    ->disk('public')
+                    ->square()
+                    ->size(72),
+
+                ImageColumn::make('welcome_image')
+                    ->label('Modified Officials Image')
                     ->disk('public')
                     ->square()
                     ->size(72),
@@ -76,6 +89,12 @@ class OfficialsImageResource extends Resource
                         \Filament\Infolists\Components\Section::make('Officials Preview')
                             ->schema([
                                 \Filament\Infolists\Components\ImageEntry::make('image')
+                                    ->label('Officials Image')
+                                    ->disk('public')
+                                    ->height(250),
+
+                                \Filament\Infolists\Components\ImageEntry::make('welcome_image')
+                                    ->label('Modified Officials Image')
                                     ->disk('public')
                                     ->height(250),
 

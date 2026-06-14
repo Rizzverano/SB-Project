@@ -40,7 +40,7 @@ class HeaderResource extends Resource
                 ->description('Upload the header image displayed on the homepage.')
                 ->schema([
                     FileUpload::make('image')
-                        ->label('Header Image')
+                        ->label('Header Image - SB Hilongos Banner')
                         ->image()
                         ->imageEditor()
                         ->disk('public')
@@ -92,6 +92,8 @@ class HeaderResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->modal()
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('Header Preview')
                             ->schema([

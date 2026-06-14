@@ -121,6 +121,15 @@ class SpamContactMessages extends Page implements HasTable
                     ->requiresConfirmation()
                     ->modalHeading('Block Sender')
                     ->modalDescription('Block email and device permanently?')
+                    ->visible(function (ContactMessage $record) {
+                        return ! (
+                            \App\Models\BlockedEmail::where('email', $record->email)->exists() ||
+                            (
+                                ! empty($record->ip_address) &&
+                                \App\Models\BlockedIp::where('ip_address', $record->ip_address)->exists()
+                            )
+                        );
+                    })
                     ->action(function (ContactMessage $record) {
 
                         BlockedEmail::firstOrCreate([

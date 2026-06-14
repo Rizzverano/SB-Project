@@ -27,11 +27,15 @@ class RecognitionResource extends Resource
     {
         return $form->schema([
             Forms\Components\TextInput::make('award')
+                ->label('Award Type')
                 ->required()
+                ->placeholder('e.g; 3RD RUNNER UP (1st-3rd Class Municipalities)')
                 ->maxLength(255),
 
             Forms\Components\TextInput::make('category')
+                ->label('Recognition Description')
                 ->required()
+                ->placeholder('e.g; 2023 Local Legislative Award Regional Onsite Validation')
                 ->maxLength(255),
 
             Forms\Components\Section::make('Visibility')
@@ -49,9 +53,11 @@ class RecognitionResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('award')
+                    ->label('Award Type')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('category')
+                    ->label('Recognition Description')
                     ->searchable(),
 
                 CheckboxColumn::make('published')
@@ -70,6 +76,7 @@ class RecognitionResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->color('info')
+                    ->icon('heroicon-o-eye')
                     ->modal()
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('Recognition Overview')

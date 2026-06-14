@@ -25,7 +25,7 @@
     height: 100%;
 
     /* white transparent background */
-    background: rgba(248, 250, 252, 0.8);
+    background: rgba(203, 213, 225, 0.8);
 
     display: flex;
     justify-content: center;

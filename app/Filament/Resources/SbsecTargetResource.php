@@ -28,11 +28,13 @@ class SbsecTargetResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('title')
                 ->required()
+                ->placeholder('e.g; Full Digitalization of Legislative Records and Archives')
                 ->columnSpanFull()
                 ->maxLength(255),
 
             Forms\Components\Textarea::make('description')
                 ->required()
+                ->placeholder('e.g; Secure back-up systems for disaster recovery and data security.')
                 ->rows(5)
                 ->columnSpanFull(),
 
@@ -74,6 +76,7 @@ class SbsecTargetResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->color('info')
+                    ->icon('heroicon-o-eye')
                     ->modal()
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('SBSEC Target Overview')

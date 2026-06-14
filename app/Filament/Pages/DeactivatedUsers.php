@@ -116,18 +116,55 @@ class DeactivatedUsers extends Page implements HasTable
                         Section::make('User Information')
                             ->schema([
                                 TextInput::make('name')
+                                    ->label('Full Name')
                                     ->required()
-                                    ->maxLength(50),
+                                    ->maxLength(50)
+                                    ->minLength(3)
+                                    ->regex('/^[a-zA-Z\s]+$/')
+                                    ->validationMessages([
+                                        'required' => 'Name is required.',
+                                        'min' => 'Name must be at least 3 characters.',
+                                        'regex' => 'Name must only contain letters and spaces.',
+                                    ]),
 
                                 TextInput::make('email')
+                                    ->label('Email Address')
                                     ->email()
+                                    ->rule('email:rfc,dns')
                                     ->required()
-                                    ->maxLength(50),
+                                    ->minLength(5)
+                                    ->maxLength(255)
+                                    ->regex('/^\S*$/')
+                                    ->unique(table: 'users', column: 'email', ignorable: auth()->user())
+                                    ->validationMessages([
+                                        'required' => 'Email is required.',
+                                        'email' => 'Enter a valid email address.',
+                                        'unique' => 'This email is already taken.',
+                                        'regex' => 'Email must not contain spaces.',
+                                    ]),
 
                                 TextInput::make('password')
                                     ->password()
                                     ->revealable()
-                                    ->helperText('Leave blank to keep current password.'),
+                                    ->nullable()
+                                    ->minLength(8)
+                                    ->maxLength(255)
+                                    ->regex('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])\S+$/')
+                                    ->same('password_confirmation')
+                                    ->helperText(str('
+                                        <div class="grid grid-cols-2 gap-x-6 gap-y-1 mt-2 text-xs text-gray-400">
+                                            <span>• At least 8 characters</span>
+                                            <span>• One uppercase letter</span>
+                                            <span>• One lowercase letter</span>
+                                            <span>• One number</span>
+                                            <span>• One symbol (! @ # $ % ^ & *)</span>
+                                        </div>
+                                    ')->toHtmlString())
+                                    ->validationMessages([
+                                        'min'       => 'Password must be at least 12 characters.',
+                                        'same'      => 'Passwords do not match.',
+                                        'regex'     => 'Password must have at least 12 characters, one uppercase letter, one lowercase letter, one number, and one symbol (! @ # $ % ^ & *).',
+                                    ]),
 
                                 Select::make('role')
                                     ->options(User::roleOptions())

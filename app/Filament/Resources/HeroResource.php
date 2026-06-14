@@ -40,7 +40,7 @@ class HeroResource extends Resource
                 ->description('Upload the hero images displayed on the homepage banner.')
                 ->schema([
                     FileUpload::make('image1')
-                        ->label('Hero Image 1')
+                        ->label('Hero Image 1 - SB Hilongos Building')
                         ->image()
                         ->imageEditor()
                         ->disk('public')
@@ -49,7 +49,7 @@ class HeroResource extends Resource
                         ->helperText('Primary hero image.'),
 
                     FileUpload::make('image2')
-                        ->label('Hero Image 2')
+                        ->label('Hero Image 2 - LGU Hilongos Building')
                         ->image()
                         ->imageEditor()
                         ->disk('public')
@@ -106,6 +106,8 @@ class HeroResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->modal()
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
                     ->infolist([
                         \Filament\Infolists\Components\Section::make('Hero Preview')
                             ->schema([
