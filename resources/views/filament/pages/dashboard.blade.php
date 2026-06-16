@@ -31,7 +31,7 @@
                 <div>
                     <p class="text-sm text-gray-500">SB Members</p>
                     <p class="text-2xl font-bold">
-                        {{ \App\Models\SbMember::query()->where('is_archived', false)->count() }}
+                        {{ \App\Models\Sbmember::query()->where('is_archived', false)->count() }}
                     </p>
                 </div>
 
